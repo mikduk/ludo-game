@@ -1,21 +1,9 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
+# Podstawowe pliki systemowe
 .DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-migrate_working_dir/
-
-# IntelliJ/Android Studio related
 *.iml
-*.ipr
-*.iws
+*.hprof
 .idea/
-.vscode/
+*.swp
 
 # Flutter/Dart
 .dart_tool/
@@ -25,6 +13,13 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 build/
+
+# Android
+/android/.gradle/
+/android/app/build/
+/android/local.properties
+/android/.idea/
+/android/gradle/wrapper/gradle-wrapper.properties
 
 # iOS/macOS
 ios/Flutter/Generated.xcconfig
@@ -36,42 +31,44 @@ ios/build/
 macos/Pods/
 /macos/build/
 
-# Android
-/android/.gradle/
-/android/app/build/
-/android/local.properties
-/android/.idea/
-/android/gradle/wrapper/gradle-wrapper.properties
-/android/app/debug
-/android/app/profile
-/android/app/release
-
-# Windows/Linux/Web
-windows/flutter/ephemeral/
-windows/build/
+# Linux
 linux/flutter/ephemeral/
 linux/build/
+
+# Windows
+windows/flutter/ephemeral/
+windows/build/
+
+# Web
 web/.dart_tool/
-web/build/
+/web/build/
 
 # Firebase
 .firebase/
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 
-# Symbolication related
-app.*.symbols
+# Konfiguracja VS Code i IntelliJ/Android Studio
+.vscode/
+.idea/workspace.xml
+.idea/libraries/
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/modules.xml
+.idea/.name
+*.ipr
+*.iws
+*.bak
+*.tmp
 
-# Obfuscation related
-app.*.map.json
-
-# Pliki tymczasowe
+# Pliki tymczasowe i cache
+*.log
 *.tmp
 *.bak
 *.lock
 *.temp
 
-# Pliki generowane przez Flutter/Dart do testów
+# Pliki do testów i eksperymentów
 /test/.flutter-plugins
 /test/build/
 coverage/
