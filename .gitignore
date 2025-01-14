@@ -1,0 +1,87 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ/Android Studio related
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# iOS/macOS
+ios/Flutter/Generated.xcconfig
+ios/Pods/
+/ios/.symlinks/
+/ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/build/
+macos/Pods/
+/macos/build/
+
+# Android
+/android/.gradle/
+/android/app/build/
+/android/local.properties
+/android/.idea/
+/android/gradle/wrapper/gradle-wrapper.properties
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Windows/Linux/Web
+windows/flutter/ephemeral/
+windows/build/
+linux/flutter/ephemeral/
+linux/build/
+web/.dart_tool/
+web/build/
+
+# Firebase
+.firebase/
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Pliki tymczasowe
+*.tmp
+*.bak
+*.lock
+*.temp
+
+# Pliki generowane przez Flutter/Dart do testów
+/test/.flutter-plugins
+/test/build/
+coverage/
+
+# Specjalne dla systemu Windows
+*.exe
+*.dll
+*.bat
+*.cmd
+Thumbs.db
+
+# Specjalne dla systemu Linux/Mac
+*.out
