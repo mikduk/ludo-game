@@ -180,11 +180,9 @@ class GamePageController extends GetxController {
 
   Future<void> goToField(int x, int pow, int pawnNumber) async {
     print('|goToField| x: $x, pow: $pow, pawnNumber: $pawnNumber');
-    int result = board[x];
-    List<int> attackMoves = [1, 10, 100, 1000];
-    if (result == 0) {
+    if (board[x] == 0) {
       board[x] = pow;
-    } else if (attackMoves.contains(result) && pow != result) {
+    } else if (canCapture(x, pow)) {
       await capture(x, pow);
       board[x] = pow;
     } else {
@@ -193,6 +191,19 @@ class GamePageController extends GetxController {
     positionPawns[4 * tenLog(pow) + pawnNumber] = x;
     await endTurn();
     print('|goToField| END');
+  }
+
+  bool canCapture(int x, int pow, {bool teamMode=false}) {
+    List<int> saveFields = [4, 12, 17, 25, 30, 38, 43, 51];
+    List<int> attackMoves = [1, 10, 100, 1000];
+    int result = board[x];
+
+    if (x < 4 || x > 55 || saveFields.contains(x)) {
+      return false;
+    } else if (attackMoves.contains(result) && pow != result) { // TODO
+      return true;
+    }
+    return false;
   }
 
   Future<void> capture(int x, int pow) async {
