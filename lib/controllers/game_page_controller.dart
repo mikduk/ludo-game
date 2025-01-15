@@ -180,6 +180,7 @@ class GamePageController extends GetxController {
 
   Future<void> goToField(int x, int pow, int pawnNumber) async {
     print('|goToField| x: $x, pow: $pow, pawnNumber: $pawnNumber');
+    await goToFieldAnimate(positionPawns[4 * tenLog(pow) + pawnNumber], x, pow);
     if (board[x] == 0) {
       board[x] = pow;
     } else if (canCapture(x, pow)) {
@@ -191,6 +192,23 @@ class GamePageController extends GetxController {
     positionPawns[4 * tenLog(pow) + pawnNumber] = x;
     await endTurn();
     print('|goToField| END');
+  }
+
+  Future<void> goToFieldAnimate(int from, int to, int pow, {Duration delayTime=const Duration(milliseconds: 180)}) async {
+    int originalPosition = from;
+    while (from != to) {
+      if (3 < from && to < 56) {
+        from++;
+        if (from > 55) {
+          from = 4;
+        }
+        board[from] += pow;
+      } else {
+        return;
+      }
+      await Future.delayed(delayTime);
+      board[from] -= pow;
+    }
   }
 
   bool canCapture(int x, int pow, {bool teamMode=false}) {
