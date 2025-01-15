@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/game_page_controller.dart';
+import 'base_squared.dart';
 import 'board_squared.dart';
 
 class GamePage extends StatelessWidget {
@@ -250,10 +251,25 @@ class GamePage extends StatelessWidget {
           Positioned(top: t + s * 0, left: l + s * 9, child: BoardSquare(index: 78, color: Colors.yellow.shade200)),
           const Positioned(top: t + s * 0, left: l + s * 8, child: BoardSquare(index: 79, color: Colors.yellow)),
           //
-          const Positioned(top: t + s * 8, left: l + s * 1, child: BoardSquare(index: 0)),
-          const Positioned(bottom: t + s * 8, left: l + s * 3, child: BoardSquare(index: 1)),
-          const Positioned(bottom: t + s * 8, right: l + s * 3, child: BoardSquare(index: 2)),
-          const Positioned(top: t + s * 8, right: l + s * 1, child: BoardSquare(index: 3)),
+          const Positioned(top: t + s * 5.5, left: l + s * 3, child: BaseSquare(index: 0)),
+          const Positioned(top: t + s * 5.5, left: l + s * 4, child: BaseSquare(index: 1)),
+          const Positioned(top: t + s * 6.5, left: l + s * 3, child: BaseSquare(index: 2)),
+          const Positioned(top: t + s * 6.5, left: l + s * 4, child: BaseSquare(index: 3)),
+          //
+          const Positioned(top: t - s * 4, left: l + s * 0.5, child: BaseSquare(index: 4)),
+          const Positioned(top: t - s * 4, left: l + s * 1.5, child: BaseSquare(index: 5)),
+          const Positioned(top: t - s * 3, left: l + s * 0.5, child: BaseSquare(index: 6)),
+          const Positioned(top: t - s * 3, left: l + s * 1.5, child: BaseSquare(index: 7)),
+          //
+          const Positioned(top: t - s * 6.5, left: l + s * 10, child: BaseSquare(index: 8, color: Colors.green)),
+          const Positioned(top: t - s * 6.5, left: l + s * 11, child: BaseSquare(index: 9, color: Colors.green)),
+          const Positioned(top: t - s * 5.5, left: l + s * 10, child: BaseSquare(index: 10, color: Colors.green)),
+          const Positioned(top: t - s * 5.5, left: l + s * 11, child: BaseSquare(index: 11, color: Colors.green)),
+          //
+          const Positioned(top: t + s * 3, left: l + s * 12.5, child: BaseSquare(index: 12)),
+          const Positioned(top: t + s * 3, left: l + s * 13.5, child: BaseSquare(index: 12)),
+          const Positioned(top: t + s * 4, left: l + s * 12.5, child: BaseSquare(index: 12)),
+          const Positioned(top: t + s * 4, left: l + s * 13.5, child: BaseSquare(index: 12)),
 
 
         ],
