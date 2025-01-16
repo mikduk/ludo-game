@@ -12,27 +12,50 @@ class BoardSquare extends StatelessWidget {
   Widget build(BuildContext context) {
     final GamePageController controller = Get.find<GamePageController>();
 
-    return Obx(() => Container(
-      width: 29.0,
-      height: 29.0,
-      decoration: BoxDecoration(
-        color: color ?? Colors.grey.shade100,
-        border: Border.all()
-      ),
-      child: Center(
-        child: Text(
-          showPawn(controller.board[index]), // Wyświetla wartość board[index]
-          style: const TextStyle(
-            fontSize: 6.0,
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
+    return Obx(() => InkWell(
+        onTap: () => fieldAction(controller),
+        child: Container(
+          width: 29.0,
+          height: 29.0,
+          decoration: BoxDecoration(
+              color: color ?? Colors.grey.shade100, border: Border.all()),
+          child: Center(
+            child: Text(
+              showPawn(
+                  controller.board[index]), // Wyświetla wartość board[index]
+              style: const TextStyle(
+                fontSize: 6.0,
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-        ),
-      ),
-    ));
+        )));
   }
 
-  String showPawn(int field){
+  Future<void> fieldAction(GamePageController controller) async {
+    print('fieldAction: $index, ==> [${controller.board[index]}]');
+    int result = controller.board[index];
+    if (result == 0) {
+      return;
+    }
+    int currentPlayerIndex =
+        controller.colors.indexOf(controller.currentPlayer.value);
+    int foundPawn = -1;
+    print('currentPlayerIndex: $currentPlayerIndex');
+    for (int i = 0; i < 4; i++) {
+      if (controller.positionPawns[4 * currentPlayerIndex + i] == index) {
+        foundPawn = i;
+        break;
+      }
+    }
+    print('foundPawn: $foundPawn, ${controller.positionPawns}');
+    if (foundPawn >= 0 && foundPawn <= 3) {
+      await controller.movePawn(pawnNumber: foundPawn);
+    }
+  }
+
+  String showPawn(int field) {
     try {
       if (field == 0) {
         return '';
@@ -55,6 +78,5 @@ class BoardSquare extends StatelessWidget {
       print(e);
       return 'E';
     }
-
   }
 }

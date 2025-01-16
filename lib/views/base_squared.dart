@@ -12,27 +12,36 @@ class BaseSquare extends StatelessWidget {
   Widget build(BuildContext context) {
     final GamePageController controller = Get.find<GamePageController>();
 
-    return Obx(() => Container(
-      width: 29.0,
-      height: 29.0,
-      decoration: BoxDecoration(
-        color: color ?? Colors.grey.shade100,
-        border: Border.all()
-      ),
-      child: Center(
-        child: Text(
-          showPawn(controller.positionPawns[index]), // Wyświetla wartość board[index]
-          style: const TextStyle(
-            fontSize: 6.0,
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
+    return Obx(() => InkWell(
+        onTap: () => fieldAction(controller),
+        child: Container(
+          width: 29.0,
+          height: 29.0,
+          decoration: BoxDecoration(
+              color: color ?? Colors.grey.shade100, border: Border.all()),
+          child: Center(
+            child: Text(
+              showPawn(controller
+                  .positionPawns[index]), // Wyświetla wartość board[index]
+              style: const TextStyle(
+                fontSize: 6.0,
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-        ),
-      ),
-    ));
+        )));
   }
 
-  String showPawn(int field){
+  Future<void> fieldAction(GamePageController controller) async {
+    if (controller.positionPawns[index] >= 4) {
+      return;
+    }
+
+    await controller.movePawn(pawnNumber: index % 4);
+  }
+
+  String showPawn(int field) {
     try {
       if (field > 3) {
         return '';
@@ -43,6 +52,5 @@ class BaseSquare extends StatelessWidget {
       print(e);
       return 'E';
     }
-
   }
 }
