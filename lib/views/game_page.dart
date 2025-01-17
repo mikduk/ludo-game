@@ -4,6 +4,7 @@ import '../controllers/game_page_controller.dart';
 import 'base_squared.dart';
 import 'board_squared.dart';
 import 'diagonal_squared.dart';
+import 'four_color_squared.dart';
 
 class GamePage extends StatelessWidget {
   const GamePage({super.key, required this.title});
@@ -94,50 +95,55 @@ class GamePage extends StatelessWidget {
               child: const Icon(Icons.casino),
             ),
           ),
-          // Positioned(
-          //   bottom: 170,
-          //   left: 93,
-          //   child: FloatingActionButton(
-          //     heroTag: 'btn5',
-          //     backgroundColor: Colors.blueGrey,
-          //     onPressed: gameController.moveFirstPawn,
-          //     tooltip: 'Move pawn',
-          //     child: const Icon(Icons.directions_walk),
-          //   ),
-          // ),
-          // Positioned(
-          //   bottom: 170,
-          //   left: 154,
-          //   child: FloatingActionButton(
-          //     heroTag: 'btn6',
-          //     backgroundColor: Colors.blueGrey,
-          //     onPressed: gameController.moveSecondPawn,
-          //     tooltip: 'Move pawn',
-          //     child: const Icon(Icons.directions_walk),
-          //   ),
-          // ),
-          // Positioned(
-          //   bottom: 170,
-          //   left: 215,
-          //   child: FloatingActionButton(
-          //     heroTag: 'btn7',
-          //     backgroundColor: Colors.blueGrey,
-          //     onPressed: gameController.moveThirdPawn,
-          //     tooltip: 'Move pawn',
-          //     child: const Icon(Icons.directions_walk),
-          //   ),
-          // ),
-          // Positioned(
-          //   bottom: 170,
-          //   left: 276,
-          //   child: FloatingActionButton(
-          //     heroTag: 'btn8',
-          //     backgroundColor: Colors.blueGrey,
-          //     onPressed: gameController.moveFourthPawn,
-          //     tooltip: 'Move pawn',
-          //     child: const Icon(Icons.directions_walk),
-          //   ),
-          // ),
+          const Positioned(
+            top: t - s * 1,
+            left: l + s * 6,
+            child: DiagonalSquare(
+              color1: Colors.green,
+              color2: Colors.red,
+              isTopLeftToBottomRight: false,
+            ),
+          ),
+          const Positioned(
+            top: t + s * 1,
+            left: l + s * 6,
+            child: DiagonalSquare(
+              color1: Colors.red,
+              color2: Colors.blue,
+              isTopLeftToBottomRight: true,
+            ),
+          ),
+          const Positioned(
+            top: t - s * 1,
+            left: l + s * 8,
+            child: DiagonalSquare(
+              color1: Colors.green,
+              color2: Colors.yellow,
+              isTopLeftToBottomRight: true,
+            ),
+          ),
+          const Positioned(
+            top: t + s * 1,
+            left: l + s * 8,
+            child: DiagonalSquare(
+              color1: Colors.yellow,
+              color2: Colors.blue,
+              isTopLeftToBottomRight: false,
+            ),
+          ),
+          const Positioned(
+            top: t + s * 0,
+            left: l + s * 7,
+            child: FourColorSquare(
+              topLeftColor: Colors.red,
+              topRightColor: Colors.green,
+              bottomLeftColor: Colors.blue,
+              bottomRightColor: Colors.yellow,
+              showBorder: true,
+              borderColor: Colors.black,
+              borderWidth: 0.0,
+            ),
+          ),
           Positioned(
             top: 40,
             left: 160,
@@ -314,14 +320,14 @@ class GamePage extends StatelessWidget {
               top: t + s * 3,
               left: l + s * 7,
               child: BoardSquare(index: 59, color: Colors.blue.shade200)),
+          const Positioned(
+              top: t + s * 1,
+              left: l + s * 7,
+              child: BoardSquare(index: 61, color: Colors.blue, border: false)),
           Positioned(
               top: t + s * 2,
               left: l + s * 7,
               child: BoardSquare(index: 60, color: Colors.blue.shade200)),
-          const Positioned(
-              top: t + s * 1,
-              left: l + s * 7,
-              child: BoardSquare(index: 61, color: Colors.blue)),
           //
           Positioned(
               top: t + s * 0,
@@ -339,14 +345,14 @@ class GamePage extends StatelessWidget {
               top: t + s * 0,
               left: l + s * 4,
               child: BoardSquare(index: 65, color: Colors.red.shade200)),
+          const Positioned(
+              top: t + s * 0,
+              left: l + s * 6,
+              child: BoardSquare(index: 67, color: Colors.red, border: false)),
           Positioned(
               top: t + s * 0,
               left: l + s * 5,
               child: BoardSquare(index: 66, color: Colors.red.shade200)),
-          const Positioned(
-              top: t + s * 0,
-              left: l + s * 6,
-              child: BoardSquare(index: 67, color: Colors.red)),
           //
           Positioned(
               top: t - s * 6,
@@ -364,14 +370,14 @@ class GamePage extends StatelessWidget {
               top: t - s * 3,
               left: l + s * 7,
               child: BoardSquare(index: 71, color: Colors.green.shade200)),
+          const Positioned(
+              top: t - s * 1,
+              left: l + s * 7,
+              child: BoardSquare(index: 73, color: Colors.green, border: false)),
           Positioned(
               top: t - s * 2,
               left: l + s * 7,
               child: BoardSquare(index: 72, color: Colors.green.shade200)),
-          const Positioned(
-              top: t - s * 1,
-              left: l + s * 7,
-              child: BoardSquare(index: 73, color: Colors.green)),
           //
           Positioned(
               top: t + s * 0,
@@ -389,68 +395,58 @@ class GamePage extends StatelessWidget {
               top: t + s * 0,
               left: l + s * 10,
               child: BoardSquare(index: 77, color: Colors.yellow.shade200)),
+          const Positioned(
+              top: t + s * 0,
+              left: l + s * 8,
+              child: BoardSquare(index: 79, color: Colors.yellow, border: false)),
           Positioned(
               top: t + s * 0,
               left: l + s * 9,
               child: BoardSquare(index: 78, color: Colors.yellow.shade200)),
-          const Positioned(
-              top: t + s * 0,
-              left: l + s * 8,
-              child: BoardSquare(index: 79, color: Colors.yellow)),
           //
-          const Positioned(
-              top: t + s * 5.5, left: l + s * 3, child: BaseSquare(index: 0)),
-          const Positioned(
-              top: t + s * 5.5, left: l + s * 4, child: BaseSquare(index: 1)),
-          const Positioned(
-              top: t + s * 6.5, left: l + s * 3, child: BaseSquare(index: 2)),
-          const Positioned(
-              top: t + s * 6.5, left: l + s * 4, child: BaseSquare(index: 3)),
+          Positioned(
+              top: t + s * 5.5, left: l + s * 3, child: BaseSquare(index: 0, color: Colors.yellow.shade200)),
+          Positioned(
+              top: t + s * 5.5, left: l + s * 4, child: BaseSquare(index: 1, color: Colors.yellow.shade200)),
+          Positioned(
+              top: t + s * 6.5, left: l + s * 3, child: BaseSquare(index: 2, color: Colors.yellow.shade200)),
+          Positioned(
+              top: t + s * 6.5, left: l + s * 4, child: BaseSquare(index: 3, color: Colors.yellow.shade200)),
           //
-          const Positioned(
-              top: t - s * 4, left: l + s * 0.5, child: BaseSquare(index: 4)),
-          const Positioned(
-              top: t - s * 4, left: l + s * 1.5, child: BaseSquare(index: 5)),
-          const Positioned(
-              top: t - s * 3, left: l + s * 0.5, child: BaseSquare(index: 6)),
-          const Positioned(
-              top: t - s * 3, left: l + s * 1.5, child: BaseSquare(index: 7)),
+          Positioned(
+              top: t - s * 4, left: l + s * 0.5, child: BaseSquare(index: 4, color: Colors.yellow.shade200)),
+          Positioned(
+              top: t - s * 4, left: l + s * 1.5, child: BaseSquare(index: 5, color: Colors.yellow.shade200)),
+          Positioned(
+              top: t - s * 3, left: l + s * 0.5, child: BaseSquare(index: 6, color: Colors.yellow.shade200)),
+          Positioned(
+              top: t - s * 3, left: l + s * 1.5, child: BaseSquare(index: 7, color: Colors.yellow.shade200)),
           //
-          const Positioned(
+          Positioned(
               top: t - s * 6.5,
               left: l + s * 10,
-              child: BaseSquare(index: 8, color: Colors.green)),
-          const Positioned(
+              child: BaseSquare(index: 8, color: Colors.green.shade200)),
+          Positioned(
               top: t - s * 6.5,
               left: l + s * 11,
-              child: BaseSquare(index: 9, color: Colors.green)),
-          const Positioned(
+              child: BaseSquare(index: 9, color: Colors.green.shade200)),
+          Positioned(
               top: t - s * 5.5,
               left: l + s * 10,
-              child: BaseSquare(index: 10, color: Colors.green)),
-          const Positioned(
+              child: BaseSquare(index: 10, color: Colors.green.shade200)),
+          Positioned(
               top: t - s * 5.5,
               left: l + s * 11,
-              child: BaseSquare(index: 11, color: Colors.green)),
+              child: BaseSquare(index: 11, color: Colors.green.shade200)),
           //
-          const Positioned(
-              top: t + s * 3, left: l + s * 12.5, child: BaseSquare(index: 12)),
-          const Positioned(
-              top: t + s * 3, left: l + s * 13.5, child: BaseSquare(index: 13)),
-          const Positioned(
-              top: t + s * 4, left: l + s * 12.5, child: BaseSquare(index: 14)),
-          const Positioned(
-              top: t + s * 4, left: l + s * 13.5, child: BaseSquare(index: 15)),
-          //
-          const Positioned(
-            top: t + s * 1,
-            left: l + s * 6,
-            child: DiagonalSquare(
-              color1: Colors.red,
-              color2: Colors.white,
-              isTopLeftToBottomRight: false,
-            ),
-          )
+          Positioned(
+              top: t + s * 3, left: l + s * 12.5, child: BaseSquare(index: 12, color: Colors.yellow.shade200)),
+          Positioned(
+              top: t + s * 3, left: l + s * 13.5, child: BaseSquare(index: 13, color: Colors.yellow.shade200)),
+          Positioned(
+              top: t + s * 4, left: l + s * 12.5, child: BaseSquare(index: 14, color: Colors.yellow.shade200)),
+          Positioned(
+              top: t + s * 4, left: l + s * 13.5, child: BaseSquare(index: 15, color: Colors.yellow.shade200)),
         ],
       ),
     );

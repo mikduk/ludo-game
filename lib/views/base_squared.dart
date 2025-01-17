@@ -23,14 +23,26 @@ class BaseSquare extends StatelessWidget {
             child: Text(
               showPawn(controller
                   .positionPawns[index]), // Wyświetla wartość board[index]
-              style: const TextStyle(
-                fontSize: 6.0,
+              style: TextStyle(
+                fontSize: getSize(controller.positionPawns[index]),
                 color: Colors.black87,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
         )));
+  }
+
+  double? getSize(int result) {
+    switch (result) {
+      case 0:
+      case 1:
+      case 2:
+      case 3:
+        return 12;
+      default:
+        return 6;
+    }
   }
 
   Future<void> fieldAction(GamePageController controller) async {

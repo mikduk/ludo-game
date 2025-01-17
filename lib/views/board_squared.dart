@@ -5,8 +5,9 @@ import '../controllers/game_page_controller.dart';
 class BoardSquare extends StatelessWidget {
   final int index; // Indeks elementu board, który ma być wyświetlany
   final Color? color;
+  final bool border;
 
-  const BoardSquare({super.key, required this.index, this.color});
+  const BoardSquare({super.key, required this.index, this.color, this.border=true});
 
   @override
   Widget build(BuildContext context) {
@@ -18,19 +19,33 @@ class BoardSquare extends StatelessWidget {
           width: 29.0,
           height: 29.0,
           decoration: BoxDecoration(
-              color: color ?? Colors.grey.shade100, border: Border.all()),
+              color: color ?? Colors.grey.shade100, border: border ? Border.all() : null),
           child: Center(
             child: Text(
               showPawn(
                   controller.board[index]), // Wyświetla wartość board[index]
-              style: const TextStyle(
-                fontSize: 6.0,
+              style: TextStyle(
+                fontSize: getSize(controller.board[index]),
                 color: Colors.black87,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
         )));
+  }
+
+  double? getSize(int result) {
+    switch (result) {
+      case 0:
+        return null;
+      case 1:
+      case 10:
+      case 100:
+      case 1000:
+        return 12;
+      default:
+        return 6;
+    }
   }
 
   Future<void> fieldAction(GamePageController controller) async {

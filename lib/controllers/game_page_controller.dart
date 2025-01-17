@@ -53,7 +53,7 @@ class GamePageController extends GetxController {
     super.onClose(); // Wywołanie domyślnej metody onClose()
   }
 
-  Future<void> rollDice({String player = '', int possibilities = 2}) async {
+  Future<void> rollDice({String player = '', int possibilities = 6}) async {
     print('|rollDice| waitForMove: $waitForMove');
     if (waitForMove.value) {
       if (showSnackbar) {
