@@ -54,8 +54,7 @@ class BoardSquare extends StatelessWidget {
     if (result == 0) {
       return;
     }
-    int currentPlayerIndex =
-        controller.colors.indexOf(controller.currentPlayer.value);
+    int currentPlayerIndex = controller.currentPlayer.value;
     int foundPawn = -1;
     print('currentPlayerIndex: $currentPlayerIndex');
     for (int i = 0; i < 4; i++) {

@@ -6,8 +6,8 @@ class GamePageController extends GetxController {
 
   var score = 0.obs;
   var scores = ''.obs;
-  var currentPlayer = 'Blue'.obs;
-  var nextPlayer = 'Red'.obs;
+  var currentPlayer = 0.obs;
+  var nextPlayer = 1.obs;
   var waitForMove = false.obs;
   var board = List.filled(80, 0).obs;
   var kills = 0.obs;
@@ -25,8 +25,8 @@ class GamePageController extends GetxController {
 
   void initializeBoard() {
     board.value = List.filled(80, 0);
-    currentPlayer.value = 'Blue';
-    nextPlayer.value = 'Red';
+    currentPlayer.value = 0;
+    nextPlayer.value = 1;
     waitForMove = false.obs;
     score = 0.obs;
     scores = ''.obs;
@@ -39,6 +39,10 @@ class GamePageController extends GetxController {
     for (int i=0; i<16; i++) {
       positionPawns[i] = i ~/ 4;
     }
+
+    board[0] = 3;
+    board[61] = 1;
+    positionPawns[0] = 61;
   }
 
   @override
@@ -53,7 +57,7 @@ class GamePageController extends GetxController {
     super.onClose(); // Wywołanie domyślnej metody onClose()
   }
 
-  Future<void> rollDice({String player = '', int possibilities = 6}) async {
+  Future<void> rollDice({int player = -1, int possibilities = 6}) async {
     print('|rollDice| waitForMove: $waitForMove');
     if (waitForMove.value) {
       if (showSnackbar) {
@@ -72,7 +76,7 @@ class GamePageController extends GetxController {
   }
 
   Future<void> automaticallyMovePawn() async {
-    if (everyoneInBase() && score.value != 6) {
+    if (everyoneInBaseOrFinish() && score.value != 6) {
       await Future.delayed(const Duration(seconds: 1), getNextPlayer);
     } else if (scores.value.contains('666')) {
       await Future.delayed(const Duration(seconds: 2), getNextPlayer);
@@ -81,10 +85,14 @@ class GamePageController extends GetxController {
     }
   }
 
+  bool everyoneInBaseOrFinish() {
+    int pow = tenPow(currentPlayer.value);
+    return (board[currentPlayer.value] + board[61 + currentPlayer.value * 6] == 4 * pow);
+  }
+
   bool everyoneInBase() {
-    int currentIndex = colors.indexOf(currentPlayer.value);
-    int pow = tenPow(currentIndex);
-    return (board[currentIndex] == 4 * pow);
+    int pow = tenPow(currentPlayer.value);
+    return (board[currentPlayer.value] == 4 * pow);
   }
 
   Future<void> moveFirstPawn() async => await movePawn(pawnNumber: 0);
@@ -118,7 +126,7 @@ class GamePageController extends GetxController {
   }
 
   Future<void> movePlayerPawn(int? pawnNumber) async {
-    int currentIndex = colors.indexOf(currentPlayer.value);
+    int currentIndex = currentPlayer.value;
     int pow = tenPow(currentIndex);
 
     print('|movePlayerPawn| currentIndex: $currentIndex, pow: $pow');
@@ -265,11 +273,10 @@ class GamePageController extends GetxController {
   }
 
   void getNextPlayer() {
-    int currentIndex = colors.indexOf(nextPlayer.value);
+    int currentIndex = nextPlayer.value;
     int nextIndex = (currentIndex + 1) % colors.length;
-    String tmp = colors[nextIndex];
     currentPlayer.value = nextPlayer.value;
-    nextPlayer.value = tmp;
+    nextPlayer.value = nextIndex;
     scores.value = '';
     score.value = 0;
   }

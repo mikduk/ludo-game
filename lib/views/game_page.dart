@@ -33,7 +33,7 @@ class GamePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Obx(() => Text(
-                        'Player ${gameController.currentPlayer}',
+                        'Player ${gameController.colors[gameController.currentPlayer.value]}',
                         style: Get.textTheme.headlineMedium,
                       )),
                   const Text('Your current score is:'),
@@ -42,7 +42,7 @@ class GamePage extends StatelessWidget {
                         style: Get.textTheme.headlineMedium,
                       )),
                   Obx(() =>
-                      Text('Next player is ${gameController.nextPlayer}')),
+                      Text('Next player is ${gameController.colors[gameController.nextPlayer.value]}')),
                 ],
               ),
             ),
@@ -54,7 +54,7 @@ class GamePage extends StatelessWidget {
             child: FloatingActionButton(
               heroTag: 'btn1',
               backgroundColor: Colors.red,
-              onPressed: () => gameController.rollDice(player: "Red"),
+              onPressed: () => gameController.rollDice(player: 1),
               tooltip: 'Roll dice (1 to 6)',
               child: const Icon(Icons.casino),
             ),
@@ -66,7 +66,7 @@ class GamePage extends StatelessWidget {
             child: FloatingActionButton(
               heroTag: 'btn2',
               backgroundColor: Colors.green,
-              onPressed: () => gameController.rollDice(player: "Green"),
+              onPressed: () => gameController.rollDice(player: 2),
               tooltip: 'Roll dice (1 to 6)',
               child: const Icon(Icons.casino),
             ),
@@ -78,7 +78,7 @@ class GamePage extends StatelessWidget {
             child: FloatingActionButton(
               heroTag: 'btn3',
               backgroundColor: Colors.blue,
-              onPressed: () => gameController.rollDice(player: "Blue"),
+              onPressed: () => gameController.rollDice(player: 0),
               tooltip: 'Roll dice (1 to 6)',
               child: const Icon(Icons.casino),
             ),
@@ -90,7 +90,7 @@ class GamePage extends StatelessWidget {
             child: FloatingActionButton(
               heroTag: 'btn4',
               backgroundColor: Colors.yellow,
-              onPressed: () => gameController.rollDice(player: "Yellow"),
+              onPressed: () => gameController.rollDice(player: 3),
               tooltip: 'Roll dice (1 to 6)',
               child: const Icon(Icons.casino),
             ),
