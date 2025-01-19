@@ -44,7 +44,7 @@ class BoardSquare extends StatelessWidget {
       case 1000:
         return 12;
       default:
-        return 6;
+        return 9;
     }
   }
 

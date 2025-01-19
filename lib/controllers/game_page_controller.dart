@@ -11,6 +11,7 @@ class GamePageController extends GetxController {
   var waitForMove = false.obs;
   var board = List.filled(80, 0).obs;
   var kills = 0.obs;
+  var finished = 0.obs;
   bool showSnackbar = false;
   var positionPawns = List.filled(16, 0).obs;
 
@@ -36,13 +37,21 @@ class GamePageController extends GetxController {
     board[2] = 400;
     board[3] = 4000;
 
-    for (int i=0; i<16; i++) {
+    for (int i = 0; i < 16; i++) {
       positionPawns[i] = i ~/ 4;
     }
 
-    board[0] = 3;
-    board[61] = 1;
+    /// TEST
+    board[0] = 0;
+    board[61] = 3;
+    board[48] = 1;
     positionPawns[0] = 61;
+    positionPawns[1] = 61;
+    positionPawns[2] = 61;
+    positionPawns[3] = 48;
+    board[1] = 30;
+    board[54] = 10;
+    positionPawns[4] = 54;
   }
 
   @override
@@ -57,7 +66,7 @@ class GamePageController extends GetxController {
     super.onClose(); // Wywołanie domyślnej metody onClose()
   }
 
-  Future<void> rollDice({int player = -1, int possibilities = 6}) async {
+  Future<void> rollDice({int player = -1, int possibilities = 1}) async {
     print('|rollDice| waitForMove: $waitForMove');
     if (waitForMove.value) {
       if (showSnackbar) {
@@ -76,7 +85,13 @@ class GamePageController extends GetxController {
   }
 
   Future<void> automaticallyMovePawn() async {
-    if (everyoneInBaseOrFinish() && score.value != 6) {
+    if (everyoneInBaseOrFinish()) {
+      if (score.value != 6) {
+        await Future.delayed(const Duration(seconds: 1), getNextPlayer);
+      } else {
+        waitForMove.value = true;
+      }
+    } else if (everyoneInBaseOrFinishOrCannotGo()) {
       await Future.delayed(const Duration(seconds: 1), getNextPlayer);
     } else if (scores.value.contains('666')) {
       await Future.delayed(const Duration(seconds: 2), getNextPlayer);
@@ -85,14 +100,29 @@ class GamePageController extends GetxController {
     }
   }
 
-  bool everyoneInBaseOrFinish() {
-    int pow = tenPow(currentPlayer.value);
-    return (board[currentPlayer.value] + board[61 + currentPlayer.value * 6] == 4 * pow);
+  bool everyoneInFinish({int? player}) {
+    player ??= currentPlayer.value;
+    int pow = tenPow(player);
+    return (board[61 + player * 6] == 4 * pow);
   }
 
-  bool everyoneInBase() {
+  bool everyoneInBaseOrFinish() {
     int pow = tenPow(currentPlayer.value);
-    return (board[currentPlayer.value] == 4 * pow);
+    return (board[currentPlayer.value] + board[61 + currentPlayer.value * 6] ==
+        4 * pow);
+  }
+
+  bool everyoneInBaseOrFinishOrCannotGo() {
+    bool result = true;
+    int cpv = currentPlayer.value;
+
+    for (int i = 0; i < 4; i++) {
+      int pawnField = positionPawns[4 * cpv + i];
+      if (pawnField != cpv && (pawnField + score.value) <= (61 + cpv * 6)) {
+        return false;
+      }
+    }
+    return result;
   }
 
   Future<void> moveFirstPawn() async => await movePawn(pawnNumber: 0);
@@ -132,17 +162,20 @@ class GamePageController extends GetxController {
     print('|movePlayerPawn| currentIndex: $currentIndex, pow: $pow');
 
     // Pierwszy ruch
-    if (score.value == 6 && positionPawns[4 * currentIndex + (pawnNumber ?? 0)] == currentIndex) {
+    if (score.value == 6 &&
+        positionPawns[4 * currentIndex + (pawnNumber ?? 0)] == currentIndex) {
       board[currentIndex] -= pow;
       int x = currentIndex * 13 + 4;
       await goToField(x, pow, pawnNumber ?? 0);
-    } else if (positionPawns[4 * currentIndex + (pawnNumber ?? 0)] != currentIndex) {
+    } else if (positionPawns[4 * currentIndex + (pawnNumber ?? 0)] !=
+        currentIndex) {
       int i = positionPawns[4 * currentIndex + (pawnNumber ?? 0)];
       board[i] -= pow;
       int x = whereToGo(i, score.value, currentIndex);
       await goToField(x, pow, pawnNumber ?? 0);
     } else {
-      throw ArgumentError('Pionek $pawnNumber. $currentPlayer nie może się ruszyć.');
+      throw ArgumentError(
+          'Pionek $pawnNumber. $currentPlayer nie może się ruszyć.');
     }
     print('|movePlayerPawn| END');
   }
@@ -197,18 +230,63 @@ class GamePageController extends GetxController {
     } else {
       board[x] += pow;
     }
+    print('PRE, $positionPawns');
     positionPawns[4 * tenLog(pow) + pawnNumber] = x;
+    print('POST, $positionPawns');
+    if ([61, 67, 73, 79].contains(x)) {
+      finished.value += 1;
+    }
     await endTurn();
     print('|goToField| END');
   }
 
-  Future<void> goToFieldAnimate(int from, int to, int pow, {Duration delayTime=const Duration(milliseconds: 180)}) async {
-    int originalPosition = from;
+  Future<void> goToFieldAnimate(int from, int to, int pow,
+      {Duration delayTime = const Duration(milliseconds: 180)}) async {
+    int originalPosition = to;
+    if ([0, 1, 2, 3].contains(to)) {
+      switch (to) {
+        case 0:
+          to = 4;
+          break;
+        case 1:
+          to = 17;
+          break;
+        case 2:
+          to = 30;
+          break;
+        case 3:
+          to = 43;
+          break;
+      }
+    }
     while (from != to) {
-      if (3 < from && to < 56) {
+      if ((3 < from && to < 56 && to == originalPosition) || (from >= 56 && to >= 56)) {
         from++;
-        if (from > 55) {
+        if (from > 55 && to < 56) {
           from = 4;
+        }
+        board[from] += pow;
+      } else if (to >= 56) {
+        from++;
+        switch (from) {
+          case 16:
+            from = 62;
+            break;
+          case 29:
+            from = 68;
+            break;
+          case 42:
+            from = 74;
+            break;
+          case 55:
+            from = 56;
+            break;
+        }
+        board[from] += pow;
+      } else if ([0, 1, 2, 3].contains(originalPosition)) {
+        from--;
+        if (from < 4) {
+          from = 55;
         }
         board[from] += pow;
       } else {
@@ -219,14 +297,15 @@ class GamePageController extends GetxController {
     }
   }
 
-  bool canCapture(int x, int pow, {bool teamMode=false}) {
+  bool canCapture(int x, int pow, {bool teamMode = false}) {
     List<int> saveFields = [4, 12, 17, 25, 30, 38, 43, 51];
     List<int> attackMoves = [1, 10, 100, 1000];
     int result = board[x];
 
     if (x < 4 || x > 55 || saveFields.contains(x)) {
       return false;
-    } else if (attackMoves.contains(result) && pow != result) { // TODO
+    } else if (attackMoves.contains(result) && pow != result) {
+      // TODO
       return true;
     }
     return false;
@@ -236,11 +315,11 @@ class GamePageController extends GetxController {
     print('|capture| x: $x, pow: $pow');
     int result = board[x];
     int opponent = tenLog(result);
-    print('|capture| result: $result, opponent: $opponent');
-    board[opponent] += result;
-    for (int i=0; i<4; i++) {
+    int opponentPawn = -1;
+    for (int i = 0; i < 4; i++) {
       if (positionPawns[4 * opponent + i] == x) {
-        positionPawns[4 * opponent + i] = opponent;
+        goToField(opponent, result, i);
+        break;
       }
     }
     kills.value += 1;
@@ -249,15 +328,19 @@ class GamePageController extends GetxController {
   Future<void> endTurn() async {
     print('|endTurn|');
     if (score.value == 6) {
-      return;
+      if (!everyoneInBaseOrFinish()) {
+        return;
+      }
     } else if (kills.value > 0) {
       kills.value -= 1;
       waitForMove.value = true;
       return;
-    } else {
-      await Future.delayed(const Duration(seconds: 2), getNextPlayer);
+    } else if (finished.value > 0) {
+      finished.value -= 1;
+      waitForMove.value = true;
+      return;
     }
-    // TODO: EXTRA CASE WHEN END
+    await Future.delayed(const Duration(seconds: 2), getNextPlayer);
   }
 
   int tenPow(int exponent) {
@@ -279,6 +362,10 @@ class GamePageController extends GetxController {
     nextPlayer.value = nextIndex;
     scores.value = '';
     score.value = 0;
+    if (everyoneInFinish(player: nextPlayer.value)) {
+      nextIndex = (nextIndex + 1) % colors.length;
+      nextPlayer.value = nextIndex;
+    }
   }
 
   void showBoard() {

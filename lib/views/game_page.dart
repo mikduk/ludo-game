@@ -390,11 +390,11 @@ class GamePage extends StatelessWidget {
           Positioned(
               top: t + s * 0,
               left: l + s * 11,
-              child: BoardSquare(index: 76, color: Colors.yellow.shade200)),
+              child: BoardSquare(index: 76, color: Colors.yellow.shade300)),
           Positioned(
               top: t + s * 0,
               left: l + s * 10,
-              child: BoardSquare(index: 77, color: Colors.yellow.shade200)),
+              child: BoardSquare(index: 77, color: Colors.yellow.shade300)),
           const Positioned(
               top: t + s * 0,
               left: l + s * 8,
@@ -402,7 +402,7 @@ class GamePage extends StatelessWidget {
           Positioned(
               top: t + s * 0,
               left: l + s * 9,
-              child: BoardSquare(index: 78, color: Colors.yellow.shade200)),
+              child: BoardSquare(index: 78, color: Colors.yellow.shade400)),
           //
           Positioned(
               top: t + s * 5.5, left: l + s * 3, child: BaseSquare(index: 0, color: Colors.blue.shade200)),
