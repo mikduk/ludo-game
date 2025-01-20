@@ -23,6 +23,16 @@ class GamePageController extends GetxController {
       showSnackbar = true;
     }
     initializeBoard();
+    executePeriodicallyBots();
+  }
+
+  Future<void> executePeriodicallyBots() async {
+    await Future.delayed(const Duration(seconds: 3));
+    while (board[79] ~/ 4000 + board[73] ~/ 400 + board[67] ~/ 40 + board[61] ~/ 4 < 3) {
+      await doBotTurn();
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
+    print('KONIEC PĘTLI');
   }
 
   void initializeBoard() {
@@ -58,13 +68,16 @@ class GamePageController extends GetxController {
     board[79] = 2000;
     positionPawns[0] = 61;
     positionPawns[1] = 61;
+    // positionPawns[2] = 61;
     positionPawns[4] = 67;
     positionPawns[5] = 67;
+    // positionPawns[6] = 67;
     positionPawns[8] = 73;
     positionPawns[9] = 73;
+    // positionPawns[10] = 73;
     positionPawns[12] = 79;
     positionPawns[13] = 79;
-
+    // positionPawns[14] = 79;
   }
 
   @override
@@ -79,7 +92,7 @@ class GamePageController extends GetxController {
     super.onClose(); // Wywołanie domyślnej metody onClose()
   }
 
-  Future<void> rollDice({int player = -1, int possibilities = 6}) async {
+  Future<void> rollDice({int player = -1, int possibilities = 2}) async {
     print(
         '|rollDice| waitForMove: $waitForMove, currentPlayer: $currentPlayer, player: $player');
     if (waitForMove.value) {
@@ -90,10 +103,10 @@ class GamePageController extends GetxController {
       return;
     }
     if (player == currentPlayer.value) {
-      int value = Random().nextInt(possibilities) + (6 - possibilities) + 1;
-      print('|rollDice| value: $value');
-      score.value = value;
-      scores.value += value.toString();
+      List<int> diceResults = [6, 1, 5, 2, 4, 3];
+      int value = Random().nextInt(possibilities);
+      score.value = diceResults[value];
+      scores.value += diceResults[value].toString();
 
       await automaticallyMovePawn();
     }
@@ -346,7 +359,6 @@ class GamePageController extends GetxController {
     print('|capture| x: $x, pow: $pow');
     int result = board[x];
     int opponent = tenLog(result);
-    int opponentPawn = -1;
     for (int i = 0; i < 4; i++) {
       if (positionPawns[4 * opponent + i] == x) {
         goToField(opponent, result, i);
@@ -361,16 +373,16 @@ class GamePageController extends GetxController {
     if (score.value == 6) {
       if (!everyoneInBaseOrFinish()) {
         setWaitForMoveValue(false);
-        return await doBotTurn();
+        return;
       }
     } else if (kills.value > 0) {
       kills.value -= 1;
       setWaitForMoveValue(false);
-      return await doBotTurn();
+      return;
     } else if (finished.value > 0) {
       finished.value -= 1;
       setWaitForMoveValue(false);
-      return await doBotTurn();
+      return;
     }
     await Future.delayed(const Duration(seconds: 2), getNextPlayer);
   }
@@ -398,9 +410,6 @@ class GamePageController extends GetxController {
     if (everyoneInFinish(player: nextPlayer.value)) {
       nextIndex = (nextIndex + 1) % colors.length;
       nextPlayer.value = nextIndex;
-    }
-    if (bots[currentPlayer.value]) {
-      doBotTurn();
     }
   }
 
@@ -433,9 +442,9 @@ class GamePageController extends GetxController {
         possMoves[i] = whereToGo(positionPawns[4 * cpv + i], dice, cpv);
       }
       print('|doBotTurn| $possMoves');
-      if (possMoves[0] == possMoves[1] &&
-          possMoves[1] == possMoves[2] &&
-          possMoves[2] == possMoves[3]) {
+      if (positionPawns[4 * cpv + 0] == positionPawns[4 * cpv + 1] &&
+          positionPawns[4 * cpv + 1] == positionPawns[4 * cpv + 2] &&
+          positionPawns[4 * cpv + 2] == positionPawns[4 * cpv + 3]) {
         int r = Random().nextInt(4);
         print('|doBotTurn| [IF] r: $r');
         try {
@@ -444,37 +453,29 @@ class GamePageController extends GetxController {
           print('426: $e');
           return await endTurn();
         }
-      } else if (dice == 6) {
-        /// Wyjdź z bazy
-        int r = Random().nextInt(4);
-        print('|doBotTurn| [ELSE] r: $r');
-        if (((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r) {
-          List<int> values = [0, 1, 2, 3];
-          values.shuffle(Random());
-          for (int value in values) {
-            if (possMoves[value] == 13 * cpv + 4) {
-              await movePawn(pawnNumber: value);
-              break;
-            }
-          }
-        } else {
-          /// TODO
-          List<int> values = [0, 1, 2, 3];
-          values.shuffle(Random());
-          for (int value in values) {
-            if (possMoves[value] != 13 * cpv + 4) {
-              try {
+      } else {
+        if (dice == 6) {
+          int r = Random().nextInt(4);
+          if (((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r) {
+            List<int> valuesSix = [0, 1, 2, 3];
+            valuesSix.shuffle(Random());
+            for (int value in valuesSix) {
+              if (possMoves[value] == 13 * cpv + 4) {
                 await movePawn(pawnNumber: value);
                 break;
-              } catch (e) {
-                print(e);
               }
             }
           }
         }
-      } else {
-        List<int> values = [0, 1, 2, 3];
+
+        List<int> values = [];
+        for (int value = 0; value < 4; value++) {
+          if (possMoves[value] != positionPawns[4 * cpv + value]) {
+            values.add(value);
+          }
+        }
         values.shuffle(Random());
+        print(values);
 
         /// BICIA
         for (int value in values) {
@@ -493,7 +494,6 @@ class GamePageController extends GetxController {
           if (possMoves[value] > 55 && positionPawns[4 * cpv + value] < 56) {
             try {
               await movePawn(pawnNumber: value);
-              print('return');
               return;
             } on ArgumentError catch (e) {
               print('Przechwycono błąd: ${e.message}');
@@ -507,7 +507,6 @@ class GamePageController extends GetxController {
           if (endFields.contains(possMoves[value])) {
             try {
               await movePawn(pawnNumber: value);
-              print('return');
               return;
             } on ArgumentError catch (e) {
               print('Przechwycono błąd: ${e.message}');
@@ -524,17 +523,30 @@ class GamePageController extends GetxController {
           }
         }
 
-        /// TODO
+        /// Zostań na bezpiecznym polu
         for (int value in values) {
-          print('|BOT| - $value');
-          try {
-            await movePawn(pawnNumber: value);
-            print('return');
-            return;
-          } on ArgumentError catch (e) {
-            print('Przechwycono błąd: ${e.message}');
+          if (!safeFields.contains(positionPawns[4 * cpv + value])) {
+            try {
+              await movePawn(pawnNumber: value);
+              return;
+            } on ArgumentError catch (e) {
+              print('Przechwycono błąd: ${e.message}');
+            }
           }
         }
+
+        /// TODO
+        for (int value in values) {
+          if (possMoves[value] != positionPawns[4 * cpv + value]) {
+            try {
+              await movePawn(pawnNumber: value);
+              return;
+            } on ArgumentError catch (e) {
+              print('Przechwycono błąd: ${e.message}');
+            }
+          }
+        }
+        await endTurn();
       }
     }
   }
