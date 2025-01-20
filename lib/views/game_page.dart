@@ -41,8 +41,8 @@ class GamePage extends StatelessWidget {
                         '${gameController.scores}',
                         style: Get.textTheme.headlineMedium,
                       )),
-                  Obx(() =>
-                      Text('Next player is ${gameController.colors[gameController.nextPlayer.value]}')),
+                  Obx(() => Text(
+                      'Next player is ${gameController.colors[gameController.nextPlayer.value]}')),
                 ],
               ),
             ),
@@ -59,6 +59,15 @@ class GamePage extends StatelessWidget {
               child: const Icon(Icons.casino),
             ),
           ),
+          Positioned(
+              top: 90,
+              left: 30,
+              child: Obx(() => Switch(
+                    value: gameController.bots[1], // Powiązanie zmiennej
+                    onChanged: (bool value) {
+                      gameController.changeBotFlag(1); // Aktualizacja zmiennej
+                    },
+                  ))),
           // Przycisk w prawym górnym rogu
           Positioned(
             top: 30,
@@ -373,7 +382,8 @@ class GamePage extends StatelessWidget {
           const Positioned(
               top: t - s * 1,
               left: l + s * 7,
-              child: BoardSquare(index: 73, color: Colors.green, border: false)),
+              child:
+                  BoardSquare(index: 73, color: Colors.green, border: false)),
           Positioned(
               top: t - s * 2,
               left: l + s * 7,
@@ -398,29 +408,46 @@ class GamePage extends StatelessWidget {
           const Positioned(
               top: t + s * 0,
               left: l + s * 8,
-              child: BoardSquare(index: 79, color: Colors.yellow, border: false)),
+              child:
+                  BoardSquare(index: 79, color: Colors.yellow, border: false)),
           Positioned(
               top: t + s * 0,
               left: l + s * 9,
               child: BoardSquare(index: 78, color: Colors.yellow.shade400)),
           //
           Positioned(
-              top: t + s * 5.5, left: l + s * 3, child: BaseSquare(index: 0, color: Colors.blue.shade200)),
+              top: t + s * 5.5,
+              left: l + s * 3,
+              child: BaseSquare(index: 0, color: Colors.blue.shade200)),
           Positioned(
-              top: t + s * 5.5, left: l + s * 4, child: BaseSquare(index: 1, color: Colors.blue.shade200)),
+              top: t + s * 5.5,
+              left: l + s * 4,
+              child: BaseSquare(index: 1, color: Colors.blue.shade200)),
           Positioned(
-              top: t + s * 6.5, left: l + s * 3, child: BaseSquare(index: 2, color: Colors.blue.shade200)),
+              top: t + s * 6.5,
+              left: l + s * 3,
+              child: BaseSquare(index: 2, color: Colors.blue.shade200)),
           Positioned(
-              top: t + s * 6.5, left: l + s * 4, child: BaseSquare(index: 3, color: Colors.blue.shade200)),
+              top: t + s * 6.5,
+              left: l + s * 4,
+              child: BaseSquare(index: 3, color: Colors.blue.shade200)),
           //
           Positioned(
-              top: t - s * 4, left: l + s * 0.5, child: BaseSquare(index: 4, color: Colors.red.shade200)),
+              top: t - s * 4,
+              left: l + s * 0.5,
+              child: BaseSquare(index: 4, color: Colors.red.shade200)),
           Positioned(
-              top: t - s * 4, left: l + s * 1.5, child: BaseSquare(index: 5, color: Colors.red.shade200)),
+              top: t - s * 4,
+              left: l + s * 1.5,
+              child: BaseSquare(index: 5, color: Colors.red.shade200)),
           Positioned(
-              top: t - s * 3, left: l + s * 0.5, child: BaseSquare(index: 6, color: Colors.red.shade200)),
+              top: t - s * 3,
+              left: l + s * 0.5,
+              child: BaseSquare(index: 6, color: Colors.red.shade200)),
           Positioned(
-              top: t - s * 3, left: l + s * 1.5, child: BaseSquare(index: 7, color: Colors.red.shade200)),
+              top: t - s * 3,
+              left: l + s * 1.5,
+              child: BaseSquare(index: 7, color: Colors.red.shade200)),
           //
           Positioned(
               top: t - s * 6.5,
@@ -440,13 +467,21 @@ class GamePage extends StatelessWidget {
               child: BaseSquare(index: 11, color: Colors.green.shade200)),
           //
           Positioned(
-              top: t + s * 3, left: l + s * 12.5, child: BaseSquare(index: 12, color: Colors.yellow.shade200)),
+              top: t + s * 3,
+              left: l + s * 12.5,
+              child: BaseSquare(index: 12, color: Colors.yellow.shade200)),
           Positioned(
-              top: t + s * 3, left: l + s * 13.5, child: BaseSquare(index: 13, color: Colors.yellow.shade200)),
+              top: t + s * 3,
+              left: l + s * 13.5,
+              child: BaseSquare(index: 13, color: Colors.yellow.shade200)),
           Positioned(
-              top: t + s * 4, left: l + s * 12.5, child: BaseSquare(index: 14, color: Colors.yellow.shade200)),
+              top: t + s * 4,
+              left: l + s * 12.5,
+              child: BaseSquare(index: 14, color: Colors.yellow.shade200)),
           Positioned(
-              top: t + s * 4, left: l + s * 13.5, child: BaseSquare(index: 15, color: Colors.yellow.shade200)),
+              top: t + s * 4,
+              left: l + s * 13.5,
+              child: BaseSquare(index: 15, color: Colors.yellow.shade200)),
         ],
       ),
     );
