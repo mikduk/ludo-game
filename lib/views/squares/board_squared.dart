@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/game_page_controller.dart';
+import '../../controllers/game_page_controller.dart';
 
 class BoardSquare extends StatelessWidget {
   final int index; // Indeks elementu board, który ma być wyświetlany

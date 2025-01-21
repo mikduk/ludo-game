@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/game_page_controller.dart';
-import 'base_squared.dart';
-import 'board_squared.dart';
-import 'diagonal_squared.dart';
-import 'four_color_squared.dart';
+import 'squares/base_squared.dart';
+import 'squares/board_squared.dart';
+import 'squares/diagonal_squared.dart';
+import 'squares/four_color_squared.dart';
 
 class GamePage extends StatelessWidget {
   const GamePage({super.key, required this.title});
@@ -63,9 +63,10 @@ class GamePage extends StatelessWidget {
               top: 90,
               left: 30,
               child: Obx(() => Switch(
-                    value: gameController.bots[1], // Powiązanie zmiennej
+                activeTrackColor: Colors.red,
+                    value: gameController.bots[1],
                     onChanged: (bool value) {
-                      gameController.changeBotFlag(1); // Aktualizacja zmiennej
+                      gameController.changeBotFlag(1);
                     },
                   ))),
           // Przycisk w prawym górnym rogu
@@ -80,6 +81,16 @@ class GamePage extends StatelessWidget {
               child: const Icon(Icons.casino),
             ),
           ),
+          Positioned(
+              top: 90,
+              right: 30,
+              child: Obx(() => Switch(
+                activeTrackColor: Colors.green,
+                value: gameController.bots[2],
+                onChanged: (bool value) {
+                  gameController.changeBotFlag(2);
+                },
+              ))),
           // Przycisk w lewym dolnym rogu
           Positioned(
             bottom: 150,
@@ -92,6 +103,16 @@ class GamePage extends StatelessWidget {
               child: const Icon(Icons.casino),
             ),
           ),
+          Positioned(
+              bottom: 210,
+              left: 30,
+              child: Obx(() => Switch(
+                activeTrackColor: Colors.blue,
+                value: gameController.bots[0],
+                onChanged: (bool value) {
+                  gameController.changeBotFlag(0);
+                },
+              ))),
           // Przycisk w prawym dolnym rogu
           Positioned(
             bottom: 150,
@@ -104,6 +125,16 @@ class GamePage extends StatelessWidget {
               child: const Icon(Icons.casino),
             ),
           ),
+          Positioned(
+              bottom: 210,
+              right: 30,
+              child: Obx(() => Switch(
+                activeTrackColor: Colors.yellow,
+                value: gameController.bots[3],
+                onChanged: (bool value) {
+                  gameController.changeBotFlag(3);
+                },
+              ))),
           const Positioned(
             top: t - s * 1,
             left: l + s * 6,
