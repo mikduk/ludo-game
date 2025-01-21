@@ -51,13 +51,13 @@ class GamePage extends StatelessWidget {
           Positioned(
             top: 30,
             left: 30,
-            child: FloatingActionButton(
+            child: Obx(() => FloatingActionButton(
               heroTag: 'btn1',
-              backgroundColor: Colors.red,
-              onPressed: () => gameController.rollDice(player: 1),
+              backgroundColor: gameController.bots[1] ? Colors.grey.shade400 : Colors.red,
+              onPressed: () => gameController.bots[1] ? null : gameController.rollDice(player: 1),
               tooltip: 'Roll dice (1 to 6)',
-              child: const Icon(Icons.casino),
-            ),
+              child: Icon(Icons.casino, color: gameController.bots[1] ? Colors.grey.shade700: null),
+            )),
           ),
           Positioned(
               top: 90,
@@ -73,13 +73,13 @@ class GamePage extends StatelessWidget {
           Positioned(
             top: 30,
             right: 30,
-            child: FloatingActionButton(
+            child: Obx(() => FloatingActionButton(
               heroTag: 'btn2',
-              backgroundColor: Colors.green,
-              onPressed: () => gameController.rollDice(player: 2),
+              backgroundColor: gameController.bots[2] ? Colors.grey.shade400 : Colors.green,
+              onPressed: () => gameController.bots[2] ? null : gameController.rollDice(player: 2),
               tooltip: 'Roll dice (1 to 6)',
-              child: const Icon(Icons.casino),
-            ),
+              child: Icon(Icons.casino, color: gameController.bots[2] ? Colors.grey.shade700: null),
+            )),
           ),
           Positioned(
               top: 90,
@@ -95,13 +95,13 @@ class GamePage extends StatelessWidget {
           Positioned(
             bottom: 150,
             left: 30,
-            child: FloatingActionButton(
-              heroTag: 'btn3',
-              backgroundColor: Colors.blue,
-              onPressed: () => gameController.rollDice(player: 0),
+            child: Obx(() => FloatingActionButton(
+              heroTag: 'btn0',
+              backgroundColor: gameController.bots[0] ? Colors.grey.shade400 : Colors.blue,
+              onPressed: () => gameController.bots[0] ? null : gameController.rollDice(player: 0),
               tooltip: 'Roll dice (1 to 6)',
-              child: const Icon(Icons.casino),
-            ),
+              child: Icon(Icons.casino, color: gameController.bots[0] ? Colors.grey.shade700: null),
+            )),
           ),
           Positioned(
               bottom: 210,
@@ -117,13 +117,13 @@ class GamePage extends StatelessWidget {
           Positioned(
             bottom: 150,
             right: 30,
-            child: FloatingActionButton(
-              heroTag: 'btn4',
-              backgroundColor: Colors.yellow,
-              onPressed: () => gameController.rollDice(player: 3),
+            child: Obx(() => FloatingActionButton(
+              heroTag: 'btn3',
+              backgroundColor: gameController.bots[3] ? Colors.grey.shade400 : Colors.yellow,
+              onPressed: () => gameController.bots[3] ? null : gameController.rollDice(player: 3),
               tooltip: 'Roll dice (1 to 6)',
-              child: const Icon(Icons.casino),
-            ),
+              child: Icon(Icons.casino, color: gameController.bots[3] ? Colors.grey.shade700: null),
+            )),
           ),
           Positioned(
               bottom: 210,

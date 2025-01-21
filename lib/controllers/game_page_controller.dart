@@ -157,11 +157,6 @@ class GamePageController extends GetxController {
     return result;
   }
 
-  Future<void> moveFirstPawn() async => await movePawn(pawnNumber: 0);
-  Future<void> moveSecondPawn() async => await movePawn(pawnNumber: 1);
-  Future<void> moveThirdPawn() async => await movePawn(pawnNumber: 2);
-  Future<void> moveFourthPawn() async => await movePawn(pawnNumber: 3);
-
   Future<void> movePawn({int? pawnNumber}) async {
     print('|movePawn| waitForMove: $waitForMove');
     if (waitForMove.value) {
