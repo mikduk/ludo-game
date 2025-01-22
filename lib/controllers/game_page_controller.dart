@@ -54,30 +54,34 @@ class GamePageController extends GetxController {
 
     /// TEST
     bots[0] = true;
-    bots[1] = true;
+    bots[1] = false;
     bots[2] = true;
     bots[3] = true;
 
-    board[0] = 2;
-    board[1] = 20;
-    board[2] = 200;
-    board[3] = 2000;
+    board[0] = 1;
+    board[1] = 10;
+    board[2] = 100;
+    board[3] = 1000;
     board[61] = 2;
     board[67] = 20;
     board[73] = 200;
     board[79] = 2000;
+    board[58] = 1;
+    board[63] = 10;
+    board[68] = 100;
+    board[75] = 1000;
     positionPawns[0] = 61;
     positionPawns[1] = 61;
-    // positionPawns[2] = 61;
+    positionPawns[2] = 58;
     positionPawns[4] = 67;
     positionPawns[5] = 67;
-    // positionPawns[6] = 67;
+    positionPawns[6] = 63;
     positionPawns[8] = 73;
     positionPawns[9] = 73;
-    // positionPawns[10] = 73;
+    positionPawns[10] = 68;
     positionPawns[12] = 79;
     positionPawns[13] = 79;
-    // positionPawns[14] = 79;
+    positionPawns[14] = 75;
   }
 
   @override
@@ -107,6 +111,7 @@ class GamePageController extends GetxController {
       int value = Random().nextInt(possibilities);
       score.value = diceResults[value];
       scores.value += diceResults[value].toString();
+      print('|rollDice| value: $value, score: ${score.value}, scores: ${scores.value}');
 
       await automaticallyMovePawn();
     }
@@ -151,6 +156,8 @@ class GamePageController extends GetxController {
     for (int i = 0; i < 4; i++) {
       int pawnField = positionPawns[4 * cpv + i];
       if (pawnField != cpv && (pawnField + score.value) <= (61 + cpv * 6)) {
+        return false;
+      } else if (score.value == 6 && pawnField == cpv) {
         return false;
       }
     }
@@ -395,6 +402,7 @@ class GamePageController extends GetxController {
   }
 
   void getNextPlayer() {
+    print('|getNextPlayer| currentPlayer: $currentPlayer');
     int currentIndex = nextPlayer.value;
     int nextIndex = (currentIndex + 1) % colors.length;
     currentPlayer.value = nextPlayer.value;
@@ -423,7 +431,7 @@ class GamePageController extends GetxController {
     if (waitForMove.value) {
       print('|doBotTurn| CZEKAMY');
       setWaitForMoveValue(false);
-      await Future.delayed(const Duration(seconds: 15));
+      await Future.delayed(const Duration(seconds: 3));
       print('|doBotTurn| POCZEKANE');
     }
     await rollDice(player: cpv);
@@ -450,7 +458,14 @@ class GamePageController extends GetxController {
         }
       } else {
         if (dice == 6) {
+
+          /// test
+          for (int p = 0; p < 4; p++) {
+            print('${positionPawns[4 * cpv + p]} --> ${possMoves[p]}');
+          }
+
           int r = Random().nextInt(4);
+          print('|doBotTurn| ((${board[cpv]} + ${board[6 * cpv + 61]}) ~/ $pow) > $r | ((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r');
           if (((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r) {
             List<int> valuesSix = [0, 1, 2, 3];
             valuesSix.shuffle(Random());
