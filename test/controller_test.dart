@@ -280,115 +280,40 @@ void main() {
   test('Funkcja `whereToGo` gracz Blue [extra]', () async {
     expect(controller.currentPlayer.value, 0);
 
-    expect(controller.board[0], 4);
-    expect(controller.board[4], 0);
+    await goOutAndRun(controller);
 
-    await controller.rollDice(player: 0, possibilities: 1);
-    await controller.movePawn();
+    for (int i = 4; i <= 28; i += 12)
+    {
+      skipTurnOfAnotherPlayers(controller);
 
-    expect(controller.board[0], 3);
-    expect(controller.board[4], 1);
+      expect(controller.board[0], 3);
+      expect(controller.board[i], 0);
+      expect(controller.board[i+6], 1);
+      expect(controller.positionPawns[0], i+6);
 
-    await controller.rollDice(player: 0, possibilities: 1);
-    await controller.movePawn();
+      await controller.rollDice(player: 0, possibilities: 1);
+      await controller.movePawn();
 
-    expect(controller.board[0], 3);
-    expect(controller.board[4], 0);
-    expect(controller.board[10], 1);
+      expect(controller.board[0], 3);
+      expect(controller.board[i+6], 0);
+      expect(controller.board[i+12], 1);
+      expect(controller.positionPawns[0], i+12);
 
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 1);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 2);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 3);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 0);
+      await controller.rollDice(player: 0, possibilities: 1);
+      await controller.movePawn();
 
-    expect(controller.board[0], 3);
-    expect(controller.board[4], 0);
-    expect(controller.board[10], 1);
+      expect(controller.board[0], 3);
+      expect(controller.board[i+12], 0);
+      expect(controller.board[i+18], 1);
+      expect(controller.positionPawns[0], i+18);
+    }
 
-    await controller.rollDice(player: 0, possibilities: 1);
-    await controller.movePawn();
-
-    expect(controller.board[0], 3);
-    expect(controller.board[10], 0);
-    expect(controller.board[16], 1);
-
-    await controller.rollDice(player: 0, possibilities: 1);
-    await controller.movePawn();
-
-    expect(controller.board[0], 3);
-    expect(controller.board[16], 0);
-    expect(controller.board[22], 1);
-
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 1);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 2);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 3);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 0);
-
-    expect(controller.board[0], 3);
-    expect(controller.board[16], 0);
-    expect(controller.board[22], 1);
-
-    await controller.rollDice(player: 0, possibilities: 1);
-    await controller.movePawn();
-
-    expect(controller.board[0], 3);
-    expect(controller.board[22], 0);
-    expect(controller.board[28], 1);
-
-    await controller.rollDice(player: 0, possibilities: 1);
-    await controller.movePawn();
-
-    expect(controller.board[0], 3);
-    expect(controller.board[28], 0);
-    expect(controller.board[34], 1);
-
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 1);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 2);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 3);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 0);
-
-    expect(controller.board[0], 3);
-    expect(controller.board[28], 0);
-    expect(controller.board[34], 1);
-
-    await controller.rollDice(player: 0, possibilities: 1);
-    await controller.movePawn();
-
-    expect(controller.board[0], 3);
-    expect(controller.board[34], 0);
-    expect(controller.board[40], 1);
-
-    await controller.rollDice(player: 0, possibilities: 1);
-    await controller.movePawn();
+    skipTurnOfAnotherPlayers(controller);
 
     expect(controller.board[0], 3);
     expect(controller.board[40], 0);
     expect(controller.board[46], 1);
-
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 1);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 2);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 3);
-    controller.getNextPlayer();
-    expect(controller.currentPlayer.value, 0);
-
-    expect(controller.board[0], 3);
-    expect(controller.board[40], 0);
-    expect(controller.board[46], 1);
+    expect(controller.positionPawns[0], 46);
 
     await controller.rollDice(player: 0, possibilities: 1);
     await controller.movePawn();
@@ -396,15 +321,15 @@ void main() {
     expect(controller.board[0], 3);
     expect(controller.board[46], 0);
     expect(controller.board[52], 1);
+    expect(controller.positionPawns[0], 52);
 
     await controller.rollDice(player: 0, possibilities: 1);
     await controller.movePawn();
 
-    controller.showBoard();
-
     expect(controller.board[0], 3);
     expect(controller.board[52], 0);
     expect(controller.board[59], 1);
+    expect(controller.positionPawns[0], 59);
 
   });
 
@@ -432,4 +357,83 @@ void main() {
   //   expect(controller.tenLog(1000), 3);
   //   expect(controller.tenLog(10), 1);
   // });
+
+  test('Zbijanie', () async {
+    controller.board[1] = 30;
+    controller.board[11] = 10;
+    controller.positionPawns[4] = 11;
+
+    expect(controller.currentPlayer.value, 0);
+
+    await goOutAndRun(controller);
+
+    expect(controller.currentPlayer.value, 0);
+    expect(controller.kills.value, 0);
+    expect(controller.scores.value, '66');
+
+    await controller.rollDice(player: 0, result: 1);
+    await controller.movePawn();
+
+    expect(controller.processedCapture.value, true);
+    expect(controller.currentPlayer.value, 0);
+    expect(controller.kills.value, 0);
+    expect(controller.scores.value, '661');
+
+    await Future.delayed(const Duration(milliseconds: 500));
+    print(controller.board);
+
+    await Future.delayed(const Duration(milliseconds: 1500));
+    print(controller.board);
+
+    await Future.delayed(const Duration(milliseconds: 2500));
+    print(controller.board);
+
+    await Future.delayed(const Duration(milliseconds: 3500));
+    print(controller.board);
+
+    await Future.delayed(const Duration(milliseconds: 4500));
+    print(controller.board);
+
+    await Future.delayed(const Duration(milliseconds: 5500));
+    print(controller.board);
+
+    await Future.delayed(const Duration(milliseconds: 6500));
+    print(controller.board);
+
+    expect(controller.positionPawns[4], 1);
+    expect(controller.board[11], 1);
+    expect(controller.board[1], 40);
+
+
+  });
 }
+
+Future<void> goOutAndRun(GamePageController controller) async {
+  expect(controller.board[0], 4);
+  expect(controller.board[4], 0);
+  expect(controller.positionPawns[0], 0);
+
+  await controller.rollDice(player: 0, possibilities: 1);
+  await controller.movePawn();
+
+  expect(controller.board[0], 3);
+  expect(controller.board[4], 1);
+  expect(controller.positionPawns[0], 4);
+
+  await controller.rollDice(player: 0, possibilities: 1);
+  await controller.movePawn();
+
+  expect(controller.board[0], 3);
+  expect(controller.board[4], 0);
+  expect(controller.board[10], 1);
+  expect(controller.positionPawns[0], 10);
+}
+
+void skipTurnOfAnotherPlayers(GamePageController controller,
+    {List<int> players = const [1, 2, 3, 0]}) {
+  for (int player in players) {
+    controller.getNextPlayer();
+    expect(controller.currentPlayer.value, player);
+  }
+}
+

@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'dart:math';
 
+import 'package:get/get_rx/get_rx.dart';
+
 class GamePageController extends GetxController {
   final List<String> colors = ['Blue', 'Red', 'Green', 'Yellow'];
 
@@ -13,6 +15,7 @@ class GamePageController extends GetxController {
   var kills = 0.obs;
   var finished = 0.obs;
   bool showSnackbar = false;
+  RxBool processedCapture = false.obs;
   var positionPawns = List.filled(16, 0).obs;
   var bots = List.filled(4, false).obs;
 
@@ -51,37 +54,6 @@ class GamePageController extends GetxController {
     for (int i = 0; i < 16; i++) {
       positionPawns[i] = i ~/ 4;
     }
-
-    /// TEST
-    bots[0] = true;
-    bots[1] = false;
-    bots[2] = true;
-    bots[3] = true;
-
-    board[0] = 1;
-    board[1] = 10;
-    board[2] = 100;
-    board[3] = 1000;
-    board[61] = 2;
-    board[67] = 20;
-    board[73] = 200;
-    board[79] = 2000;
-    board[58] = 1;
-    board[63] = 10;
-    board[68] = 100;
-    board[75] = 1000;
-    positionPawns[0] = 61;
-    positionPawns[1] = 61;
-    positionPawns[2] = 58;
-    positionPawns[4] = 67;
-    positionPawns[5] = 67;
-    positionPawns[6] = 63;
-    positionPawns[8] = 73;
-    positionPawns[9] = 73;
-    positionPawns[10] = 68;
-    positionPawns[12] = 79;
-    positionPawns[13] = 79;
-    positionPawns[14] = 75;
   }
 
   @override
@@ -96,21 +68,19 @@ class GamePageController extends GetxController {
     super.onClose(); // Wywołanie domyślnej metody onClose()
   }
 
-  Future<void> rollDice({int player = -1, int possibilities = 2}) async {
+  Future<void> rollDice({int player = -1, int possibilities = 6, int? result}) async {
     print(
         '|rollDice| waitForMove: $waitForMove, currentPlayer: $currentPlayer, player: $player');
     if (waitForMove.value) {
-      if (showSnackbar) {
-        Get.snackbar('Uwaga', 'Wykonaj ruch pionka!',
-            snackPosition: SnackPosition.BOTTOM);
-      }
       return;
     }
     if (player == currentPlayer.value) {
       List<int> diceResults = [6, 1, 5, 2, 4, 3];
       int value = Random().nextInt(possibilities);
-      score.value = diceResults[value];
-      scores.value += diceResults[value].toString();
+      result ??= diceResults[value];
+      processedCapture.value = false;
+      score.value = result;
+      scores.value += result.toString();
       print('|rollDice| value: $value, score: ${score.value}, scores: ${scores.value}');
 
       await automaticallyMovePawn();
@@ -270,6 +240,7 @@ class GamePageController extends GetxController {
   Future<void> goToField(int x, int pow, int pawnNumber) async {
     print('|goToField| x: $x, pow: $pow, pawnNumber: $pawnNumber');
     await goToFieldAnimate(positionPawns[4 * tenLog(pow) + pawnNumber], x, pow);
+    print('after await goToFieldAnimated');
     if (board[x] == 0) {
       board[x] = pow;
     } else if (canCapture(x, pow)) {
@@ -341,6 +312,7 @@ class GamePageController extends GetxController {
       await Future.delayed(delayTime);
       board[from] -= pow;
     }
+    print('GO TO FIELD - END');
   }
 
   bool canCapture(int x, int pow, {bool teamMode = false}) {
@@ -379,6 +351,7 @@ class GamePageController extends GetxController {
       }
     } else if (kills.value > 0) {
       kills.value -= 1;
+      processedCapture.value = true;
       setWaitForMoveValue(false);
       return;
     } else if (finished.value > 0) {
