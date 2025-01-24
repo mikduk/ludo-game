@@ -374,36 +374,33 @@ void main() {
     await controller.rollDice(player: 0, result: 1);
     await controller.movePawn();
 
+    expect(controller.scores.value, '661');
     expect(controller.processedCapture.value, true);
     expect(controller.currentPlayer.value, 0);
-    expect(controller.kills.value, 0);
-    expect(controller.scores.value, '661');
-
-    await Future.delayed(const Duration(milliseconds: 500));
-    print(controller.board);
-
-    await Future.delayed(const Duration(milliseconds: 1500));
-    print(controller.board);
-
-    await Future.delayed(const Duration(milliseconds: 2500));
-    print(controller.board);
-
-    await Future.delayed(const Duration(milliseconds: 3500));
-    print(controller.board);
-
-    await Future.delayed(const Duration(milliseconds: 4500));
-    print(controller.board);
-
-    await Future.delayed(const Duration(milliseconds: 5500));
-    print(controller.board);
-
-    await Future.delayed(const Duration(milliseconds: 6500));
-    print(controller.board);
 
     expect(controller.positionPawns[4], 1);
     expect(controller.board[11], 1);
     expect(controller.board[1], 40);
 
+    await controller.rollDice(player: 0, result: 6);
+    await controller.movePawn();
+
+    expect(controller.board[0], 3);
+    expect(controller.board[17], 1);
+    expect(controller.positionPawns[0], 17);
+
+    await controller.rollDice(player: 0, result: 3);
+    await controller.movePawn();
+
+    expect(controller.board[0], 3);
+    expect(controller.board[20], 1);
+    expect(controller.positionPawns[0], 20);
+
+    expect(controller.currentPlayer.value, 1);
+    expect(controller.nextPlayer.value, 2);
+    expect(controller.scores.value, '');
+    expect(controller.score.value, 0);
+    expect(controller.waitForMove.value, false);
 
   });
 }

@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'dart:math';
 
-import 'package:get/get_rx/get_rx.dart';
 
 class GamePageController extends GetxController {
   final List<String> colors = ['Blue', 'Red', 'Green', 'Yellow'];
@@ -177,12 +176,14 @@ class GamePageController extends GetxController {
       board[currentIndex] -= pow;
       int x = currentIndex * 13 + 4;
       await goToField(x, pow, pawnNumber ?? 0);
+      await endTurn();
     } else if (positionPawns[4 * currentIndex + (pawnNumber ?? 0)] !=
         currentIndex) {
       int i = positionPawns[4 * currentIndex + (pawnNumber ?? 0)];
       board[i] -= pow;
       int x = whereToGo(i, score.value, currentIndex);
       await goToField(x, pow, pawnNumber ?? 0);
+      await endTurn();
     } else {
       throw ArgumentError(
           'Pionek $pawnNumber. $currentPlayer nie może się ruszyć.');
@@ -253,7 +254,7 @@ class GamePageController extends GetxController {
     if ([61, 67, 73, 79].contains(x)) {
       finished.value += 1;
     }
-    await endTurn();
+    // await endTurn();
   }
 
   Future<void> goToFieldAnimate(int from, int to, int pow,
@@ -335,15 +336,16 @@ class GamePageController extends GetxController {
     int opponent = tenLog(result);
     for (int i = 0; i < 4; i++) {
       if (positionPawns[4 * opponent + i] == x) {
-        goToField(opponent, result, i);
+        await goToField(opponent, result, i);
         break;
       }
     }
+    print('|capture| kills++');
     kills.value += 1;
   }
 
   Future<void> endTurn() async {
-    print('|endTurn|');
+    print('|endTurn| currentPlayer: $currentPlayer, scores: $scores, kills: $kills, finished: $finished');
     if (score.value == 6) {
       if (!everyoneInBaseOrFinish()) {
         setWaitForMoveValue(false);
