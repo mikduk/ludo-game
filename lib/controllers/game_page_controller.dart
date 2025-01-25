@@ -35,7 +35,7 @@ class GamePageController extends GetxController {
       await doBotTurn();
       await Future.delayed(const Duration(milliseconds: 300));
     }
-    print('KONIEC PĘTLI');
+    print('KONIEC GRY');
   }
 
   void initializeBoard() {
@@ -65,7 +65,7 @@ class GamePageController extends GetxController {
   @override
   void onClose() {
     print('Kontroler został zamknięty');
-    super.onClose(); // Wywołanie domyślnej metody onClose()
+    super.onClose();
   }
 
   void regenerateBoard() {

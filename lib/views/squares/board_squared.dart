@@ -23,7 +23,9 @@ class BoardSquare extends StatelessWidget {
           child: Center(
             child: Text(
               showPawn(
-                  controller.board[index]), // Wyświetla wartość board[index]
+                  controller.board[index],
+                  controller.regenerateBoard
+              ),
               style: TextStyle(
                 fontSize: getSize(controller.board[index]),
                 color: Colors.black87,
@@ -69,7 +71,7 @@ class BoardSquare extends StatelessWidget {
     }
   }
 
-  String showPawn(int field) {
+  String showPawn(int field, Function()? regenerate) {
     try {
       if (field == 0) {
         return '';
@@ -89,7 +91,8 @@ class BoardSquare extends StatelessWidget {
       }
       return result;
     } catch (e) {
-      print(e);
+      print('|BOARD SQUARED| $e');
+      Future.delayed(const Duration(seconds: 1), regenerate);
       return 'E';
     }
   }
