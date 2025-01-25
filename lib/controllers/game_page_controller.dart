@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'dart:math';
-
+import 'package:audioplayers/audioplayers.dart';
 
 class GamePageController extends GetxController {
   final List<String> colors = ['Blue', 'Red', 'Green', 'Yellow'];
@@ -67,6 +67,14 @@ class GamePageController extends GetxController {
     super.onClose(); // Wywołanie domyślnej metody onClose()
   }
 
+  void regenerateBoard() {
+    board.value = List.filled(80, 0);
+    for (int i = 0; i < 16; i++) {
+      int pow = tenPow(i ~/ 4);
+      board[positionPawns[i]] += pow;
+    }
+  }
+
   Future<void> rollDice({int player = -1, int possibilities = 6, int? result}) async {
     print(
         '|rollDice| waitForMove: $waitForMove, currentPlayer: $currentPlayer, player: $player');
@@ -93,6 +101,9 @@ class GamePageController extends GetxController {
   Future<void> automaticallyMovePawn() async {
     if (everyoneInBaseOrFinish()) {
       if (score.value != 6) {
+        if (onlyYouInBaseOrFinish()) {
+          playRandomlyLaugh();
+        }
         await Future.delayed(const Duration(seconds: 1), getNextPlayer);
       } else {
         setWaitForMoveValue(true);
@@ -112,10 +123,23 @@ class GamePageController extends GetxController {
     return (board[61 + player * 6] == 4 * pow);
   }
 
-  bool everyoneInBaseOrFinish() {
-    int pow = tenPow(currentPlayer.value);
-    return (board[currentPlayer.value] + board[61 + currentPlayer.value * 6] ==
+  bool everyoneInBaseOrFinish({int? player}) {
+    player ??= currentPlayer.value;
+    int pow = tenPow(player);
+    return (board[player] + board[61 + player * 6] ==
         4 * pow);
+  }
+
+  bool onlyYouInBaseOrFinish({int? player}) {
+    player ??= currentPlayer.value;
+    for (int i = 0; i < colors.length; i++) {
+      if (player == i && !everyoneInBaseOrFinish(player: i)) {
+        return false;
+      } else if (player != i && everyoneInBaseOrFinish(player: i)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   bool everyoneInBaseOrFinishOrCannotGo() {
@@ -245,6 +269,7 @@ class GamePageController extends GetxController {
     if (board[x] == 0) {
       board[x] = pow;
     } else if (canCapture(x, pow)) {
+      // TODO
       await capture(x, pow);
       board[x] = pow;
     } else {
@@ -275,6 +300,8 @@ class GamePageController extends GetxController {
           to = 43;
           break;
       }
+    } else if ([0, 1, 2, 3].contains(from)) {
+      playClickSound(sound: 'sounds/goOut.mp3');
     }
     while (from != to) {
       if ((3 < from && to < 56 && to == originalPosition) ||
@@ -331,8 +358,11 @@ class GamePageController extends GetxController {
   }
 
   Future<void> capture(int x, int pow) async {
+    playClickSound();
+    playRandomlyLaugh();
     print('|capture| x: $x, pow: $pow');
     int result = board[x];
+    board[x] = pow; // TODO
     int opponent = tenLog(result);
     for (int i = 0; i < 4; i++) {
       if (positionPawns[4 * opponent + i] == x) {
@@ -342,6 +372,26 @@ class GamePageController extends GetxController {
     }
     print('|capture| kills++');
     kills.value += 1;
+  }
+
+  void playRandomSound() async {
+    List<String> sounds = ['capture', 'goOut', 'bravo', 'laugh1', 'laugh2'];
+    int i = Random().nextInt(sounds.length);
+    playClickSound(sound: 'sounds/${sounds[i]}.mp3');
+  }
+
+  void playRandomlyLaugh() async {
+    List<String> sounds = ['laugh1', 'laugh2'];
+    int i = Random().nextInt(sounds.length);
+    if (Random().nextInt(10) >= 9) {
+      playClickSound(sound: 'sounds/${sounds[i]}.mp3');
+    }
+  }
+
+  void playClickSound({String sound = 'sounds/capture.mp3'}) async {
+    final player = AudioPlayer();
+    await player.setSource(AssetSource(sound));
+    await player.resume();
   }
 
   Future<void> endTurn() async {
@@ -359,7 +409,11 @@ class GamePageController extends GetxController {
     } else if (finished.value > 0) {
       finished.value -= 1;
       setWaitForMoveValue(false);
-      return;
+      if (everyoneInFinish()) {
+        playClickSound(sound: 'sounds/bravo.mp3');
+      } else {
+        return;
+      }
     }
     await Future.delayed(const Duration(seconds: 2), getNextPlayer);
   }
@@ -385,6 +439,10 @@ class GamePageController extends GetxController {
     scores.value = '';
     score.value = 0;
     setWaitForMoveValue(false);
+    if (everyoneInFinish(player: nextPlayer.value)) {
+      nextIndex = (nextIndex + 1) % colors.length;
+      nextPlayer.value = nextIndex;
+    }
     if (everyoneInFinish(player: nextPlayer.value)) {
       nextIndex = (nextIndex + 1) % colors.length;
       nextPlayer.value = nextIndex;

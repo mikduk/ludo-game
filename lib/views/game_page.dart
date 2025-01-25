@@ -185,10 +185,11 @@ class GamePage extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 40,
-            left: 160,
+            top: 12,
+            left: 116,
             child: FloatingActionButton(
               heroTag: 'btn9',
+              mini: true,
               backgroundColor: Colors.tealAccent,
               onPressed: gameController.showBoard,
               tooltip: 'Show info',
@@ -196,17 +197,41 @@ class GamePage extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 40,
-            left: 220,
+            top: 12,
+            left: 166,
             child: FloatingActionButton(
               heroTag: 'btn10',
+              mini: true,
               backgroundColor: Colors.amber,
               onPressed: gameController.endTurn,
               tooltip: 'End of turn',
               child: const Icon(Icons.hourglass_empty),
             ),
           ),
-
+          Positioned(
+            top: 12,
+            left: 216,
+            child: FloatingActionButton(
+              heroTag: 'btn11',
+              mini: true,
+              backgroundColor: Colors.lightBlueAccent,
+              onPressed: gameController.regenerateBoard,
+              tooltip: 'Regenerate board',
+              child: const Icon(Icons.refresh),
+            ),
+          ),
+          Positioned(
+            top: 12,
+            left: 266,
+            child: FloatingActionButton(
+              heroTag: 'btn12',
+              mini: true,
+              backgroundColor: Colors.limeAccent,
+              onPressed: gameController.playRandomSound,
+              tooltip: 'Play click sound',
+              child: const Icon(Icons.music_note_outlined),
+            ),
+          ),
           Positioned(
               top: t,
               left: l,
