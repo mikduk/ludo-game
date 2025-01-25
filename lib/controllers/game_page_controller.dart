@@ -17,6 +17,7 @@ class GamePageController extends GetxController {
   RxBool processedCapture = false.obs;
   var positionPawns = List.filled(16, 0).obs;
   var bots = List.filled(4, false).obs;
+  RxBool soundOn = true.obs;
 
   @override
   void onInit({bool test = false}) {
@@ -92,6 +93,10 @@ class GamePageController extends GetxController {
 
       await automaticallyMovePawn();
     }
+  }
+
+  void soundSwitch() {
+    soundOn.value = !soundOn.value;
   }
 
   void changeBotFlag(int player) {

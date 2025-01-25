@@ -227,9 +227,9 @@ class GamePage extends StatelessWidget {
               heroTag: 'btn12',
               mini: true,
               backgroundColor: Colors.limeAccent,
-              onPressed: gameController.playRandomSound,
-              tooltip: 'Play click sound',
-              child: const Icon(Icons.music_note_outlined),
+              onPressed: gameController.soundSwitch,
+              tooltip: 'Switch sound',
+              child: Obx(() => gameController.soundOn.value ? const Icon(Icons.music_note_outlined) : const Icon(Icons.music_off_outlined)),
             ),
           ),
           Positioned(
