@@ -4,6 +4,10 @@ import 'package:audioplayers/audioplayers.dart';
 
 class GamePageController extends GetxController {
   final List<String> colors = ['Blue', 'Red', 'Green', 'Yellow'];
+  final normalDuration = const Duration(milliseconds: 800);
+  final longerDuration = const Duration(milliseconds: 1600);
+  final movementDuration = const Duration(milliseconds: 180);
+  final nextBotDuration = const Duration(milliseconds: 300);
 
   var score = 0.obs;
   var scores = ''.obs;
@@ -17,7 +21,9 @@ class GamePageController extends GetxController {
   RxBool processedCapture = false.obs;
   var positionPawns = List.filled(16, 0).obs;
   var bots = List.filled(4, false).obs;
+
   RxBool soundOn = true.obs;
+  RxBool stopGame = false.obs;
 
   @override
   void onInit({bool test = false}) {
@@ -32,8 +38,10 @@ class GamePageController extends GetxController {
   Future<void> executePeriodicallyBots() async {
     await Future.delayed(const Duration(seconds: 3));
     while (board[79] ~/ 4000 + board[73] ~/ 400 + board[67] ~/ 40 + board[61] ~/ 4 < 3) {
-      await doBotTurn();
-      await Future.delayed(const Duration(milliseconds: 300));
+      if (!stopGame.value) {
+        await doBotTurn();
+        await Future.delayed(nextBotDuration);
+      }
     }
     print('KONIEC GRY');
   }
@@ -95,6 +103,11 @@ class GamePageController extends GetxController {
     }
   }
 
+  void startStopGame() {
+    print('SSG');
+    stopGame.value = !stopGame.value;
+  }
+
   void soundSwitch() {
     soundOn.value = !soundOn.value;
   }
@@ -109,14 +122,14 @@ class GamePageController extends GetxController {
         if (onlyYouInBaseOrFinish()) {
           playRandomlyLaugh();
         }
-        await Future.delayed(const Duration(seconds: 1), getNextPlayer);
+        await Future.delayed(normalDuration, getNextPlayer);
       } else {
         setWaitForMoveValue(true);
       }
     } else if (everyoneInBaseOrFinishOrCannotGo()) {
-      await Future.delayed(const Duration(seconds: 1), getNextPlayer);
+      await Future.delayed(normalDuration, getNextPlayer);
     } else if (scores.value.contains('666')) {
-      await Future.delayed(const Duration(seconds: 2), getNextPlayer);
+      await Future.delayed(longerDuration, getNextPlayer);
     } else {
       setWaitForMoveValue(true);
     }
@@ -269,7 +282,7 @@ class GamePageController extends GetxController {
 
   Future<void> goToField(int x, int pow, int pawnNumber) async {
     print('|goToField| x: $x, pow: $pow, pawnNumber: $pawnNumber');
-    await goToFieldAnimate(positionPawns[4 * tenLog(pow) + pawnNumber], x, pow);
+    await goToFieldAnimate(positionPawns[4 * tenLog(pow) + pawnNumber], x, pow, delayTime: movementDuration);
     print('after await goToFieldAnimated');
     if (board[x] == 0) {
       board[x] = pow;
@@ -420,7 +433,7 @@ class GamePageController extends GetxController {
         return;
       }
     }
-    await Future.delayed(const Duration(seconds: 2), getNextPlayer);
+    await Future.delayed(longerDuration, getNextPlayer);
   }
 
   int tenPow(int exponent) {
@@ -465,7 +478,7 @@ class GamePageController extends GetxController {
       return;
     }
     print('|doBotTurn| scores: $scores, waitForMove: $waitForMove');
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(normalDuration);
     if (waitForMove.value) {
       print('|doBotTurn| CZEKAMY');
       setWaitForMoveValue(false);
@@ -473,7 +486,7 @@ class GamePageController extends GetxController {
       print('|doBotTurn| POCZEKANE');
     }
     await rollDice(player: cpv);
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(normalDuration);
     print('|doBotTurn| AFTER: score: $score, scores: $scores');
     int dice = score.value;
     int pow = tenPow(cpv);

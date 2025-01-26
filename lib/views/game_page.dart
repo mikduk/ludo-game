@@ -233,6 +233,18 @@ class GamePage extends StatelessWidget {
             ),
           ),
           Positioned(
+            top: 66,
+            left: 188,
+            child: FloatingActionButton(
+              heroTag: 'btn13',
+              mini: true,
+              backgroundColor: Colors.deepOrangeAccent,
+              onPressed: gameController.startStopGame,
+              tooltip: 'Start/stop game',
+              child: Obx(() => gameController.stopGame.value ? const Icon(Icons.pause) : const Icon(Icons.play_arrow)),
+            ),
+          ),
+          Positioned(
               top: t,
               left: l,
               child: BoardSquare(index: 15, color: Colors.red.shade100)),
