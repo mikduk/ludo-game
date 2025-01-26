@@ -40,8 +40,8 @@ class GamePageController extends GetxController {
     while (board[79] ~/ 4000 + board[73] ~/ 400 + board[67] ~/ 40 + board[61] ~/ 4 < 3) {
       if (!stopGame.value) {
         await doBotTurn();
-        await Future.delayed(nextBotDuration);
       }
+      await Future.delayed(nextBotDuration);
     }
     print('KONIEC GRY');
   }
@@ -104,7 +104,6 @@ class GamePageController extends GetxController {
   }
 
   void startStopGame() {
-    print('SSG');
     stopGame.value = !stopGame.value;
   }
 
