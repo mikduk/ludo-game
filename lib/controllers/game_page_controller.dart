@@ -406,9 +406,11 @@ class GamePageController extends GetxController {
   }
 
   void playClickSound({String sound = 'sounds/capture.mp3'}) async {
-    final player = AudioPlayer();
-    await player.setSource(AssetSource(sound));
-    await player.resume();
+    if (soundOn.value) {
+      final player = AudioPlayer();
+      await player.setSource(AssetSource(sound));
+      await player.resume();
+    }
   }
 
   Future<void> endTurn() async {
