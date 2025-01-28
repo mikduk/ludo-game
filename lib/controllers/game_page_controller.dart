@@ -17,7 +17,6 @@ class GamePageController extends GetxController {
   var board = List.filled(80, 0).obs;
   var kills = 0.obs;
   var finished = 0.obs;
-  bool showSnackbar = false;
   RxBool processedCapture = false.obs;
   var positionPawns = List.filled(16, 0).obs;
   var bots = List.filled(4, false).obs;
@@ -28,9 +27,6 @@ class GamePageController extends GetxController {
   @override
   void onInit({bool test = false}) {
     super.onInit();
-    if (test) {
-      showSnackbar = true;
-    }
     initializeBoard();
     executePeriodicallyBots();
   }
@@ -180,22 +176,9 @@ class GamePageController extends GetxController {
       try {
         print('|movePawn| LECIMY TUTAJ --> movePlayerPawn($pawnNumber)');
         await movePlayerPawn(pawnNumber);
-        if (showSnackbar) {
-          Get.snackbar('Tytuł', 'Ruch pionka wykonany!',
-              snackPosition: SnackPosition.BOTTOM);
-        }
       } catch (e) {
         print('|movePawn| $e');
-        if (showSnackbar) {
-          Get.snackbar('Tytuł', 'Ruch tego pionka zabroniony!',
-              snackPosition: SnackPosition.BOTTOM);
-        }
         rethrow;
-      }
-    } else {
-      if (showSnackbar) {
-        Get.snackbar('Tytuł', 'Nie teraz byczku ;)',
-            snackPosition: SnackPosition.BOTTOM);
       }
     }
   }
