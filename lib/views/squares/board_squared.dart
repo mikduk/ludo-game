@@ -19,7 +19,7 @@ class BoardSquare extends StatelessWidget {
           width: 29.0,
           height: 29.0,
           decoration: BoxDecoration(
-              color: color ?? Colors.grey.shade100, border: border ? Border.all() : null),
+              color: isPossibleMove(controller) ? Colors.lime : (color ?? Colors.grey.shade100), border: border ? Border.all() : null),
           child: Center(
             child: Text(
               showPawn(
@@ -28,7 +28,7 @@ class BoardSquare extends StatelessWidget {
               ),
               style: TextStyle(
                 fontSize: getSize(controller.board[index]),
-                color: Colors.black87,
+                color: getColor(controller.board[index], controller.currentPlayer.value),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -48,6 +48,28 @@ class BoardSquare extends StatelessWidget {
       default:
         return 9;
     }
+  }
+
+  Color? getColor(int field, int activePlayerColor) {
+    String fieldString = field.toString().padLeft(4, '0');
+    if (fieldString[3-activePlayerColor] != '0') {
+      return Colors.black;
+    }
+    return Colors.black54;
+  }
+
+  bool isPossibleMove(GamePageController controller) {
+    int cpv = controller.currentPlayer.value;
+    if (controller.waitForMove.value && !controller.bots[cpv]) {
+      List<int> possMoves = List.filled(4, -1);
+      for (int i = 0; i < 4; i++) {
+        possMoves[i] = controller.whereToGo(controller.positionPawns[4 * cpv + i], controller.score.value, cpv);
+      }
+      if (possMoves.contains(index)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   Future<void> fieldAction(GamePageController controller) async {
