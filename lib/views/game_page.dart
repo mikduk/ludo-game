@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/game_page_controller.dart';
+import '../controllers/screen_controller.dart';
 import 'squares/base_squared.dart';
 import 'squares/board_squared.dart';
 import 'squares/diagonal_squared.dart';
@@ -13,292 +16,317 @@ class GamePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GamePageController gameController = Get.put(GamePageController());
-
-    const double s = 29 - 1;
-    const double t = 350;
-    const double l = 3;
+    final ScreenController screenController = Get.put(ScreenController());
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Get.theme.colorScheme.inversePrimary,
         title: Text(title),
       ),
-      body: Stack(
-          alignment: AlignmentDirectional.bottomCenter,
-          children: <Widget>[
-            Container(height: double.infinity, width: double.infinity, decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.purple.shade50,
-                  Colors.purple.shade100,
-                  Colors.purple.shade50,
+      body: Stack(alignment: AlignmentDirectional.center, children: <Widget>[
+        Container(
+          height: double.infinity,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.purple.shade50,
+                Colors.purple.shade100,
+                Colors.purple.shade50,
+              ],
+              stops: const [0.1, 0.8, 0.9], // Płynniejsze przejście
+            ),
+          ),
+        ),
+        Padding(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Obx(() => Text(
+                        'Player ${gameController.colors[gameController.currentPlayer.value]}',
+                        style: Get.textTheme.headlineMedium,
+                      )),
+                  const Text('Your current score is:'),
+                  Obx(() => Text(
+                        '${gameController.scores}',
+                        style: Get.textTheme.headlineMedium,
+                      )),
+                  Obx(() => Text(
+                      'Next player is ${gameController.colors[gameController.nextPlayer.value]}')),
                 ],
-                stops: const [0.1, 0.8, 0.9], // Płynniejsze przejście
               ),
-            ),),
-            Padding(
-                padding: const EdgeInsets.only(bottom: 24.0),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Obx(() => Text(
-                            'Player ${gameController.colors[gameController.currentPlayer.value]}',
-                            style: Get.textTheme.headlineMedium,
-                          )),
-                      const Text('Your current score is:'),
-                      Obx(() => Text(
-                            '${gameController.scores}',
-                            style: Get.textTheme.headlineMedium,
-                          )),
-                      Obx(() => Text(
-                          'Next player is ${gameController.colors[gameController.nextPlayer.value]}')),
-                    ],
-                  ),
-                )),
-            // Przycisk w lewym górnym rogu
-            Positioned(
-                top: 30,
-                left: 30,
-                child: Column(
+            )),
+        // Przycisk w lewym górnym rogu
+        GetBuilder<ScreenController>(
+          builder: (screenController) {
+            double topPosition = screenController.screenHeight * 0.03;
+            double leftPosition = screenController.screenWidth * 0.05;
+            double buttonWidth = screenController.screenWidth * 0.9;
+
+            return Positioned(
+              top: topPosition,
+              left: leftPosition,
+              child: SizedBox(
+                width: buttonWidth,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Obx(() => FloatingActionButton(
-                        heroTag: 'btn1',
-                        backgroundColor: gameController.bots[1]
-                            ? Colors.grey.shade400
-                            : Colors.red,
-                        onPressed: () => gameController.bots[1]
-                            ? null
-                            : gameController.rollDice(player: 1),
-                        tooltip: 'Roll dice (1 to 6)',
-                        child: Icon(Icons.casino,
-                            color: gameController.bots[1]
-                                ? Colors.grey.shade700
-                                : null))),
-                    Obx(() => Switch(
-                        activeTrackColor: Colors.red,
-                        value: gameController.bots[1],
-                        onChanged: (bool value) {
-                          gameController.changeBotFlag(1);
-                        })),
+                    Column(
+                      children: [
+                        // Obx wewnątrz GetBuilder dla dynamicznych zmian
+                        Obx(() => FloatingActionButton(
+                          heroTag: 'btn1',
+                          backgroundColor: gameController.bots[1]
+                              ? Colors.grey.shade400
+                              : Colors.red,
+                          onPressed: () => gameController.bots[1]
+                              ? null
+                              : gameController.rollDice(player: 1),
+                          tooltip: 'Roll dice (1 to 6)',
+                          child: Icon(Icons.casino,
+                              color: gameController.bots[1]
+                                  ? Colors.grey.shade700
+                                  : null),
+                        )),
+                        Obx(() => Switch(
+                          activeTrackColor: Colors.red,
+                          value: gameController.bots[1],
+                          onChanged: (bool value) {
+                            gameController.changeBotFlag(1);
+                          },
+                        )),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        // Obx wewnątrz GetBuilder dla dynamicznych zmian
+                        Obx(() => FloatingActionButton(
+                          heroTag: 'btn2',
+                          backgroundColor: gameController.bots[2]
+                              ? Colors.grey.shade400
+                              : Colors.green,
+                          onPressed: () => gameController.bots[2]
+                              ? null
+                              : gameController.rollDice(player: 2),
+                          tooltip: 'Roll dice (1 to 6)',
+                          child: Icon(Icons.casino,
+                              color: gameController.bots[2]
+                                  ? Colors.grey.shade700
+                                  : null),
+                        )),
+                        Obx(() => Switch(
+                          activeTrackColor: Colors.green,
+                          value: gameController.bots[2],
+                          onChanged: (bool value) {
+                            gameController.changeBotFlag(2);
+                          },
+                        )),
+                      ],
+                    ),
                   ],
-                )),
-            Positioned(
-                top: 30,
-                right: 30,
-                child: Column(
-                  children: [
-                    Obx(() => FloatingActionButton(
-                        heroTag: 'btn2',
-                        backgroundColor: gameController.bots[2]
-                            ? Colors.grey.shade400
-                            : Colors.green,
-                        onPressed: () => gameController.bots[2]
-                            ? null
-                            : gameController.rollDice(player: 2),
-                        tooltip: 'Roll dice (1 to 6)',
-                        child: Icon(Icons.casino,
-                            color: gameController.bots[2]
-                                ? Colors.grey.shade700
-                                : null))),
-                    Obx(() => Switch(
-                        activeTrackColor: Colors.green,
-                        value: gameController.bots[2],
-                        onChanged: (bool value) {
-                          gameController.changeBotFlag(2);
-                        })),
-                  ],
-                )),
-            // 150, 30, 0
-            Positioned(
-                bottom: 150,
-                left: 30,
-                child: Column(
-                  children: [
-                    Obx(() => Switch(
-                        activeTrackColor: Colors.blue,
-                        value: gameController.bots[0],
-                        onChanged: (bool value) {
-                          gameController.changeBotFlag(0);
-                        })),
-                    Obx(() => FloatingActionButton(
-                        heroTag: 'btn0',
-                        backgroundColor: gameController.bots[0]
-                            ? Colors.grey.shade400
-                            : Colors.blue,
-                        onPressed: () => gameController.bots[0]
-                            ? null
-                            : gameController.rollDice(player: 0),
-                        tooltip: 'Roll dice (1 to 6)',
-                        child: Icon(Icons.casino,
-                            color: gameController.bots[0]
-                                ? Colors.grey.shade700
-                                : null))),
-                  ],
-                )),
-            Positioned(
-                bottom: 150,
-                right: 30,
-                child: Column(
-                  children: [
-                    Obx(() => Switch(
-                        activeTrackColor: Colors.yellow,
-                        value: gameController.bots[3],
-                        onChanged: (bool value) {
-                          gameController.changeBotFlag(3);
-                        })),
-                    Obx(() => FloatingActionButton(
-                        heroTag: 'btn3',
-                        backgroundColor: gameController.bots[3]
-                            ? Colors.grey.shade400
-                            : Colors.yellow,
-                        onPressed: () => gameController.bots[3]
-                            ? null
-                            : gameController.rollDice(player: 3),
-                        tooltip: 'Roll dice (1 to 6)',
-                        child: Icon(Icons.casino,
-                            color: gameController.bots[3]
-                                ? Colors.grey.shade700
-                                : null))),
-                  ],
-                )),
-            const Positioned(
-              top: t - s * 1,
-              left: l + s * 6,
-              child: DiagonalSquare(
-                color1: Colors.green,
-                color2: Colors.red,
-                isTopLeftToBottomRight: false,
+                ),
               ),
-            ),
-            const Positioned(
-              top: t + s * 1,
-              left: l + s * 6,
-              child: DiagonalSquare(
-                color1: Colors.red,
-                color2: Colors.blue,
-                isTopLeftToBottomRight: true,
-              ),
-            ),
-            const Positioned(
-              top: t - s * 1,
-              left: l + s * 8,
-              child: DiagonalSquare(
-                color1: Colors.green,
-                color2: Colors.yellow,
-                isTopLeftToBottomRight: true,
-              ),
-            ),
-            const Positioned(
-              top: t + s * 1,
-              left: l + s * 8,
-              child: DiagonalSquare(
-                color1: Colors.yellow,
-                color2: Colors.blue,
-                isTopLeftToBottomRight: false,
-              ),
-            ),
-            const Positioned(
-              top: t + s * 0,
-              left: l + s * 7,
-              child: FourColorSquare(
-                topLeftColor: Colors.red,
-                topRightColor: Colors.green,
-                bottomLeftColor: Colors.blue,
-                bottomRightColor: Colors.yellow,
-                showBorder: true,
-                borderColor: Colors.black,
-                borderWidth: 0.0,
-              ),
-            ),
-            Positioned(
-              top: 12,
-              left: 116,
-              child: FloatingActionButton(
-                heroTag: 'btn9',
-                mini: true,
-                backgroundColor: Colors.tealAccent,
-                onPressed: gameController.showBoard,
-                tooltip: 'Show info',
-                child: const Icon(Icons.info),
-              ),
-            ),
-            Positioned(
-              top: 12,
-              left: 166,
-              child: FloatingActionButton(
-                heroTag: 'btn10',
-                mini: true,
-                backgroundColor: Colors.amber,
-                onPressed: gameController.endTurn,
-                tooltip: 'End of turn',
-                child: const Icon(Icons.hourglass_empty),
-              ),
-            ),
-            Positioned(
-              top: 12,
-              left: 216,
-              child: FloatingActionButton(
-                heroTag: 'btn11',
-                mini: true,
-                backgroundColor: Colors.lightBlueAccent,
-                onPressed: gameController.regenerateBoard,
-                tooltip: 'Regenerate board',
-                child: const Icon(Icons.refresh),
-              ),
-            ),
-            Positioned(
-              top: 12,
-              left: 266,
-              child: FloatingActionButton(
-                heroTag: 'btn12',
-                mini: true,
-                backgroundColor: Colors.limeAccent,
-                onPressed: gameController.soundSwitch,
-                tooltip: 'Switch sound',
-                child: Obx(() => gameController.soundOn.value
-                    ? const Icon(Icons.music_note_outlined)
-                    : const Icon(Icons.music_off_outlined)),
-              ),
-            ),
-            Positioned(
-              top: 66,
-              left: 188,
-              child: FloatingActionButton(
-                heroTag: 'btn13',
-                mini: true,
-                backgroundColor: Colors.deepOrangeAccent,
-                onPressed: gameController.startStopGame,
-                tooltip: 'Start/stop game',
-                child: Obx(() => gameController.stopGame.value
-                    ? const Icon(Icons.pause)
-                    : const Icon(Icons.play_arrow)),
-              ),
-            ),
-            const Board(t: t, l: l, s: s)
-          ]),
+            );
+          },
+        ),
+        Positioned(
+            bottom: 150,
+            left: 30,
+            child: Column(
+              children: [
+                Obx(() => Switch(
+                    activeTrackColor: Colors.blue,
+                    value: gameController.bots[0],
+                    onChanged: (bool value) {
+                      gameController.changeBotFlag(0);
+                    })),
+                Obx(() => FloatingActionButton(
+                    heroTag: 'btn0',
+                    backgroundColor: gameController.bots[0]
+                        ? Colors.grey.shade400
+                        : Colors.blue,
+                    onPressed: () => gameController.bots[0]
+                        ? null
+                        : gameController.rollDice(player: 0),
+                    tooltip: 'Roll dice (1 to 6)',
+                    child: Icon(Icons.casino,
+                        color: gameController.bots[0]
+                            ? Colors.grey.shade700
+                            : null))),
+              ],
+            )),
+        Positioned(
+            bottom: 150,
+            right: 30,
+            child: Column(
+              children: [
+                Obx(() => Switch(
+                    activeTrackColor: Colors.yellow,
+                    value: gameController.bots[3],
+                    onChanged: (bool value) {
+                      gameController.changeBotFlag(3);
+                    })),
+                Obx(() => FloatingActionButton(
+                    heroTag: 'btn3',
+                    backgroundColor: gameController.bots[3]
+                        ? Colors.grey.shade400
+                        : Colors.yellow,
+                    onPressed: () => gameController.bots[3]
+                        ? null
+                        : gameController.rollDice(player: 3),
+                    tooltip: 'Roll dice (1 to 6)',
+                    child: Icon(Icons.casino,
+                        color: gameController.bots[3]
+                            ? Colors.grey.shade700
+                            : null))),
+              ],
+            )),
+        Positioned(
+          top: 12,
+          left: 116,
+          child: FloatingActionButton(
+            heroTag: 'btn9',
+            mini: true,
+            backgroundColor: Colors.tealAccent,
+            onPressed: gameController.showBoard,
+            tooltip: 'Show info',
+            child: const Icon(Icons.info),
+          ),
+        ),
+        Positioned(
+          top: 12,
+          left: 166,
+          child: FloatingActionButton(
+            heroTag: 'btn10',
+            mini: true,
+            backgroundColor: Colors.amber,
+            onPressed: gameController.endTurn,
+            tooltip: 'End of turn',
+            child: const Icon(Icons.hourglass_empty),
+          ),
+        ),
+        Positioned(
+          top: 12,
+          left: 216,
+          child: FloatingActionButton(
+            heroTag: 'btn11',
+            mini: true,
+            backgroundColor: Colors.lightBlueAccent,
+            onPressed: gameController.regenerateBoard,
+            tooltip: 'Regenerate board',
+            child: const Icon(Icons.refresh),
+          ),
+        ),
+        Positioned(
+          top: 12,
+          left: 266,
+          child: FloatingActionButton(
+            heroTag: 'btn12',
+            mini: true,
+            backgroundColor: Colors.limeAccent,
+            onPressed: () {
+              gameController.soundSwitch();
+              gameController.playRandomSound();
+            },
+            tooltip: 'Switch sound',
+            child: Obx(() => gameController.soundOn.value
+                ? const Icon(Icons.music_note_outlined)
+                : const Icon(Icons.music_off_outlined)),
+          ),
+        ),
+        Positioned(
+          top: 66,
+          left: 188,
+          child: FloatingActionButton(
+            heroTag: 'btn13',
+            mini: true,
+            backgroundColor: Colors.deepOrangeAccent,
+            onPressed: gameController.startStopGame,
+            tooltip: 'Start/stop game',
+            child: Obx(() => gameController.stopGame.value
+                ? const Icon(Icons.pause)
+                : const Icon(Icons.play_arrow)),
+          ),
+        ),
+        Container(
+          width: min(Get.width, Get.height),
+          height: min(Get.width, Get.height),
+          // color: Colors.blueGrey,
+          child: const Stack(
+            children: [
+              Board(),
+            ],
+          ),
+        ),
+      ]),
     );
   }
 }
 
 class Board extends StatelessWidget {
-  const Board({
-    super.key,
-    required this.t,
-    required this.l,
-    required this.s,
-  });
+  const Board({super.key});
 
-  final double t;
-  final double l;
-  final double s;
+  final double s = 29 - 1;
+  final double t = (29 - 1) * 7;
+  final double l = 3;
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
+        Positioned(
+          top: t - s * 1,
+          left: l + s * 6,
+          child: const DiagonalSquare(
+            color1: Colors.green,
+            color2: Colors.red,
+            isTopLeftToBottomRight: false,
+          ),
+        ),
+        Positioned(
+          top: t + s * 1,
+          left: l + s * 6,
+          child: const DiagonalSquare(
+            color1: Colors.red,
+            color2: Colors.blue,
+            isTopLeftToBottomRight: true,
+          ),
+        ),
+        Positioned(
+          top: t - s * 1,
+          left: l + s * 8,
+          child: const DiagonalSquare(
+            color1: Colors.green,
+            color2: Colors.yellow,
+            isTopLeftToBottomRight: true,
+          ),
+        ),
+        Positioned(
+          top: t + s * 1,
+          left: l + s * 8,
+          child: const DiagonalSquare(
+            color1: Colors.yellow,
+            color2: Colors.blue,
+            isTopLeftToBottomRight: false,
+          ),
+        ),
+        Positioned(
+          top: t + s * 0,
+          left: l + s * 7,
+          child: const FourColorSquare(
+            topLeftColor: Colors.red,
+            topRightColor: Colors.green,
+            bottomLeftColor: Colors.blue,
+            bottomRightColor: Colors.yellow,
+            showBorder: true,
+            borderColor: Colors.black,
+            borderWidth: 0.0,
+          ),
+        ),
         Positioned(
             top: t,
             left: l,

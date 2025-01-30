@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
@@ -50,14 +51,28 @@ class GamePageController extends GetxController {
     score = 0.obs;
     scores = ''.obs;
 
-    board[0] = 4;
-    board[1] = 40;
-    board[2] = 400;
-    board[3] = 4000;
+    board[0] = 2;
+    board[1] = 20;
+    board[2] = 200;
+    board[3] = 2000;
 
     for (int i = 0; i < 16; i++) {
       positionPawns[i] = i ~/ 4;
     }
+
+    positionPawns[0] = 61;
+    positionPawns[1] = 61;
+    positionPawns[4] = 67;
+    positionPawns[5] = 67;
+    positionPawns[8] = 73;
+    positionPawns[9] = 73;
+    positionPawns[12] = 79;
+    positionPawns[13] = 79;
+
+    board[61] = 2;
+    board[67] = 20;
+    board[73] = 200;
+    board[79] = 2000;
   }
 
   @override
@@ -411,6 +426,7 @@ class GamePageController extends GetxController {
     } else if (finished.value > 0) {
       finished.value -= 1;
       setWaitForMoveValue(false);
+      print('|endTurn| ${everyoneInFinish()} KONIEC?');
       if (everyoneInFinish()) {
         playClickSound(sound: 'sounds/bravo.mp3');
       } else {
