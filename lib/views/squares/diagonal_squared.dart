@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DiagonalSquare extends StatelessWidget {
+  final double size;
   final Color color1;
   final Color color2;
   final bool isTopLeftToBottomRight;
@@ -10,7 +11,8 @@ class DiagonalSquare extends StatelessWidget {
   final bool showRightBorder;
 
   const DiagonalSquare({
-    Key? key,
+    super.key,
+    required this.size,
     required this.color1,
     required this.color2,
     this.isTopLeftToBottomRight = true,
@@ -18,12 +20,12 @@ class DiagonalSquare extends StatelessWidget {
     this.showBottomBorder = true,
     this.showLeftBorder = true,
     this.showRightBorder = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: const Size(29, 29),
+      size: Size(size, size),
       painter: DiagonalPainter(
         color1: color1,
         color2: color2,

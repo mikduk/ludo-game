@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class FourColorSquare extends StatelessWidget {
+  final double size;
   final Color topLeftColor;
   final Color topRightColor;
   final Color bottomLeftColor;
@@ -11,6 +12,7 @@ class FourColorSquare extends StatelessWidget {
 
   const FourColorSquare({
     super.key,
+    required this.size,
     required this.topLeftColor,
     required this.topRightColor,
     required this.bottomLeftColor,
@@ -23,7 +25,7 @@ class FourColorSquare extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: const Size(29, 29),
+      size: Size(size, size),
       painter: FourColorPainter(
         topLeftColor: topLeftColor,
         topRightColor: topRightColor,

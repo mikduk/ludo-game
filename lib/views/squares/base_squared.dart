@@ -3,10 +3,11 @@ import 'package:get/get.dart';
 import '../../controllers/game_page_controller.dart';
 
 class BaseSquare extends StatelessWidget {
-  final int index; // Indeks elementu board, który ma być wyświetlany
+  final int index;
+  final double size;
   final Color? color;
 
-  const BaseSquare({super.key, required this.index, this.color});
+  const BaseSquare({super.key, required this.index, required this.size, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +16,8 @@ class BaseSquare extends StatelessWidget {
     return Obx(() => InkWell(
         onTap: () => fieldAction(controller),
         child: Container(
-          width: 29.0,
-          height: 29.0,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
               color: color ?? Colors.grey.shade100, border: Border.all()),
           child: Center(

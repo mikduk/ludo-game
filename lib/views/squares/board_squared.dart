@@ -4,10 +4,11 @@ import '../../controllers/game_page_controller.dart';
 
 class BoardSquare extends StatelessWidget {
   final int index; // Indeks elementu board, który ma być wyświetlany
+  final double size;
   final Color? color;
   final bool border;
 
-  const BoardSquare({super.key, required this.index, this.color, this.border=true});
+  const BoardSquare({super.key, required this.index, required this.size, this.color, this.border=true});
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +17,8 @@ class BoardSquare extends StatelessWidget {
     return Obx(() => InkWell(
         onTap: () => fieldAction(controller),
         child: Container(
-          width: 29.0,
-          height: 29.0,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
               color: isPossibleMove(controller) ? Colors.lime : (color ?? Colors.grey.shade100), border: border ? Border.all() : null),
           child: Center(

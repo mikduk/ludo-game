@@ -22,10 +22,14 @@ class ScreenController extends GetxController {
         isPortrait = newIsPortrait;
         screenWidth = newWidth;
         screenHeight = newHeight;
-        update(); // Aktualizacja UI
+        update();
       }
-
       _listenOrientation();
     });
   }
+
+  double getBoardHeight() => isPortrait ? screenWidth * 1.1 : screenHeight;
+  double getBoardWidth() => isPortrait ? screenWidth  : screenHeight;
+  double getFieldSize() => ((10/11) * getBoardHeight() ~/ 15) * 1.0;
+  double getTopMargin() => isPortrait ? screenHeight * 0.1 : 0;
 }
