@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/game_page_controller.dart';
+import '../../controllers/screen_controller.dart';
 
 class BoardSquare extends StatelessWidget {
   final int index; // Indeks elementu board, który ma być wyświetlany
@@ -38,6 +39,8 @@ class BoardSquare extends StatelessWidget {
   }
 
   double? getSize(int result) {
+    final ScreenController controller = Get.find<ScreenController>();
+    double ratio = controller.getFieldSize() / 29;
     switch (result) {
       case 0:
         return null;
@@ -45,9 +48,20 @@ class BoardSquare extends StatelessWidget {
       case 10:
       case 100:
       case 1000:
-        return 12;
+        return 12 * ratio;
+      case 11:
+      case 101:
+      case 110:
+      case 1001:
+      case 1010:
+      case 1100:
+      case 2:
+      case 20:
+      case 200:
+      case 2000:
+        return 10.5 * ratio;
       default:
-        return 9;
+        return 9 * ratio;
     }
   }
 

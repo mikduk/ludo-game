@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/game_page_controller.dart';
+import '../../controllers/screen_controller.dart';
 
 class BaseSquare extends StatelessWidget {
   final int index;
@@ -35,14 +36,16 @@ class BaseSquare extends StatelessWidget {
   }
 
   double? getSize(int result) {
+    final ScreenController controller = Get.find<ScreenController>();
+    double ratio = controller.getFieldSize() / 29;
     switch (result) {
       case 0:
       case 1:
       case 2:
       case 3:
-        return 12;
+        return 12 * ratio;
       default:
-        return 6;
+        return 6 * ratio;
     }
   }
 

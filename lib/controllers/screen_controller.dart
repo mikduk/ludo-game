@@ -31,5 +31,7 @@ class ScreenController extends GetxController {
   double getBoardHeight() => isPortrait ? screenWidth * 1.1 : screenHeight;
   double getBoardWidth() => isPortrait ? screenWidth  : screenHeight;
   double getFieldSize() => ((10/11) * getBoardHeight() ~/ 15) * 1.0;
-  double getTopMargin() => isPortrait ? screenHeight * 0.1 : 0;
+  double getTopMargin() => isPortrait ? Get.mediaQuery.padding.top : 0;
+  double getBottomMargin() => isPortrait ? Get.mediaQuery.padding.bottom : 0;
+  double getRightMargin() => Get.mediaQuery.padding.right * 0.5;
 }
