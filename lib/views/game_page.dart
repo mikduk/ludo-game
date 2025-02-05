@@ -243,7 +243,9 @@ class GamePage extends StatelessWidget {
                                 ])),
                       if (!screenController.isPortrait)
                         Padding(
-                            padding: EdgeInsets.only(top: topPadding, right: screenController.getRightMargin()),
+                            padding: EdgeInsets.only(
+                                top: topPadding,
+                                right: screenController.getRightMargin()),
                             child: Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -285,26 +287,44 @@ class PlayerDice extends StatelessWidget {
     final ScreenController controller = Get.find<ScreenController>();
     bool shortVersion = controller.screenWidth < 600.0;
     return Column(
-      crossAxisAlignment: shortVersion ? (
-          player >= 2 ? CrossAxisAlignment.end : CrossAxisAlignment.start
-      ) : CrossAxisAlignment.center,
+      crossAxisAlignment: shortVersion
+          ? (player >= 2 ? CrossAxisAlignment.end : CrossAxisAlignment.start)
+          : CrossAxisAlignment.center,
       children: [
-        Padding(padding: EdgeInsets.only(left: player >= 2 ? 0 : 5, right: player >= 2 ? 5 : 0), child:
-        Obx(() => FloatingActionButton(
-              heroTag: 'btn$player',
-              backgroundColor:
-                  gameController.bots[player] ? Colors.grey.shade400 : color,
-              onPressed: () => gameController.bots[player]
-                  ? null
-                  : gameController.rollDice(player: player),
-              tooltip: 'Roll dice (1 to 6)',
-              child: Icon(
-                Icons.casino,
-                color:
-                    gameController.bots[player] ? Colors.grey.shade700 : null,
-              ),
-            )),
-        ),
+        Padding(
+            padding: EdgeInsets.only(
+                left: player >= 2 ? 0 : 5, right: player >= 2 ? 5 : 0),
+            child: Obx(() => Stack(
+                alignment: AlignmentDirectional.bottomEnd,
+                children: [
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 2, right: 20, left: 0),
+                  child: FloatingActionButton(
+                    heroTag: 'btn$player',
+                    backgroundColor: gameController.bots[player]
+                        ? Colors.grey.shade400
+                        : color,
+                    onPressed: () => gameController.bots[player]
+                        ? null
+                        : gameController.rollDice(player: player),
+                    tooltip: 'Roll dice (1 to 6)',
+                    child: Icon(
+                      Icons.casino,
+                      color: gameController.bots[player]
+                          ? Colors.grey.shade700
+                          : null,
+                    ),
+                  )),
+              InkWell(
+                  onLongPress: () {gameController.autoMovesSwitch(player);},
+                  child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      // color: Colors.deepOrangeAccent[100],
+                      child: Icon(gameController.autoMoves[player]
+                          ? Icons.directions_run_outlined
+                          : Icons.touch_app_sharp, color: Colors.black38)))
+            ]))),
         Obx(() => Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

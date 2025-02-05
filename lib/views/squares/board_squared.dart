@@ -21,7 +21,7 @@ class BoardSquare extends StatelessWidget {
           width: size,
           height: size,
           decoration: BoxDecoration(
-              color: isPossibleMove(controller) ? Colors.lime : (color ?? Colors.grey.shade100), border: border ? Border.all() : null),
+              color: (controller.waitForMove.value && isPossibleMove(controller)) ? Colors.lime : (color ?? Colors.grey.shade100), border: border ? Border.all() : null),
           child: Center(
             child: Text(
               showPawn(
@@ -75,11 +75,15 @@ class BoardSquare extends StatelessWidget {
 
   bool isPossibleMove(GamePageController controller) {
     int cpv = controller.currentPlayer.value;
+    print('cpv: $cpv, $index');
     if (controller.waitForMove.value && !controller.bots[cpv]) {
       List<int> possMoves = List.filled(4, -1);
       for (int i = 0; i < 4; i++) {
-        possMoves[i] = controller.whereToGo(controller.positionPawns[4 * cpv + i], controller.score.value, cpv);
+        int position = controller.positionPawns[4 * cpv + i];
+        int move = controller.whereToGo(position, controller.score.value, cpv);
+        possMoves[i] = (position != move) ? move : -1;
       }
+      print('cpv: $cpv, index: $index, possMoves: $possMoves, wFM: ${controller.waitForMove}');
       if (possMoves.contains(index)) {
         return true;
       }

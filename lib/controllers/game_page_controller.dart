@@ -21,6 +21,7 @@ class GamePageController extends GetxController {
   RxBool processedCapture = false.obs;
   var positionPawns = List.filled(16, 0).obs;
   var bots = List.filled(4, false).obs;
+  var autoMoves = List.filled(4, false).obs;
 
   RxBool soundOn = true.obs;
   RxBool stopGame = false.obs;
@@ -34,7 +35,11 @@ class GamePageController extends GetxController {
 
   Future<void> executePeriodicallyBots() async {
     await Future.delayed(const Duration(seconds: 3));
-    while (board[79] ~/ 4000 + board[73] ~/ 400 + board[67] ~/ 40 + board[61] ~/ 4 < 3) {
+    while (board[79] ~/ 4000 +
+            board[73] ~/ 400 +
+            board[67] ~/ 40 +
+            board[61] ~/ 4 <
+        3) {
       if (!stopGame.value) {
         await doBotTurn();
       }
@@ -95,7 +100,8 @@ class GamePageController extends GetxController {
     }
   }
 
-  Future<void> rollDice({int player = -1, int possibilities = 6, int? result}) async {
+  Future<void> rollDice(
+      {int player = -1, int possibilities = 6, int? result}) async {
     print(
         '|rollDice| waitForMove: $waitForMove, currentPlayer: $currentPlayer, player: $player');
     if (waitForMove.value) {
@@ -108,10 +114,15 @@ class GamePageController extends GetxController {
       processedCapture.value = false;
       score.value = result;
       scores.value += result.toString();
-      print('|rollDice| value: $value, score: ${score.value}, scores: ${scores.value}');
+      print(
+          '|rollDice| value: $value, score: ${score.value}, scores: ${scores.value}');
 
       await automaticallyMovePawn();
     }
+  }
+
+  void autoMovesSwitch(int player) {
+    autoMoves[player] = !autoMoves[player];
   }
 
   void startStopGame() {
@@ -154,8 +165,7 @@ class GamePageController extends GetxController {
   bool everyoneInBaseOrFinish({int? player}) {
     player ??= currentPlayer.value;
     int pow = tenPow(player);
-    return (board[player] + board[61 + player * 6] ==
-        4 * pow);
+    return (board[player] + board[61 + player * 6] == 4 * pow);
   }
 
   bool onlyYouInBaseOrFinish({int? player}) {
@@ -230,7 +240,6 @@ class GamePageController extends GetxController {
   }
 
   int whereToGo(int i, int n, int colorIndex) {
-    print('|whereToGo| i: $i, n: $n, colorIndex: $colorIndex');
     if (i < 4) {
       if (n != 6) {
         return i;
@@ -252,7 +261,6 @@ class GamePageController extends GetxController {
     if (translatedI + n < 51 + 4) {
       translatedI += n;
     } else {
-      print('|whereToGo| i: $i, translatedI: $translatedI');
       if (translatedI >= 56 && translatedI <= 61) {
         if (translatedI + n <= 61) {
           translatedI += n;
@@ -273,13 +281,13 @@ class GamePageController extends GetxController {
         i = i - 55 + 4 - 1;
       }
     }
-    print('|whereToGo| ==> i: $i, translatedI: $translatedI');
     return i;
   }
 
   Future<void> goToField(int x, int pow, int pawnNumber) async {
     print('|goToField| x: $x, pow: $pow, pawnNumber: $pawnNumber');
-    await goToFieldAnimate(positionPawns[4 * tenLog(pow) + pawnNumber], x, pow, delayTime: movementDuration);
+    await goToFieldAnimate(positionPawns[4 * tenLog(pow) + pawnNumber], x, pow,
+        delayTime: movementDuration);
     print('after await goToFieldAnimated');
     if (board[x] == 0) {
       board[x] = pow;
@@ -412,7 +420,8 @@ class GamePageController extends GetxController {
   }
 
   Future<void> endTurn() async {
-    print('|endTurn| currentPlayer: $currentPlayer, scores: $scores, kills: $kills, finished: $finished');
+    print(
+        '|endTurn| currentPlayer: $currentPlayer, scores: $scores, kills: $kills, finished: $finished');
     if (score.value == 6) {
       if (!everyoneInBaseOrFinish()) {
         setWaitForMoveValue(false);
@@ -433,6 +442,7 @@ class GamePageController extends GetxController {
         return;
       }
     }
+    setWaitForMoveValue(false);
     await Future.delayed(longerDuration, getNextPlayer);
   }
 
@@ -474,16 +484,13 @@ class GamePageController extends GetxController {
 
   Future<void> doBotTurn() async {
     int cpv = currentPlayer.value;
-    if (!bots[cpv]) {
+    if (!bots[cpv] && !autoMoves[cpv]) {
       return;
     }
     print('|doBotTurn| scores: $scores, waitForMove: $waitForMove');
     await Future.delayed(normalDuration);
     if (waitForMove.value) {
-      print('|doBotTurn| CZEKAMY');
-      setWaitForMoveValue(false);
-      await Future.delayed(const Duration(seconds: 3));
-      print('|doBotTurn| POCZEKANE');
+      return;
     }
     await rollDice(player: cpv);
     await Future.delayed(normalDuration);
@@ -508,15 +515,50 @@ class GamePageController extends GetxController {
           return await endTurn();
         }
       } else {
-        if (dice == 6) {
+        if (!bots[cpv] && autoMoves[cpv]) {
+          if ((possMoves[0] == positionPawns[4 * cpv + 0] ? 1 : 0) +
+                  (possMoves[1] == positionPawns[4 * cpv + 1] ? 1 : 0) +
+                  (possMoves[2] == positionPawns[4 * cpv + 2] ? 1 : 0) +
+                  (possMoves[3] == positionPawns[4 * cpv + 3] ? 1 : 0) ==
+              3) {
+            for (int i = 0; i < 4; i++) {
+              if (possMoves[i] != positionPawns[4 * cpv + i]) {
+                await movePawn(pawnNumber: i);
+                return;
+              }
+            }
+          } else {
+            int mv = -1;
+            int p = -1;
+            for (int i = 0; i < 4; i++) {
+              if (possMoves[i] != positionPawns[4 * cpv + i]) {
+                if (mv == -1 || mv == possMoves[i]) {
+                  mv = possMoves[i];
+                  p = i;
+                } else {
+                  autoMovesSwitch(cpv);
+                  return;
+                }
+              }
+            }
+            if (p != -1) {
+              await movePawn(pawnNumber: p);
+              return;
+            }
+          }
+          autoMovesSwitch(cpv);
+          return;
+        }
 
+        if (dice == 6) {
           /// test
           for (int p = 0; p < 4; p++) {
             print('${positionPawns[4 * cpv + p]} --> ${possMoves[p]}');
           }
 
           int r = Random().nextInt(4);
-          print('|doBotTurn| ((${board[cpv]} + ${board[6 * cpv + 61]}) ~/ $pow) > $r | ((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r');
+          print(
+              '|doBotTurn| ((${board[cpv]} + ${board[6 * cpv + 61]}) ~/ $pow) > $r | ((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r');
           if (((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r) {
             List<int> valuesSix = [0, 1, 2, 3];
             valuesSix.shuffle(Random());
