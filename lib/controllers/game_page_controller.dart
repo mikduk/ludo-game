@@ -369,13 +369,146 @@ class GamePageController extends GetxController {
   bool canCapture(int x, int pow, {bool teamMode = false}) {
     List<int> safeFields = [4, 12, 17, 25, 30, 38, 43, 51];
     List<int> attackMoves = [1, 10, 100, 1000];
+    List<int> attackMovesA = [
+      10,
+      11,
+      12,
+      13,
+      14,
+      110,
+      111,
+      112,
+      113,
+      114,
+      210,
+      211,
+      212,
+      213,
+      214,
+      310,
+      311,
+      312,
+      313,
+      314,
+      410,
+      411,
+      412,
+      413,
+      1000,
+      1001,
+      1002,
+      1003,
+      1004,
+      1100,
+      1101,
+      1102,
+      1103,
+      1104,
+      1200,
+      1201,
+      1202,
+      1203,
+      1204,
+      1300,
+      1301,
+      1302,
+      1303,
+      1304,
+      1400,
+      1401,
+      1402,
+      1403
+    ];
+    List<int> attackMovesB = [
+      1,
+      11,
+      21,
+      31,
+      41,
+      100,
+      110,
+      120,
+      130,
+      140,
+      1001,
+      1011,
+      1021,
+      1031,
+      1041,
+      1100,
+      1110,
+      1120,
+      1130,
+      1140,
+      2001,
+      2011,
+      2021,
+      2031,
+      2041,
+      2100,
+      2110,
+      2120,
+      2130,
+      2140,
+      3001,
+      3011,
+      3021,
+      3031,
+      3041,
+      3100,
+      3110,
+      3120,
+      3130,
+      3140,
+      4001,
+      4011,
+      4021,
+      4031,
+      4031,
+      4100,
+      4110,
+      4120,
+      4130
+    ];
     int result = board[x];
 
-    if (x < 4 || x > 55 || safeFields.contains(x)) {
+    if (x < 4 || x > 55 || safeFields.contains(x) || pow == result) {
       return false;
-    } else if (attackMoves.contains(result) && pow != result) {
-      // TODO
+    } else if (teamMode &&
+        (pow == 1 || pow == 100) &&
+        attackMovesA.contains(result)) {
       return true;
+    } else if (teamMode &&
+        (pow == 10 || pow == 1000) &&
+        attackMovesB.contains(result)) {
+      return true;
+    } else if (attackMoves.contains(result)) {
+      return true;
+    } else if (!teamMode) {
+      switch (pow) {
+        case 1:
+          if ([11, 12, 13, 101, 102, 103, 1001, 1002, 1003].contains(result)) {
+            return true;
+          }
+          break;
+        case 10:
+          if ([11, 21, 31, 110, 120, 130, 1010, 1020, 1030].contains(result)) {
+            return true;
+          }
+          break;
+        case 100:
+          if ([101, 201, 301, 110, 210, 310, 1100, 1200, 1300]
+              .contains(result)) {
+            return true;
+          }
+          break;
+        case 1000:
+          if ([1001, 1002, 1003, 1010, 1020, 1030, 1100, 1200, 1300]
+              .contains(result)) {
+            return true;
+          }
+          break;
+      }
     }
     return false;
   }
