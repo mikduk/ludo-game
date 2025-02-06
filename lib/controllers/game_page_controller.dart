@@ -43,6 +43,7 @@ class GamePageController extends GetxController {
       await Future.delayed(nextBotDuration);
     }
     print('KONIEC GRY');
+    playClickSound(sound: 'sounds/end.mp3');
   }
 
   bool gameOver() {
@@ -66,30 +67,31 @@ class GamePageController extends GetxController {
     score = 0.obs;
     scores = ''.obs;
 
-    board[0] = 2;
-    board[1] = 20;
-    board[2] = 200;
-    board[3] = 2000;
+    board[0] = 4;
+    board[1] = 40;
+    board[2] = 400;
+    board[3] = 4000;
 
     for (int i = 0; i < 16; i++) {
       positionPawns[i] = i ~/ 4;
     }
 
-    positionPawns[8] = 5;
-    positionPawns[9] = 6;
-    positionPawns[10] = 7;
-    positionPawns[11] = 8;
+    positionPawns[0] = 61;
+    positionPawns[1] = 61;
+    positionPawns[2] = 61;
+    positionPawns[3] = 52;
     positionPawns[4] = 67;
     positionPawns[5] = 67;
-    positionPawns[0] = 4;
-    positionPawns[1] = 4;
+    positionPawns[6] = 67;
+    positionPawns[7] = 8;
+    positionPawns[8] = 73;
+    positionPawns[9] = 73;
+    positionPawns[10] = 73;
+    positionPawns[11] = 54;
     positionPawns[12] = 79;
     positionPawns[13] = 79;
-
-    board[61] = 2;
-    board[67] = 20;
-    board[73] = 200;
-    board[79] = 2000;
+    positionPawns[14] = 79;
+    positionPawns[15] = 77;
   }
 
   @override
@@ -624,12 +626,9 @@ class GamePageController extends GetxController {
       finished.value -= 1;
       setWaitForMoveValue(false);
       print(
-          '|endTurn| ${everyoneInFinish(player: getCurrentPlayer())} KONIEC?');
-      if (everyoneInFinish(player: getCurrentPlayer())) {
+          '|endTurn| ${everyoneInFinish()} | ${everyoneInFinish(player: getCurrentPlayer())} KONIEC?');
+      if (everyoneInFinish() && !teamWork.value) {
         playClickSound(sound: 'sounds/bravo.mp3');
-        if (teamWork.value && !everyoneInFinish(player: getPlayerFriend())) {
-          return;
-        }
       } else {
         return;
       }
