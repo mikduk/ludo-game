@@ -50,6 +50,9 @@ class BaseSquare extends StatelessWidget {
   }
 
   Future<void> fieldAction(GamePageController controller) async {
+    if (controller.bots[controller.currentPlayer.value]) {
+      return;
+    }
     if (controller.positionPawns[index] >= 4) {
       return;
     }

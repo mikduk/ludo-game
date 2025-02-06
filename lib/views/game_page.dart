@@ -81,9 +81,11 @@ class GamePage extends StatelessWidget {
                                 heroTag: 'btn9',
                                 mini: true,
                                 backgroundColor: Colors.tealAccent,
-                                onPressed: gameController.showBoard,
-                                tooltip: 'Show info',
-                                child: const Icon(Icons.info),
+                                onPressed: gameController.changeMode,
+                                tooltip: 'Change mode',
+                                child: Obx(() => gameController.teamWork.value
+                                    ? const Icon(Icons.people)
+                                    : const Icon(Icons.person)),
                               ),
                               FloatingActionButton(
                                 heroTag: 'btn10',
@@ -200,13 +202,15 @@ class GamePage extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   FloatingActionButton(
-                                    heroTag: 'btn9',
-                                    mini: true,
-                                    backgroundColor: Colors.tealAccent,
-                                    onPressed: gameController.showBoard,
-                                    tooltip: 'Show info',
-                                    child: const Icon(Icons.info),
-                                  ),
+                                      heroTag: 'btn9',
+                                      mini: true,
+                                      backgroundColor: Colors.tealAccent,
+                                      onPressed: gameController.changeMode,
+                                      tooltip: 'Change mode',
+                                      child: Obx(() =>
+                                          gameController.stopGame.value
+                                              ? const Icon(Icons.pause)
+                                              : const Icon(Icons.play_arrow))),
                                   FloatingActionButton(
                                     heroTag: 'btn10',
                                     mini: true,
@@ -294,37 +298,41 @@ class PlayerDice extends StatelessWidget {
         Padding(
             padding: EdgeInsets.only(
                 left: player >= 2 ? 0 : 5, right: player >= 2 ? 5 : 0),
-            child: Obx(() => Stack(
-                alignment: AlignmentDirectional.bottomEnd,
-                children: [
-              Padding(
-                  padding: const EdgeInsets.only(bottom: 2, right: 20, left: 0),
-                  child: FloatingActionButton(
-                    heroTag: 'btn$player',
-                    backgroundColor: gameController.bots[player]
-                        ? Colors.grey.shade400
-                        : color,
-                    onPressed: () => gameController.bots[player]
-                        ? null
-                        : gameController.rollDice(player: player),
-                    tooltip: 'Roll dice (1 to 6)',
-                    child: Icon(
-                      Icons.casino,
-                      color: gameController.bots[player]
-                          ? Colors.grey.shade700
-                          : null,
-                    ),
-                  )),
-              InkWell(
-                  onLongPress: () {gameController.autoMovesSwitch(player);},
-                  child: SizedBox(
-                      height: 20,
-                      width: 20,
-                      // color: Colors.deepOrangeAccent[100],
-                      child: Icon(gameController.autoMoves[player]
-                          ? Icons.directions_run_outlined
-                          : Icons.touch_app_sharp, color: Colors.black38)))
-            ]))),
+            child: Obx(() =>
+                Stack(alignment: AlignmentDirectional.bottomEnd, children: [
+                  Padding(
+                      padding:
+                          const EdgeInsets.only(bottom: 2, right: 20, left: 0),
+                      child: FloatingActionButton(
+                        heroTag: 'btn$player',
+                        backgroundColor: gameController.bots[player]
+                            ? Colors.grey.shade400
+                            : color,
+                        onPressed: () => gameController.bots[player]
+                            ? null
+                            : gameController.rollDice(player: player),
+                        tooltip: 'Roll dice (1 to 6)',
+                        child: Icon(
+                          Icons.casino,
+                          color: gameController.bots[player]
+                              ? Colors.grey.shade700
+                              : null,
+                        ),
+                      )),
+                  InkWell(
+                      onLongPress: () {
+                        gameController.autoMovesSwitch(player);
+                      },
+                      child: SizedBox(
+                          height: 20,
+                          width: 20,
+                          // color: Colors.deepOrangeAccent[100],
+                          child: Icon(
+                              gameController.autoMoves[player]
+                                  ? Icons.directions_run_outlined
+                                  : Icons.touch_app_sharp,
+                              color: Colors.black38)))
+                ]))),
         Obx(() => Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -376,8 +384,6 @@ class Board extends StatelessWidget {
     double s = fieldSize;
     double t = s * 7;
     double l = (height > width) ? (width - fieldSize * 15) * 0.5 : 0;
-
-    print('l: $l, width: $width, fieldSize: $fieldSize');
 
     return Padding(
         padding: EdgeInsets.only(

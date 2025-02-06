@@ -30,7 +30,7 @@ class BoardSquare extends StatelessWidget {
               ),
               style: TextStyle(
                 fontSize: getSize(controller.board[index]),
-                color: getColor(controller.board[index], controller.currentPlayer.value),
+                color: getColor(controller.board[index], controller.getCurrentPlayer()),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -74,16 +74,14 @@ class BoardSquare extends StatelessWidget {
   }
 
   bool isPossibleMove(GamePageController controller) {
-    int cpv = controller.currentPlayer.value;
-    print('cpv: $cpv, $index');
-    if (controller.waitForMove.value && !controller.bots[cpv]) {
+    int cpv = controller.getCurrentPlayer();
+    if (controller.waitForMove.value && !controller.bots[controller.currentPlayer.value]) {
       List<int> possMoves = List.filled(4, -1);
       for (int i = 0; i < 4; i++) {
         int position = controller.positionPawns[4 * cpv + i];
         int move = controller.whereToGo(position, controller.score.value, cpv);
         possMoves[i] = (position != move) ? move : -1;
       }
-      print('cpv: $cpv, index: $index, possMoves: $possMoves, wFM: ${controller.waitForMove}');
       if (possMoves.contains(index)) {
         return true;
       }
@@ -92,21 +90,18 @@ class BoardSquare extends StatelessWidget {
   }
 
   Future<void> fieldAction(GamePageController controller) async {
-    print('fieldAction: $index, ==> [${controller.board[index]}]');
     int result = controller.board[index];
     if (result == 0) {
       return;
     }
-    int currentPlayerIndex = controller.currentPlayer.value;
+    int currentPlayerIndex = controller.getCurrentPlayer();
     int foundPawn = -1;
-    print('currentPlayerIndex: $currentPlayerIndex');
     for (int i = 0; i < 4; i++) {
       if (controller.positionPawns[4 * currentPlayerIndex + i] == index) {
         foundPawn = i;
         break;
       }
     }
-    print('foundPawn: $foundPawn, ${controller.positionPawns}');
     if (foundPawn >= 0 && foundPawn <= 3) {
       await controller.movePawn(pawnNumber: foundPawn);
     }

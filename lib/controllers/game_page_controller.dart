@@ -25,6 +25,7 @@ class GamePageController extends GetxController {
 
   RxBool soundOn = true.obs;
   RxBool stopGame = false.obs;
+  RxBool teamWork = true.obs;
 
   @override
   void onInit({bool test = false}) {
@@ -35,17 +36,26 @@ class GamePageController extends GetxController {
 
   Future<void> executePeriodicallyBots() async {
     await Future.delayed(const Duration(seconds: 3));
-    while (board[79] ~/ 4000 +
-            board[73] ~/ 400 +
-            board[67] ~/ 40 +
-            board[61] ~/ 4 <
-        3) {
+    while (!gameOver()) {
       if (!stopGame.value) {
         await doBotTurn();
       }
       await Future.delayed(nextBotDuration);
     }
     print('KONIEC GRY');
+  }
+
+  bool gameOver() {
+    if (teamWork.value) {
+      return ((everyoneInFinish(player: 0) && everyoneInFinish(player: 2)) ||
+          (everyoneInFinish(player: 1) && everyoneInFinish(player: 3)));
+    } else {
+      return (board[79] ~/ 4000 +
+              board[73] ~/ 400 +
+              board[67] ~/ 40 +
+              board[61] ~/ 4 >=
+          3);
+    }
   }
 
   void initializeBoard() {
@@ -65,12 +75,14 @@ class GamePageController extends GetxController {
       positionPawns[i] = i ~/ 4;
     }
 
-    positionPawns[0] = 61;
-    positionPawns[1] = 61;
+    positionPawns[8] = 5;
+    positionPawns[9] = 6;
+    positionPawns[10] = 7;
+    positionPawns[11] = 8;
     positionPawns[4] = 67;
     positionPawns[5] = 67;
-    positionPawns[8] = 73;
-    positionPawns[9] = 73;
+    positionPawns[0] = 4;
+    positionPawns[1] = 4;
     positionPawns[12] = 79;
     positionPawns[13] = 79;
 
@@ -98,6 +110,15 @@ class GamePageController extends GetxController {
       int pow = tenPow(i ~/ 4);
       board[positionPawns[i]] += pow;
     }
+  }
+
+  int getCurrentPlayer() {
+    if (everyoneInFinish() &&
+        teamWork.value &&
+        !everyoneInBaseOrFinishOrCannotGo(player: getPlayerFriend())) {
+      return getPlayerFriend();
+    }
+    return currentPlayer.value;
   }
 
   Future<void> rollDice(
@@ -137,8 +158,19 @@ class GamePageController extends GetxController {
     bots[player] = !bots[player];
   }
 
+  void changeMode() {
+    teamWork.value = !teamWork.value;
+  }
+
   Future<void> automaticallyMovePawn() async {
-    if (everyoneInBaseOrFinish()) {
+    if (everyoneInFinish()) {
+      if (teamWork.value &&
+          !everyoneInBaseOrFinishOrCannotGo(player: getPlayerFriend())) {
+        setWaitForMoveValue(true);
+      } else {
+        await Future.delayed(normalDuration, getNextPlayer);
+      }
+    } else if (everyoneInBaseOrFinish()) {
       if (score.value != 6) {
         if (onlyYouInBaseOrFinish()) {
           playRandomlyLaugh();
@@ -154,6 +186,23 @@ class GamePageController extends GetxController {
     } else {
       setWaitForMoveValue(true);
     }
+  }
+
+  int getPlayerFriend({int? player}) {
+    player ??= currentPlayer.value;
+    if (teamWork.value) {
+      switch (player) {
+        case 0:
+          return 2;
+        case 1:
+          return 3;
+        case 2:
+          return 0;
+        case 3:
+          return 1;
+      }
+    }
+    return player;
   }
 
   bool everyoneInFinish({int? player}) {
@@ -180,15 +229,16 @@ class GamePageController extends GetxController {
     return true;
   }
 
-  bool everyoneInBaseOrFinishOrCannotGo() {
+  bool everyoneInBaseOrFinishOrCannotGo({int? player}) {
     bool result = true;
-    int cpv = currentPlayer.value;
+    player ??= currentPlayer.value;
 
     for (int i = 0; i < 4; i++) {
-      int pawnField = positionPawns[4 * cpv + i];
-      if (pawnField != cpv && (pawnField + score.value) <= (61 + cpv * 6)) {
+      int pawnField = positionPawns[4 * player + i];
+      if (pawnField != player &&
+          (pawnField + score.value) <= (61 + player * 6)) {
         return false;
-      } else if (score.value == 6 && pawnField == cpv) {
+      } else if (score.value == 6 && pawnField == player) {
         return false;
       }
     }
@@ -214,7 +264,7 @@ class GamePageController extends GetxController {
   }
 
   Future<void> movePlayerPawn(int? pawnNumber) async {
-    int currentIndex = currentPlayer.value;
+    int currentIndex = getCurrentPlayer();
     int pow = tenPow(currentIndex);
 
     print('|movePlayerPawn| currentIndex: $currentIndex, pow: $pow');
@@ -366,7 +416,7 @@ class GamePageController extends GetxController {
     print('GO TO FIELD - END');
   }
 
-  bool canCapture(int x, int pow, {bool teamMode = false}) {
+  bool canCapture(int x, int pow) {
     List<int> safeFields = [4, 12, 17, 25, 30, 38, 43, 51];
     List<int> attackMoves = [1, 10, 100, 1000];
     List<int> attackMovesA = [
@@ -471,6 +521,10 @@ class GamePageController extends GetxController {
       4130
     ];
     int result = board[x];
+    bool teamMode = teamWork.value;
+
+    print(
+        '|canCapture| teamMode: $teamMode, pow: $result, a: ${attackMovesA.contains(result)}, b: ${attackMovesB.contains(result)}');
 
     if (x < 4 || x > 55 || safeFields.contains(x) || pow == result) {
       return false;
@@ -482,7 +536,7 @@ class GamePageController extends GetxController {
         (pow == 10 || pow == 1000) &&
         attackMovesB.contains(result)) {
       return true;
-    } else if (attackMoves.contains(result)) {
+    } else if (!teamMode && attackMoves.contains(result)) {
       return true;
     } else if (!teamMode) {
       switch (pow) {
@@ -510,6 +564,7 @@ class GamePageController extends GetxController {
           break;
       }
     }
+    print('|canCapture| return false;');
     return false;
   }
 
@@ -556,7 +611,7 @@ class GamePageController extends GetxController {
     print(
         '|endTurn| currentPlayer: $currentPlayer, scores: $scores, kills: $kills, finished: $finished');
     if (score.value == 6) {
-      if (!everyoneInBaseOrFinish()) {
+      if (!everyoneInBaseOrFinish(player: getCurrentPlayer())) {
         setWaitForMoveValue(false);
         return;
       }
@@ -568,9 +623,13 @@ class GamePageController extends GetxController {
     } else if (finished.value > 0) {
       finished.value -= 1;
       setWaitForMoveValue(false);
-      print('|endTurn| ${everyoneInFinish()} KONIEC?');
-      if (everyoneInFinish()) {
+      print(
+          '|endTurn| ${everyoneInFinish(player: getCurrentPlayer())} KONIEC?');
+      if (everyoneInFinish(player: getCurrentPlayer())) {
         playClickSound(sound: 'sounds/bravo.mp3');
+        if (teamWork.value && !everyoneInFinish(player: getPlayerFriend())) {
+          return;
+        }
       } else {
         return;
       }
@@ -600,13 +659,15 @@ class GamePageController extends GetxController {
     scores.value = '';
     score.value = 0;
     setWaitForMoveValue(false);
-    if (everyoneInFinish(player: nextPlayer.value)) {
-      nextIndex = (nextIndex + 1) % colors.length;
-      nextPlayer.value = nextIndex;
-    }
-    if (everyoneInFinish(player: nextPlayer.value)) {
-      nextIndex = (nextIndex + 1) % colors.length;
-      nextPlayer.value = nextIndex;
+    if (!teamWork.value) {
+      if (everyoneInFinish(player: nextPlayer.value)) {
+        nextIndex = (nextIndex + 1) % colors.length;
+        nextPlayer.value = nextIndex;
+      }
+      if (everyoneInFinish(player: nextPlayer.value)) {
+        nextIndex = (nextIndex + 1) % colors.length;
+        nextPlayer.value = nextIndex;
+      }
     }
   }
 
@@ -616,16 +677,16 @@ class GamePageController extends GetxController {
   }
 
   Future<void> doBotTurn() async {
-    int cpv = currentPlayer.value;
-    if (!bots[cpv] && !autoMoves[cpv]) {
+    if (!bots[currentPlayer.value] && !autoMoves[currentPlayer.value]) {
       return;
     }
+    int cpv = getCurrentPlayer();
     print('|doBotTurn| scores: $scores, waitForMove: $waitForMove');
     await Future.delayed(normalDuration);
     if (waitForMove.value) {
       return;
     }
-    await rollDice(player: cpv);
+    await rollDice(player: currentPlayer.value);
     await Future.delayed(normalDuration);
     print('|doBotTurn| AFTER: score: $score, scores: $scores');
     int dice = score.value;
@@ -648,7 +709,7 @@ class GamePageController extends GetxController {
           return await endTurn();
         }
       } else {
-        if (!bots[cpv] && autoMoves[cpv]) {
+        if (!bots[currentPlayer.value] && autoMoves[currentPlayer.value]) {
           if ((possMoves[0] == positionPawns[4 * cpv + 0] ? 1 : 0) +
                   (possMoves[1] == positionPawns[4 * cpv + 1] ? 1 : 0) +
                   (possMoves[2] == positionPawns[4 * cpv + 2] ? 1 : 0) +
