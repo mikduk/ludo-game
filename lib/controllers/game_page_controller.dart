@@ -75,23 +75,6 @@ class GamePageController extends GetxController {
     for (int i = 0; i < 16; i++) {
       positionPawns[i] = i ~/ 4;
     }
-
-    positionPawns[0] = 61;
-    positionPawns[1] = 61;
-    positionPawns[2] = 61;
-    positionPawns[3] = 52;
-    positionPawns[4] = 67;
-    positionPawns[5] = 67;
-    positionPawns[6] = 67;
-    positionPawns[7] = 8;
-    positionPawns[8] = 73;
-    positionPawns[9] = 73;
-    positionPawns[10] = 73;
-    positionPawns[11] = 54;
-    positionPawns[12] = 79;
-    positionPawns[13] = 79;
-    positionPawns[14] = 79;
-    positionPawns[15] = 77;
   }
 
   @override
@@ -165,7 +148,9 @@ class GamePageController extends GetxController {
   }
 
   Future<void> automaticallyMovePawn() async {
-    if (everyoneInFinish()) {
+    if (scores.value.contains('666')) {
+      await Future.delayed(longerDuration, getNextPlayer);
+    } else if (everyoneInFinish()) {
       if (teamWork.value &&
           !everyoneInBaseOrFinishOrCannotGo(player: getPlayerFriend())) {
         setWaitForMoveValue(true);
@@ -183,8 +168,6 @@ class GamePageController extends GetxController {
       }
     } else if (everyoneInBaseOrFinishOrCannotGo()) {
       await Future.delayed(normalDuration, getNextPlayer);
-    } else if (scores.value.contains('666')) {
-      await Future.delayed(longerDuration, getNextPlayer);
     } else {
       setWaitForMoveValue(true);
     }
