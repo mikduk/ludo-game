@@ -5,9 +5,10 @@ import 'package:audioplayers/audioplayers.dart';
 
 class GamePageController extends GetxController {
   final List<String> colors = ['Blue', 'Red', 'Green', 'Yellow'];
-  final shorterDuration = const Duration(milliseconds: 1400);
-  final normalDuration = const Duration(milliseconds: 2900);
-  final longerDuration = const Duration(milliseconds: 4000);
+  final botWaitForRollDuration = const Duration(milliseconds: 620);
+  final shorterDuration = const Duration(milliseconds: 1200);
+  final normalDuration = const Duration(milliseconds: 1600);
+  final longerDuration = const Duration(milliseconds: 2800);
   final movementDuration = const Duration(milliseconds: 180);
   final nextBotDuration = const Duration(milliseconds: 300);
 
@@ -627,7 +628,7 @@ class GamePageController extends GetxController {
       }
     }
     setWaitForMoveValue(false);
-    await Future.delayed(longerDuration, getNextPlayer);
+    await Future.delayed(shorterDuration, getNextPlayer);
   }
 
   int tenPow(int exponent) {
@@ -674,7 +675,7 @@ class GamePageController extends GetxController {
     }
     int cpv = getCurrentPlayer();
     print('|doBotTurn| scores: $scores, waitForMove: $waitForMove');
-    await Future.delayed(shorterDuration);
+    await Future.delayed(botWaitForRollDuration);
     if (waitForMove.value) {
       return;
     }
