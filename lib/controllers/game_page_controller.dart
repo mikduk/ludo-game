@@ -5,8 +5,9 @@ import 'package:audioplayers/audioplayers.dart';
 
 class GamePageController extends GetxController {
   final List<String> colors = ['Blue', 'Red', 'Green', 'Yellow'];
-  final normalDuration = const Duration(milliseconds: 800);
-  final longerDuration = const Duration(milliseconds: 1600);
+  final shorterDuration = const Duration(milliseconds: 1400);
+  final normalDuration = const Duration(milliseconds: 2900);
+  final longerDuration = const Duration(milliseconds: 4000);
   final movementDuration = const Duration(milliseconds: 180);
   final nextBotDuration = const Duration(milliseconds: 300);
 
@@ -114,17 +115,22 @@ class GamePageController extends GetxController {
       return;
     }
     if (player == currentPlayer.value) {
-      List<int> diceResults = [6, 1, 5, 2, 4, 3];
-      int value = Random().nextInt(possibilities);
-      result ??= diceResults[value];
+      result = getRandomValue(possibilities, result);
       processedCapture.value = false;
       score.value = result;
       scores.value += result.toString();
       print(
-          '|rollDice| value: $value, score: ${score.value}, scores: ${scores.value}');
+          '|rollDice| score: ${score.value}, scores: ${scores.value}');
 
       await automaticallyMovePawn();
     }
+  }
+
+  static int getRandomValue(int possibilities, int? result) {
+    List<int> diceResults = [6, 1, 5, 2, 4, 3];
+    int value = Random().nextInt(possibilities);
+    result ??= diceResults[value];
+    return result;
   }
 
   void autoMovesSwitch(int player) {
@@ -586,9 +592,13 @@ class GamePageController extends GetxController {
 
   void playClickSound({String sound = 'sounds/capture.mp3'}) async {
     if (soundOn.value) {
-      final player = AudioPlayer();
-      await player.setSource(AssetSource(sound));
-      await player.resume();
+      try {
+        final player = AudioPlayer();
+        await player.setSource(AssetSource(sound));
+        await player.resume();
+      } catch (e) {
+        print('|playClickSound| $e');
+      }
     }
   }
 
@@ -664,12 +674,12 @@ class GamePageController extends GetxController {
     }
     int cpv = getCurrentPlayer();
     print('|doBotTurn| scores: $scores, waitForMove: $waitForMove');
-    await Future.delayed(normalDuration);
+    await Future.delayed(shorterDuration);
     if (waitForMove.value) {
       return;
     }
     await rollDice(player: currentPlayer.value);
-    await Future.delayed(normalDuration);
+    await Future.delayed(shorterDuration);
     print('|doBotTurn| AFTER: score: $score, scores: $scores');
     int dice = score.value;
     int pow = tenPow(cpv);

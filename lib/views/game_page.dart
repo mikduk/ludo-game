@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/game_page_controller.dart';
 import '../controllers/screen_controller.dart';
+import 'score_board.dart';
 import 'squares/base_squared.dart';
 import 'squares/board_squared.dart';
 import 'squares/diagonal_squared.dart';
@@ -77,16 +78,7 @@ class GamePage extends StatelessWidget {
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              FloatingActionButton(
-                                heroTag: 'btn9',
-                                mini: true,
-                                backgroundColor: Colors.tealAccent,
-                                onPressed: gameController.changeMode,
-                                tooltip: 'Change mode',
-                                child: Obx(() => gameController.teamWork.value
-                                    ? const Icon(Icons.people)
-                                    : const Icon(Icons.person)),
-                              ),
+                              ChangeModeButton(gameController: gameController),
                               FloatingActionButton(
                                 heroTag: 'btn10',
                                 mini: true,
@@ -150,26 +142,7 @@ class GamePage extends StatelessWidget {
                       color: Colors.blue,
                       gameController: gameController),
                   if (screenController.isPortrait)
-                    Padding(
-                        padding: const EdgeInsets.only(bottom: 24.0),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              Obx(() => Text(
-                                    'Player ${gameController.colors[gameController.currentPlayer.value]}',
-                                    style: Get.textTheme.headlineMedium,
-                                  )),
-                              const Text('Your current score is:'),
-                              Obx(() => Text(
-                                    '${gameController.scores}',
-                                    style: Get.textTheme.headlineMedium,
-                                  )),
-                              Obx(() => Text(
-                                  'Next player is ${gameController.colors[gameController.nextPlayer.value]}')),
-                            ],
-                          ),
-                        )),
+                    ScoreBoard(gameController: gameController),
                   PlayerDice(
                       player: 3,
                       color: Colors.yellow,
@@ -181,8 +154,8 @@ class GamePage extends StatelessWidget {
         },
       ),
       GetBuilder<ScreenController>(builder: (screenController) {
-        double topPosition = screenController.screenHeight * 0.36;
-        double topPadding = screenController.screenHeight * 0.04;
+        double topPosition = screenController.screenHeight * 0.28;
+        double topPadding = screenController.screenHeight * 0.08;
         double leftPosition = screenController.screenWidth * 0.05;
         double buttonWidth = screenController.screenWidth * 0.9;
 
@@ -196,21 +169,13 @@ class GamePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (!screenController.isPortrait)
+                        Padding(padding: EdgeInsets.only(top: topPadding), child:
                         SizedBox(
                             width: Get.width * 0.04,
                             child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  FloatingActionButton(
-                                      heroTag: 'btn9',
-                                      mini: true,
-                                      backgroundColor: Colors.tealAccent,
-                                      onPressed: gameController.changeMode,
-                                      tooltip: 'Change mode',
-                                      child: Obx(() =>
-                                          gameController.stopGame.value
-                                              ? const Icon(Icons.pause)
-                                              : const Icon(Icons.play_arrow))),
+                                  ChangeModeButton(gameController: gameController),
                                   FloatingActionButton(
                                     heroTag: 'btn10',
                                     mini: true,
@@ -244,33 +209,35 @@ class GamePage extends StatelessWidget {
                                             ? const Icon(Icons.pause)
                                             : const Icon(Icons.play_arrow)),
                                   ),
-                                ])),
+                                ]))),
                       if (!screenController.isPortrait)
-                        Padding(
-                            padding: EdgeInsets.only(
-                                top: topPadding,
-                                right: screenController.getRightMargin()),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Obx(() => Text(
-                                        'Player ${gameController.colors[gameController.currentPlayer.value]}',
-                                        style: Get.textTheme.headlineMedium,
-                                      )),
-                                  const Text('Your current score is:'),
-                                  Obx(() => Text(
-                                        '${gameController.scores}',
-                                        style: Get.textTheme.headlineMedium,
-                                      )),
-                                  Obx(() => Text(
-                                      'Next player is ${gameController.colors[gameController.nextPlayer.value]}')),
-                                ],
-                              ),
-                            )),
+                        ScoreBoard(gameController: gameController),
                     ])));
       })
     ]));
+  }
+}
+
+class ChangeModeButton extends StatelessWidget {
+  const ChangeModeButton({
+    super.key,
+    required this.gameController,
+  });
+
+  final GamePageController gameController;
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      heroTag: 'btn9',
+      mini: true,
+      backgroundColor: Colors.tealAccent,
+      onPressed: gameController.changeMode,
+      tooltip: 'Change mode',
+      child: Obx(() => gameController.teamWork.value
+          ? const Icon(Icons.people)
+          : const Icon(Icons.person)),
+    );
   }
 }
 
