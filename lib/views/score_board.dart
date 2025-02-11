@@ -22,7 +22,7 @@ class ScoreBoard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _buildCurrentPlayerInfo(),
-          if (vertical)
+          if (vertical && screenController.showNextPlayerString())
             Text(
               'Następny gracz:',
               style: Get.textTheme.bodyLarge?.copyWith(
@@ -53,8 +53,8 @@ class ScoreBoard extends StatelessWidget {
           height: vertical ? 0 : 0,
           width: vertical ? 20 : 0,
         ),
-      if (!vertical &&
-          screenController.getBoardHeight() > 600)
+      if (!vertical && screenController.showNextPlayerString()
+          && screenController.getBoardHeight() > 600)
         Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,

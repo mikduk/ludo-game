@@ -35,6 +35,13 @@ class ScreenController extends GetxController {
   double getBottomMargin() => isPortrait ? Get.mediaQuery.padding.bottom : 0;
   double getRightMargin() => Get.mediaQuery.padding.right * 0.5;
 
+  bool showNextPlayerString() {
+    if (screenWidth == 844 && screenHeight == 390) {
+      return false;
+    }
+    return true;
+  }
+
   bool horizontalScoreBoard() {
     //
     // iPhone SE (2/3 gen) / iPhone 8

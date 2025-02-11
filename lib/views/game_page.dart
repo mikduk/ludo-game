@@ -170,10 +170,7 @@ class GamePage extends StatelessWidget {
           heroTag: 'btn11',
           mini: true,
           backgroundColor: Colors.limeAccent,
-          onPressed: () {
-            gameController.soundSwitch();
-            gameController.playRandomSound();
-          },
+          onPressed: gameController.soundSwitch,
           tooltip: 'Switch sound',
           child: Obx(() => gameController.soundOn.value
               ? const Icon(Icons.music_note_outlined)
@@ -213,10 +210,7 @@ class GamePage extends StatelessWidget {
             heroTag: 'btn11',
             mini: true,
             backgroundColor: Colors.limeAccent,
-            onPressed: () {
-              gameController.soundSwitch();
-              gameController.playRandomSound();
-            },
+            onPressed: gameController.soundSwitch,
             tooltip: 'Switch sound',
             child: Obx(() => gameController.soundOn.value
                 ? const Icon(Icons.music_note_outlined)
@@ -268,10 +262,7 @@ class GamePage extends StatelessWidget {
               heroTag: 'btn11',
               mini: true,
               backgroundColor: Colors.limeAccent,
-              onPressed: () {
-                gameController.soundSwitch();
-                gameController.playRandomSound();
-              },
+              onPressed: gameController.soundSwitch,
               tooltip: 'Switch sound',
               child: Obx(() => gameController.soundOn.value
                   ? const Icon(Icons.music_note_outlined)

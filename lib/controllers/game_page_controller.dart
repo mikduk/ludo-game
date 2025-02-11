@@ -1,8 +1,7 @@
+import 'sound_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'dart:math';
-import 'package:audioplayers/audioplayers.dart';
 
 class GamePageController extends GetxController {
   final List<String> colors = ['Blue', 'Red', 'Green', 'Yellow'];
@@ -36,6 +35,8 @@ class GamePageController extends GetxController {
   RxBool stopGame = false.obs;
   RxBool teamWork = true.obs;
 
+  final SoundController soundController = Get.put(SoundController());
+
   @override
   void onInit({bool test = false}) {
     super.onInit();
@@ -52,7 +53,7 @@ class GamePageController extends GetxController {
       await Future.delayed(nextBotDuration);
     }
     print('KONIEC GRY');
-    playClickSound(sound: 'sounds/end.mp3');
+    soundController.playClickSound(sound: 'sounds/end.mp3');
     showStatistics();
     showStatisticsDialog();
   }
@@ -156,6 +157,7 @@ class GamePageController extends GetxController {
 
   void soundSwitch() {
     soundOn.value = !soundOn.value;
+    soundController.playRandomSound();
   }
 
   void changeBotFlag(int player) {
@@ -188,7 +190,7 @@ class GamePageController extends GetxController {
     } else if (everyoneInBaseOrFinish()) {
       if (score.value != 6) {
         if (onlyYouInBaseOrFinish()) {
-          playRandomlyLaugh();
+          soundController.playRandomlyLaugh();
         }
         printForYellow('3');
         await Future.delayed(normalDuration, getNextPlayer);
@@ -280,6 +282,7 @@ class GamePageController extends GetxController {
     int currentIndex = getCurrentPlayer();
     int pow = tenPow(currentIndex);
 
+    printForYellow('A');
     print('|movePlayerPawn| currentIndex: $currentIndex, pow: $pow');
 
     // Pierwszy ruch
@@ -387,7 +390,7 @@ class GamePageController extends GetxController {
           break;
       }
     } else if ([0, 1, 2, 3].contains(from)) {
-      playClickSound(sound: 'sounds/goOut.mp3');
+      soundController.playClickSound(sound: 'sounds/goOut.mp3');
     }
     while (from != to) {
       if ((3 < from && to < 56 && to == originalPosition) ||
@@ -577,8 +580,8 @@ class GamePageController extends GetxController {
   }
 
   Future<void> capture(int x, int pow) async {
-    playClickSound();
-    playRandomlyLaugh();
+    soundController.playClickSound();
+    soundController.playRandomlyLaugh();
     print('|capture| x: $x, pow: $pow');
     int result = board[x];
     board[x] = pow; // TODO
@@ -593,33 +596,6 @@ class GamePageController extends GetxController {
     }
     print('|capture| kills++');
     kills.value += 1;
-  }
-
-  void playRandomSound() async {
-    List<String> sounds = ['capture', 'goOut', 'bravo', 'laugh1', 'laugh2'];
-    int i = Random().nextInt(sounds.length);
-    playClickSound(sound: 'sounds/${sounds[i]}.mp3');
-  }
-
-  void playRandomlyLaugh() async {
-    List<String> sounds = ['laugh1', 'laugh2'];
-    int i = Random().nextInt(sounds.length);
-    if (Random().nextInt(10) >= 9) {
-      playClickSound(sound: 'sounds/${sounds[i]}.mp3');
-    }
-  }
-
-  void playClickSound({String sound = 'sounds/capture.mp3'}) async {
-    if (soundOn.value) {
-      print('|playClickSound| sound: $sound');
-      try {
-        final player = AudioPlayer();
-        await player.setSource(AssetSource(sound));
-        await player.resume();
-      } catch (e) {
-        print('|playClickSound| $e');
-      }
-    }
   }
 
   Future<void> endTurn() async {
@@ -641,7 +617,7 @@ class GamePageController extends GetxController {
       print(
           '|endTurn| ${everyoneInFinish()} | ${everyoneInFinish(player: getCurrentPlayer())} KONIEC?');
       if (everyoneInFinish() && !teamWork.value) {
-        playClickSound(sound: 'sounds/bravo.mp3');
+        soundController.playClickSound(sound: 'sounds/bravo.mp3');
       } else {
         return;
       }
