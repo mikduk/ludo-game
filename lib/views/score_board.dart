@@ -13,6 +13,8 @@ class ScoreBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     final ScreenController screenController = Get.find();
     double h = screenController.getBoardHeight() / 410;
+    bool vertical = screenController.isPortrait;
+    vertical = screenController.horizontalScoreBoard();
 
     List<Widget> children = [
       Column(
@@ -20,46 +22,54 @@ class ScoreBoard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _buildCurrentPlayerInfo(),
-          if (screenController.isPortrait)
-            Text('Następny gracz:', style: Get.textTheme.bodyLarge?.copyWith(
-    color: Colors.black38,
-    ),),
-          if (screenController.isPortrait)
+          if (vertical)
+            Text(
+              'Następny gracz:',
+              style: Get.textTheme.bodyLarge?.copyWith(
+                color: Colors.black38,
+              ),
+            ),
+          if (vertical)
             SizedBox(height: h),
-          if (screenController.isPortrait)
+          if (vertical)
             _buildNextPlayerInfo(),
         ],
       ),
       SizedBox(
-        height: screenController.isPortrait ? 0 : 10,
-        width: screenController.isPortrait ? 15 * h : 0,
+        height: vertical ? 0 : 10,
+        width: vertical ? 15 * h : 0,
       ),
       Column(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _buildDiceResult(
-              screenController.getFieldSize(), h, screenController.isPortrait),
+              screenController.getFieldSize(), h, vertical),
         ],
       ),
-      if (!screenController.isPortrait)
-      SizedBox(
-        height: screenController.isPortrait ? 0 : 10,
-        width: screenController.isPortrait ? 20 : 0,
-      ),
-      if (!screenController.isPortrait)
-      Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text('Następny gracz:', style: Get.textTheme.bodyLarge?.copyWith(
-            color: Colors.grey,
-          ),),
-          SizedBox(height: h),
-          _buildNextPlayerInfo(),
-        ],
-      ),
+      if (!vertical &&
+          screenController.getBoardHeight() > 600)
+        SizedBox(
+          height: vertical ? 0 : 0,
+          width: vertical ? 20 : 0,
+        ),
+      if (!vertical &&
+          screenController.getBoardHeight() > 600)
+        Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Następny gracz:',
+              style: Get.textTheme.bodyLarge?.copyWith(
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: h),
+            _buildNextPlayerInfo(),
+          ],
+        ),
     ];
 
     return Center(
@@ -68,9 +78,10 @@ class ScoreBoard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        child: screenController.isPortrait
+        child: vertical
             ? Padding(
-                padding: EdgeInsets.symmetric(vertical: 6 * h, horizontal: 16 * h),
+                padding:
+                    EdgeInsets.symmetric(vertical: 6 * h, horizontal: 16 * h),
                 child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -90,6 +101,7 @@ class ScoreBoard extends StatelessWidget {
 
   /// Sekcja: "Aktualny gracz"
   Widget _buildCurrentPlayerInfo() {
+    final ScreenController screenController = Get.find();
     return Obx(() {
       final String currentName =
           gameController.colors[gameController.currentPlayer.value];
@@ -101,11 +113,13 @@ class ScoreBoard extends StatelessWidget {
       ];
       return Column(
         children: [
-          Text(
-            'Aktualny gracz:',
-            style: Get.textTheme.titleMedium,
-          ),
-          const SizedBox(height: 4),
+          if (screenController.getBoardHeight() > 600)
+            Text(
+              'Aktualny gracz:',
+              style: Get.textTheme.titleMedium,
+            ),
+          if (screenController.getBoardHeight() > 600)
+            const SizedBox(height: 4),
           Text(
             currentName,
             style: Get.textTheme.headlineSmall?.copyWith(
@@ -155,7 +169,7 @@ class ScoreBoard extends StatelessWidget {
 
   /// Buduje "twarz" kostki dla wyniku 1–6 za pomocą Stacka i kropek.
   Widget _buildDiceFace(double size, int score, bool portait, {Key? key}) {
-    double s = 0.01 * size * (portait ? 1 : 2);
+    double s = 0.01 * size * (portait ? 1.3 : 2);
     return Container(
       key: key,
       width: 100 * s,

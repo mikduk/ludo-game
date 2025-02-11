@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'dart:math';
@@ -25,6 +26,12 @@ class GamePageController extends GetxController {
   var bots = List.filled(4, false).obs;
   var autoMoves = List.filled(4, false).obs;
 
+  var statisticKills = List.filled(4, 0);
+  var statisticDeaths = List.filled(4, 0);
+  var statisticTrippleSix = List.filled(4, 0);
+  var statisticRolls = List.filled(4, List.filled(6, 0));
+  var statisticMoves = List.filled(4, List.filled(6, 0));
+
   RxBool soundOn = true.obs;
   RxBool stopGame = false.obs;
   RxBool teamWork = true.obs;
@@ -46,6 +53,8 @@ class GamePageController extends GetxController {
     }
     print('KONIEC GRY');
     playClickSound(sound: 'sounds/end.mp3');
+    showStatistics();
+    showStatisticsDialog();
   }
 
   bool gameOver() {
@@ -77,6 +86,12 @@ class GamePageController extends GetxController {
     for (int i = 0; i < 16; i++) {
       positionPawns[i] = i ~/ 4;
     }
+
+    statisticKills = List.filled(4, 0);
+    statisticDeaths = List.filled(4, 0);
+    statisticTrippleSix = List.filled(4, 0);
+    statisticRolls = List.filled(4, List.filled(6, 0));
+    statisticMoves = List.filled(4, List.filled(6, 0));
   }
 
   @override
@@ -110,8 +125,6 @@ class GamePageController extends GetxController {
 
   Future<void> rollDice(
       {int player = -1, int possibilities = 6, int? result}) async {
-    print(
-        '|rollDice| waitForMove: $waitForMove, currentPlayer: $currentPlayer, player: $player');
     if (waitForMove.value) {
       return;
     }
@@ -120,8 +133,7 @@ class GamePageController extends GetxController {
       processedCapture.value = false;
       score.value = result;
       scores.value += result.toString();
-      print(
-          '|rollDice| score: ${score.value}, scores: ${scores.value}');
+      statisticRolls[currentPlayer.value][result-1] += 1;
 
       await automaticallyMovePawn();
     }
@@ -154,14 +166,23 @@ class GamePageController extends GetxController {
     teamWork.value = !teamWork.value;
   }
 
+  void printForYellow(String x) {
+    if (currentPlayer.value == 3) {
+      print('[printForYELLOW] $x');
+    }
+  }
+
   Future<void> automaticallyMovePawn() async {
     if (scores.value.contains('666')) {
+      statisticTrippleSix[currentPlayer.value] += 1;
       await Future.delayed(longerDuration, getNextPlayer);
+      printForYellow('1');
     } else if (everyoneInFinish()) {
       if (teamWork.value &&
           !everyoneInBaseOrFinishOrCannotGo(player: getPlayerFriend())) {
         setWaitForMoveValue(true);
       } else {
+        printForYellow('2');
         await Future.delayed(normalDuration, getNextPlayer);
       }
     } else if (everyoneInBaseOrFinish()) {
@@ -169,11 +190,13 @@ class GamePageController extends GetxController {
         if (onlyYouInBaseOrFinish()) {
           playRandomlyLaugh();
         }
+        printForYellow('3');
         await Future.delayed(normalDuration, getNextPlayer);
       } else {
         setWaitForMoveValue(true);
       }
     } else if (everyoneInBaseOrFinishOrCannotGo()) {
+      printForYellow('4');
       await Future.delayed(normalDuration, getNextPlayer);
     } else {
       setWaitForMoveValue(true);
@@ -238,10 +261,8 @@ class GamePageController extends GetxController {
   }
 
   Future<void> movePawn({int? pawnNumber}) async {
-    print('|movePawn| waitForMove: $waitForMove');
     if (waitForMove.value) {
       try {
-        print('|movePawn| LECIMY TUTAJ --> movePlayerPawn($pawnNumber)');
         await movePlayerPawn(pawnNumber);
       } catch (e) {
         print('|movePawn| $e');
@@ -267,12 +288,14 @@ class GamePageController extends GetxController {
       board[currentIndex] -= pow;
       int x = currentIndex * 13 + 4;
       await goToField(x, pow, pawnNumber ?? 0);
+      statisticMoves[tenLog(pow)][score.value-1] += 1;
       await endTurn();
     } else if (positionPawns[4 * currentIndex + (pawnNumber ?? 0)] !=
         currentIndex) {
       int i = positionPawns[4 * currentIndex + (pawnNumber ?? 0)];
       board[i] -= pow;
       int x = whereToGo(i, score.value, currentIndex);
+      statisticMoves[tenLog(pow)][score.value-1] += 1;
       await goToField(x, pow, pawnNumber ?? 0);
       await endTurn();
     } else {
@@ -327,10 +350,8 @@ class GamePageController extends GetxController {
   }
 
   Future<void> goToField(int x, int pow, int pawnNumber) async {
-    print('|goToField| x: $x, pow: $pow, pawnNumber: $pawnNumber');
     await goToFieldAnimate(positionPawns[4 * tenLog(pow) + pawnNumber], x, pow,
         delayTime: movementDuration);
-    print('after await goToFieldAnimated');
     if (board[x] == 0) {
       board[x] = pow;
     } else if (canCapture(x, pow)) {
@@ -405,7 +426,6 @@ class GamePageController extends GetxController {
       await Future.delayed(delayTime);
       board[from] -= pow;
     }
-    print('GO TO FIELD - END');
   }
 
   bool canCapture(int x, int pow) {
@@ -515,9 +535,6 @@ class GamePageController extends GetxController {
     int result = board[x];
     bool teamMode = teamWork.value;
 
-    print(
-        '|canCapture| teamMode: $teamMode, pow: $result, a: ${attackMovesA.contains(result)}, b: ${attackMovesB.contains(result)}');
-
     if (x < 4 || x > 55 || safeFields.contains(x) || pow == result) {
       return false;
     } else if (teamMode &&
@@ -556,7 +573,6 @@ class GamePageController extends GetxController {
           break;
       }
     }
-    print('|canCapture| return false;');
     return false;
   }
 
@@ -569,6 +585,8 @@ class GamePageController extends GetxController {
     int opponent = tenLog(result);
     for (int i = 0; i < 4; i++) {
       if (positionPawns[4 * opponent + i] == x) {
+        statisticDeaths[opponent] += 1;
+        statisticKills[tenLog(pow)] += 1;
         await goToField(opponent, result, i);
         break;
       }
@@ -593,6 +611,7 @@ class GamePageController extends GetxController {
 
   void playClickSound({String sound = 'sounds/capture.mp3'}) async {
     if (soundOn.value) {
+      print('|playClickSound| sound: $sound');
       try {
         final player = AudioPlayer();
         await player.setSource(AssetSource(sound));
@@ -644,7 +663,6 @@ class GamePageController extends GetxController {
   }
 
   void getNextPlayer() {
-    print('|getNextPlayer| currentPlayer: $currentPlayer');
     int currentIndex = nextPlayer.value;
     int nextIndex = (currentIndex + 1) % colors.length;
     currentPlayer.value = nextPlayer.value;
@@ -664,6 +682,136 @@ class GamePageController extends GetxController {
     }
   }
 
+  void showStatistics() {
+    print('\n\nSTATYSTYKI:\n');
+    for (int i=0; i < 4; i++) {
+      print('=================');
+      print('Kolor ${colors[i]}');
+      print('');
+      print('Zbił: ${statisticKills[i]}');
+      print('Został zbity: ${statisticDeaths[i]}');
+      print('');
+      print('Potrójna szóstka: ${statisticTrippleSix[i]}');
+      for (int j=0; j<6; j++) {
+        print('[${j+1}] wyrzucono: ${statisticRolls[i][j]}, ruch: ${statisticMoves[i][j]}');
+      }
+      print('\n');
+    }
+  }
+
+  void showStatisticsDialog() {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Container(
+          // Możesz dostosować szerokość / wysokość, np. fraction of screen
+          width: Get.width * 0.8,
+          height: Get.height * 0.7,
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Text(
+                'Statystyki',
+                style: Get.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Lista / tablica z danymi dla każdego gracza
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(4, (i) {
+                      return _buildPlayerStatsCard(i);
+                    }),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Przycisk "Nowa gra"
+              ElevatedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Nowa gra'),
+                onPressed: () {
+                  initializeBoard(); // reset planszy
+                  Get.back(); // zamknij dialog
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: true, // kliknięcie poza zamyka dialog
+    );
+  }
+
+  // Prywatna metoda budująca widget z danymi jednego gracza
+  Widget _buildPlayerStatsCard(int playerIndex) {
+    final colorName = colors[playerIndex];
+    final kills = statisticKills[playerIndex];
+    final deaths = statisticDeaths[playerIndex];
+    final tripleSix = statisticTrippleSix[playerIndex];
+    final rolls = statisticRolls[playerIndex];
+    final moves = statisticMoves[playerIndex];
+
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Gracz: $colorName',
+                style: Get.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                )),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.check_circle_outline, color: Colors.green),
+                const SizedBox(width: 4),
+                Text('Zbił pionki: $kills'),
+              ],
+            ),
+            Row(
+              children: [
+                const Icon(Icons.cancel_outlined, color: Colors.redAccent),
+                const SizedBox(width: 4),
+                Text('Został zbity: $deaths'),
+              ],
+            ),
+            Row(
+              children: [
+                const Icon(Icons.star_rate_rounded, color: Colors.orange),
+                const SizedBox(width: 4),
+                Text('Potrójna szóstka: $tripleSix'),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // Tabela rzutów 1-6
+            Text(
+              'Rzuty i ruchy:',
+              style: Get.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            // Można użyć np. DataTable, tutaj dla przykładu prosty Column
+            Column(
+              children: List.generate(6, (j) {
+                return Text(
+                  'Wynik: ${j + 1}  |  '
+                      'ile razy wyrzucono: ${rolls[j]}  |  ruchy: ${moves[j]}',
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void showBoard() {
     print(board);
     print(positionPawns);
@@ -674,14 +822,14 @@ class GamePageController extends GetxController {
       return;
     }
     int cpv = getCurrentPlayer();
-    print('|doBotTurn| scores: $scores, waitForMove: $waitForMove');
+    // print('|doBotTurn| scores: $scores, waitForMove: $waitForMove');
     await Future.delayed(botWaitForRollDuration);
     if (waitForMove.value) {
       return;
     }
     await rollDice(player: currentPlayer.value);
     await Future.delayed(shorterDuration);
-    print('|doBotTurn| AFTER: score: $score, scores: $scores');
+    // print('|doBotTurn| AFTER: score: $score, scores: $scores');
     int dice = score.value;
     int pow = tenPow(cpv);
     if (waitForMove.value) {
@@ -689,12 +837,12 @@ class GamePageController extends GetxController {
       for (int i = 0; i < 4; i++) {
         possMoves[i] = whereToGo(positionPawns[4 * cpv + i], dice, cpv);
       }
-      print('|doBotTurn| $possMoves');
+      // print('|doBotTurn| $possMoves');
       if (positionPawns[4 * cpv + 0] == positionPawns[4 * cpv + 1] &&
           positionPawns[4 * cpv + 1] == positionPawns[4 * cpv + 2] &&
           positionPawns[4 * cpv + 2] == positionPawns[4 * cpv + 3]) {
         int r = Random().nextInt(4);
-        print('|doBotTurn| [IF] r: $r');
+        // print('|doBotTurn| [IF] r: $r');
         try {
           await movePawn(pawnNumber: r);
         } catch (e) {
@@ -738,14 +886,10 @@ class GamePageController extends GetxController {
         }
 
         if (dice == 6) {
-          /// test
-          for (int p = 0; p < 4; p++) {
-            print('${positionPawns[4 * cpv + p]} --> ${possMoves[p]}');
-          }
 
           int r = Random().nextInt(4);
-          print(
-              '|doBotTurn| ((${board[cpv]} + ${board[6 * cpv + 61]}) ~/ $pow) > $r | ((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r');
+          // print(
+          //     '|doBotTurn| ((${board[cpv]} + ${board[6 * cpv + 61]}) ~/ $pow) > $r | ((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r');
           if (((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r) {
             List<int> valuesSix = [0, 1, 2, 3];
             valuesSix.shuffle(Random());
@@ -765,12 +909,12 @@ class GamePageController extends GetxController {
           }
         }
         values.shuffle(Random());
-        print(values);
+        // print(values);
 
         /// BICIA
         for (int value in values) {
-          print(
-              '|BOT| BICIA - canCapture(possMoves[$value], $pow): ${canCapture(possMoves[value], pow)}');
+          // print(
+          //     '|BOT| BICIA - canCapture(possMoves[$value], $pow): ${canCapture(possMoves[value], pow)}');
           if (canCapture(possMoves[value], pow)) {
             await movePawn(pawnNumber: value);
             return;
@@ -779,8 +923,8 @@ class GamePageController extends GetxController {
 
         /// KOŃCOWE POLE
         for (int value in values) {
-          print(
-              '|BOT| KOŃCOWE - possMoves[$value] > 55 : ${possMoves[value] > 55}');
+          // print(
+          //     '|BOT| KOŃCOWE - possMoves[$value] > 55 : ${possMoves[value] > 55}');
           if (possMoves[value] > 55 && positionPawns[4 * cpv + value] < 56) {
             try {
               await movePawn(pawnNumber: value);

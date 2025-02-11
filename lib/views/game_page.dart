@@ -74,43 +74,9 @@ class GamePage extends StatelessWidget {
                       gameController: gameController),
                   if (screenController.isPortrait)
                     SizedBox(
-                        width: Get.width * 0.5,
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ChangeModeButton(gameController: gameController),
-                              FloatingActionButton(
-                                heroTag: 'btn10',
-                                mini: true,
-                                backgroundColor: Colors.lightBlueAccent,
-                                onPressed: gameController.regenerateBoard,
-                                tooltip: 'Regenerate board',
-                                child: const Icon(Icons.refresh),
-                              ),
-                              FloatingActionButton(
-                                heroTag: 'btn11',
-                                mini: true,
-                                backgroundColor: Colors.limeAccent,
-                                onPressed: () {
-                                  gameController.soundSwitch();
-                                  gameController.playRandomSound();
-                                },
-                                tooltip: 'Switch sound',
-                                child: Obx(() => gameController.soundOn.value
-                                    ? const Icon(Icons.music_note_outlined)
-                                    : const Icon(Icons.music_off_outlined)),
-                              ),
-                              FloatingActionButton(
-                                heroTag: 'btn12',
-                                mini: true,
-                                backgroundColor: Colors.deepOrangeAccent,
-                                onPressed: gameController.startStopGame,
-                                tooltip: 'Start/stop game',
-                                child: Obx(() => gameController.stopGame.value
-                                    ? const Icon(Icons.pause)
-                                    : const Icon(Icons.play_arrow)),
-                              ),
-                            ])),
+                        width: Get.width * 0.45,
+                        child: screenController.getBoardWidth() >= 600 ?  _buildSingleRowLayout(gameController, screenController) : _buildTwoByTwoLayout(gameController, screenController)
+                    ),
                   PlayerDice(
                       player: 2,
                       color: Colors.green,
@@ -154,8 +120,9 @@ class GamePage extends StatelessWidget {
         },
       ),
       GetBuilder<ScreenController>(builder: (screenController) {
-        double topPosition = screenController.screenHeight * 0.28;
-        double topPadding = screenController.screenHeight * 0.08;
+        double x = (screenController.horizontalScoreBoard()) ? 0.03 : 0.08;
+        double topPosition = screenController.screenHeight * (0.36 - x);
+        double topPadding = screenController.screenHeight * x;
         double leftPosition = screenController.screenWidth * 0.05;
         double buttonWidth = screenController.screenWidth * 0.9;
 
@@ -169,52 +136,162 @@ class GamePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (!screenController.isPortrait)
-                        Padding(padding: EdgeInsets.only(top: topPadding), child:
-                        SizedBox(
-                            width: Get.width * 0.04,
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ChangeModeButton(gameController: gameController),
-                                  FloatingActionButton(
-                                    heroTag: 'btn10',
-                                    mini: true,
-                                    backgroundColor: Colors.lightBlueAccent,
-                                    onPressed: gameController.regenerateBoard,
-                                    tooltip: 'Regenerate board',
-                                    child: const Icon(Icons.refresh),
-                                  ),
-                                  FloatingActionButton(
-                                    heroTag: 'btn11',
-                                    mini: true,
-                                    backgroundColor: Colors.limeAccent,
-                                    onPressed: () {
-                                      gameController.soundSwitch();
-                                      gameController.playRandomSound();
-                                    },
-                                    tooltip: 'Switch sound',
-                                    child: Obx(() => gameController
-                                            .soundOn.value
-                                        ? const Icon(Icons.music_note_outlined)
-                                        : const Icon(Icons.music_off_outlined)),
-                                  ),
-                                  FloatingActionButton(
-                                    heroTag: 'btn12',
-                                    mini: true,
-                                    backgroundColor: Colors.deepOrangeAccent,
-                                    onPressed: gameController.startStopGame,
-                                    tooltip: 'Start/stop game',
-                                    child: Obx(() =>
-                                        gameController.stopGame.value
-                                            ? const Icon(Icons.pause)
-                                            : const Icon(Icons.play_arrow)),
-                                  ),
-                                ]))),
+                        Padding(
+                            padding: EdgeInsets.only(top: topPadding),
+                            child: SizedBox(
+                                width: screenController.getBoardHeight() >= 600 ? 0.04 * Get.width : null,
+                                child: screenController.getBoardHeight() >= 600
+                                    ? _buildSingleColumnLayout(gameController, screenController)
+                                    : _buildTwoByTwoLayout(gameController, screenController))),
                       if (!screenController.isPortrait)
                         ScoreBoard(gameController: gameController),
                     ])));
       })
     ]));
+  }
+
+  Widget _buildSingleColumnLayout(GamePageController gameController, ScreenController screenController) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ChangeModeButton(gameController: gameController),
+        FloatingActionButton(
+          heroTag: 'btn10',
+          mini: true,
+          backgroundColor: Colors.lightBlueAccent,
+          onPressed: () {
+            gameController.regenerateBoard();
+            screenController.update();
+          },
+          tooltip: 'Regenerate board',
+          child: const Icon(Icons.refresh),
+        ),
+        FloatingActionButton(
+          heroTag: 'btn11',
+          mini: true,
+          backgroundColor: Colors.limeAccent,
+          onPressed: () {
+            gameController.soundSwitch();
+            gameController.playRandomSound();
+          },
+          tooltip: 'Switch sound',
+          child: Obx(() => gameController.soundOn.value
+              ? const Icon(Icons.music_note_outlined)
+              : const Icon(Icons.music_off_outlined)),
+        ),
+        FloatingActionButton(
+          heroTag: 'btn12',
+          mini: true,
+          backgroundColor: Colors.deepOrangeAccent,
+          onPressed: gameController.startStopGame,
+          tooltip: 'Start/stop game',
+          child: Obx(() => gameController.stopGame.value
+              ? const Icon(Icons.pause)
+              : const Icon(Icons.play_arrow)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSingleRowLayout(GamePageController gameController, ScreenController screenController) {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ChangeModeButton(gameController: gameController),
+          FloatingActionButton(
+            heroTag: 'btn10',
+            mini: true,
+            backgroundColor: Colors.lightBlueAccent,
+            onPressed: () {
+              gameController.regenerateBoard();
+              screenController.update();
+            },
+            tooltip: 'Regenerate board',
+            child: const Icon(Icons.refresh),
+          ),
+          FloatingActionButton(
+            heroTag: 'btn11',
+            mini: true,
+            backgroundColor: Colors.limeAccent,
+            onPressed: () {
+              gameController.soundSwitch();
+              gameController.playRandomSound();
+            },
+            tooltip: 'Switch sound',
+            child: Obx(() => gameController.soundOn.value
+                ? const Icon(Icons.music_note_outlined)
+                : const Icon(Icons.music_off_outlined)),
+          ),
+          FloatingActionButton(
+            heroTag: 'btn12',
+            mini: true,
+            backgroundColor: Colors.deepOrangeAccent,
+            onPressed: gameController.startStopGame,
+            tooltip: 'Start/stop game',
+            child: Obx(() => gameController.stopGame.value
+                ? const Icon(Icons.pause)
+                : const Icon(Icons.play_arrow)),
+          ),
+        ]);
+  }
+
+  Widget _buildTwoByTwoLayout(GamePageController gameController, ScreenController screenController) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Pierwszy wiersz (2 przyciski)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ChangeModeButton(gameController: gameController),
+            const SizedBox(width: 8),
+            FloatingActionButton(
+              heroTag: 'btn10',
+              mini: true,
+              backgroundColor: Colors.lightBlueAccent,
+              onPressed: () {
+    gameController.regenerateBoard();
+    screenController.update();
+    },
+              tooltip: 'Regenerate board',
+              child: const Icon(Icons.refresh),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+        // Drugi wiersz (2 przyciski)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FloatingActionButton(
+              heroTag: 'btn11',
+              mini: true,
+              backgroundColor: Colors.limeAccent,
+              onPressed: () {
+                gameController.soundSwitch();
+                gameController.playRandomSound();
+              },
+              tooltip: 'Switch sound',
+              child: Obx(() => gameController.soundOn.value
+                  ? const Icon(Icons.music_note_outlined)
+                  : const Icon(Icons.music_off_outlined)),
+            ),
+            const SizedBox(width: 8),
+            FloatingActionButton(
+              heroTag: 'btn12',
+              mini: true,
+              backgroundColor: Colors.deepOrangeAccent,
+              onPressed: gameController.startStopGame,
+              tooltip: 'Start/stop game',
+              child: Obx(() => gameController.stopGame.value
+                  ? const Icon(Icons.pause)
+                  : const Icon(Icons.play_arrow)),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
 
