@@ -1,5 +1,6 @@
+import '../models/players.dart';
+import '../views/statistics_dialog.dart';
 import 'sound_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:math';
 
@@ -14,8 +15,8 @@ class GamePageController extends GetxController {
 
   var score = 0.obs;
   var scores = ''.obs;
-  var currentPlayer = 0.obs;
-  var nextPlayer = 1.obs;
+  var currentPlayer = Player.blue.index.obs;
+  var nextPlayer = Player.red.index.obs;
   var waitForMove = false.obs;
   var board = List.filled(80, 0).obs;
   var kills = 0.obs;
@@ -30,6 +31,7 @@ class GamePageController extends GetxController {
   var statisticTrippleSix = List.filled(4, 0);
   var statisticRolls = List.filled(4, List.filled(6, 0));
   var statisticMoves = List.filled(4, List.filled(6, 0));
+  RxInt turnsCounter = 1.obs;
 
   RxBool soundOn = true.obs;
   RxBool stopGame = false.obs;
@@ -45,6 +47,7 @@ class GamePageController extends GetxController {
   }
 
   Future<void> executePeriodicallyBots() async {
+
     await Future.delayed(const Duration(seconds: 3));
     while (!gameOver()) {
       if (!stopGame.value) {
@@ -72,6 +75,7 @@ class GamePageController extends GetxController {
   }
 
   void initializeBoard() {
+    turnsCounter.value = 1;
     board.value = List.filled(80, 0);
     currentPlayer.value = 0;
     nextPlayer.value = 1;
@@ -87,6 +91,8 @@ class GamePageController extends GetxController {
     for (int i = 0; i < 16; i++) {
       positionPawns[i] = i ~/ 4;
     }
+
+    regenerateBoard();
 
     statisticKills = List.filled(4, 0);
     statisticDeaths = List.filled(4, 0);
@@ -641,6 +647,11 @@ class GamePageController extends GetxController {
   void getNextPlayer() {
     int currentIndex = nextPlayer.value;
     int nextIndex = (currentIndex + 1) % colors.length;
+
+    if (currentIndex > nextIndex) {
+      turnsCounter.value += 1;
+    }
+
     currentPlayer.value = nextPlayer.value;
     nextPlayer.value = nextIndex;
     scores.value = '';
@@ -677,115 +688,8 @@ class GamePageController extends GetxController {
 
   void showStatisticsDialog() {
     Get.dialog(
-      Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Container(
-          // Możesz dostosować szerokość / wysokość, np. fraction of screen
-          width: Get.width * 0.8,
-          height: Get.height * 0.7,
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Text(
-                'Statystyki',
-                style: Get.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Lista / tablica z danymi dla każdego gracza
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: List.generate(4, (i) {
-                      return _buildPlayerStatsCard(i);
-                    }),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Przycisk "Nowa gra"
-              ElevatedButton.icon(
-                icon: const Icon(Icons.refresh),
-                label: const Text('Nowa gra'),
-                onPressed: () {
-                  initializeBoard();
-                  executePeriodicallyBots();
-                  Get.back();
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-      barrierDismissible: true, // kliknięcie poza zamyka dialog
-    );
-  }
-
-  // Prywatna metoda budująca widget z danymi jednego gracza
-  Widget _buildPlayerStatsCard(int playerIndex) {
-    final colorName = colors[playerIndex];
-    final kills = statisticKills[playerIndex];
-    final deaths = statisticDeaths[playerIndex];
-    final tripleSix = statisticTrippleSix[playerIndex];
-    final rolls = statisticRolls[playerIndex];
-    final moves = statisticMoves[playerIndex];
-
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Gracz: $colorName',
-                style: Get.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                )),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.check_circle_outline, color: Colors.green),
-                const SizedBox(width: 4),
-                Text('Zbił pionki: $kills'),
-              ],
-            ),
-            Row(
-              children: [
-                const Icon(Icons.cancel_outlined, color: Colors.redAccent),
-                const SizedBox(width: 4),
-                Text('Został zbity: $deaths'),
-              ],
-            ),
-            Row(
-              children: [
-                const Icon(Icons.star_rate_rounded, color: Colors.orange),
-                const SizedBox(width: 4),
-                Text('Potrójna szóstka: $tripleSix'),
-              ],
-            ),
-            const SizedBox(height: 8),
-
-            // Tabela rzutów 1-6
-            Text(
-              'Rzuty i ruchy:',
-              style: Get.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            // Można użyć np. DataTable, tutaj dla przykładu prosty Column
-            Column(
-              children: List.generate(6, (j) {
-                return Text(
-                  'Wynik: ${j + 1}  |  '
-                      'ile razy wyrzucono: ${rolls[j]}  |  ruchy: ${moves[j]}',
-                );
-              }),
-            ),
-          ],
-        ),
-      ),
+      StatisticsDialog(gameController: this),
+      barrierDismissible: false,
     );
   }
 
@@ -799,6 +703,7 @@ class GamePageController extends GetxController {
       return;
     }
     int cpv = getCurrentPlayer();
+    printForYellow('|doBotTurn| scores: $scores, waitForMove: $waitForMove');
     // print('|doBotTurn| scores: $scores, waitForMove: $waitForMove');
     await Future.delayed(botWaitForRollDuration);
     if (waitForMove.value) {
