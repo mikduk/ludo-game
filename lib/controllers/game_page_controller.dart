@@ -709,8 +709,9 @@ class GamePageController extends GetxController {
                 icon: const Icon(Icons.refresh),
                 label: const Text('Nowa gra'),
                 onPressed: () {
-                  initializeBoard(); // reset planszy
-                  Get.back(); // zamknij dialog
+                  initializeBoard();
+                  executePeriodicallyBots();
+                  Get.back();
                 },
               ),
             ],

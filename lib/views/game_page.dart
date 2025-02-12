@@ -11,8 +11,7 @@ import 'squares/diagonal_squared.dart';
 import 'squares/four_color_squared.dart';
 
 class GamePage extends StatelessWidget {
-  const GamePage({super.key, required this.title});
-  final String title;
+  const GamePage({super.key});
 
   @override
   Widget build(BuildContext context) {
