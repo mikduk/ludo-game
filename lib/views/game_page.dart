@@ -344,7 +344,7 @@ class PlayerDice extends StatelessWidget {
                             : color,
                         onPressed: () => gameController.bots[player]
                             ? null
-                            : gameController.rollDice(player: player),
+                            : gameController.rollDicePlayer(player: player),
                         tooltip: 'Roll dice (1 to 6)',
                         child: Icon(
                           Icons.casino,

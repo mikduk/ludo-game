@@ -37,6 +37,8 @@ class GamePageController extends GetxController {
   RxBool stopGame = false.obs;
   RxBool teamWork = true.obs;
 
+  bool rollDicePlayerFlag = false;
+
   final SoundController soundController = Get.put(SoundController());
 
   @override
@@ -75,6 +77,7 @@ class GamePageController extends GetxController {
   }
 
   void initializeBoard() {
+    rollDicePlayerFlag = false;
     turnsCounter.value = 1;
     board.value = List.filled(80, 0);
     currentPlayer.value = 0;
@@ -128,6 +131,15 @@ class GamePageController extends GetxController {
       return getPlayerFriend();
     }
     return currentPlayer.value;
+  }
+  
+  Future<void> rollDicePlayer({int player = -1, int possibilities = 6, int? result}) async {
+    if (rollDicePlayerFlag) {
+      return;
+    }
+    rollDicePlayerFlag = true;
+    await rollDice(player: player, possibilities: possibilities, result: result);
+    rollDicePlayerFlag = false;
   }
 
   Future<void> rollDice(
