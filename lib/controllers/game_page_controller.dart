@@ -29,8 +29,8 @@ class GamePageController extends GetxController {
   var statisticKills = List.filled(4, 0);
   var statisticDeaths = List.filled(4, 0);
   var statisticTrippleSix = List.filled(4, 0);
-  var statisticRolls = List.filled(4, List.filled(6, 0));
-  var statisticMoves = List.filled(4, List.filled(6, 0));
+  var statisticRolls = List.filled(4 * 6, 0);
+  var statisticMoves = List.filled(4 * 6, 0);
   RxInt turnsCounter = 1.obs;
 
   RxBool soundOn = true.obs;
@@ -101,8 +101,8 @@ class GamePageController extends GetxController {
     statisticKills = List.filled(4, 0);
     statisticDeaths = List.filled(4, 0);
     statisticTrippleSix = List.filled(4, 0);
-    statisticRolls = List.filled(4, List.filled(6, 0));
-    statisticMoves = List.filled(4, List.filled(6, 0));
+    statisticRolls = List.filled(4 * 6, 0);
+    statisticMoves = List.filled(4 * 6, 0);
   }
 
   @override
@@ -153,7 +153,7 @@ class GamePageController extends GetxController {
       processedCapture.value = false;
       score.value = result;
       scores.value += result.toString();
-      statisticRolls[currentPlayer.value][result-1] += 1;
+      statisticRolls[6 * currentPlayer.value + result-1] += 1;
 
       await automaticallyMovePawn();
     }
@@ -204,6 +204,7 @@ class GamePageController extends GetxController {
       await Future.delayed(longerDuration, getNextPlayer);
       printForYellow('1');
     } else if (everyoneInFinish()) {
+      printForYellow('2a');
       if (teamWork.value &&
           !everyoneInBaseOrFinishOrCannotGo(player: getPlayerFriend())) {
         setWaitForMoveValue(true);
@@ -219,12 +220,14 @@ class GamePageController extends GetxController {
         printForYellow('3');
         await Future.delayed(normalDuration, getNextPlayer);
       } else {
+        printForYellow('X3X');
         setWaitForMoveValue(true);
       }
     } else if (everyoneInBaseOrFinishOrCannotGo()) {
       printForYellow('4');
       await Future.delayed(normalDuration, getNextPlayer);
     } else {
+      printForYellow('8L');
       setWaitForMoveValue(true);
     }
   }
@@ -299,6 +302,7 @@ class GamePageController extends GetxController {
 
   void setWaitForMoveValue(bool value) {
     print('|setWaitForMoveValue| value: $value');
+    printForYellow('SETWAITFORMOVE - $value');
     waitForMove.value = value;
   }
 
@@ -315,14 +319,14 @@ class GamePageController extends GetxController {
       board[currentIndex] -= pow;
       int x = currentIndex * 13 + 4;
       await goToField(x, pow, pawnNumber ?? 0);
-      statisticMoves[tenLog(pow)][score.value-1] += 1;
+      statisticMoves[currentIndex * 6 + score.value-1] += 1;
       await endTurn();
     } else if (positionPawns[4 * currentIndex + (pawnNumber ?? 0)] !=
         currentIndex) {
       int i = positionPawns[4 * currentIndex + (pawnNumber ?? 0)];
       board[i] -= pow;
       int x = whereToGo(i, score.value, currentIndex);
-      statisticMoves[tenLog(pow)][score.value-1] += 1;
+      statisticMoves[currentIndex * 6 + score.value-1] += 1;
       await goToField(x, pow, pawnNumber ?? 0);
       await endTurn();
     } else {
@@ -626,16 +630,20 @@ class GamePageController extends GetxController {
     print(
         '|endTurn| currentPlayer: $currentPlayer, scores: $scores, kills: $kills, finished: $finished');
     if (score.value == 6) {
+      printForYellow('[END TURN] A');
       if (!everyoneInBaseOrFinish(player: getCurrentPlayer())) {
+        printForYellow('[END TURN] AĄA');
         setWaitForMoveValue(false);
         return;
       }
     } else if (kills.value > 0) {
+      printForYellow('[END TURN] B');
       kills.value -= 1;
       processedCapture.value = true;
       setWaitForMoveValue(false);
       return;
     } else if (finished.value > 0) {
+      printForYellow('[END TURN] C');
       finished.value -= 1;
       setWaitForMoveValue(false);
       print(
@@ -646,6 +654,7 @@ class GamePageController extends GetxController {
         return;
       }
     }
+    printForYellow('[END TURN] UUU');
     setWaitForMoveValue(false);
     await Future.delayed(shorterDuration, getNextPlayer);
   }
@@ -674,6 +683,7 @@ class GamePageController extends GetxController {
     nextPlayer.value = nextIndex;
     scores.value = '';
     score.value = 0;
+    printForYellow('[getNextPlayer] LLL');
     setWaitForMoveValue(false);
     if (!teamWork.value) {
       if (everyoneInFinish(player: nextPlayer.value)) {
@@ -698,7 +708,7 @@ class GamePageController extends GetxController {
       print('');
       print('Potrójna szóstka: ${statisticTrippleSix[i]}');
       for (int j=0; j<6; j++) {
-        print('[${j+1}] wyrzucono: ${statisticRolls[i][j]}, ruch: ${statisticMoves[i][j]}');
+        print('[${j+1}] wyrzucono: ${statisticRolls[6*i+j]}, ruch: ${statisticMoves[6*i+j]}');
       }
       print('\n');
     }

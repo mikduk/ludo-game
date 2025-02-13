@@ -55,8 +55,8 @@ class StatisticsDialog extends StatelessWidget {
     final kills = gameController.statisticKills[playerIndex];
     final deaths = gameController.statisticDeaths[playerIndex];
     final tripleSix = gameController.statisticTrippleSix[playerIndex];
-    final rolls = gameController.statisticRolls[playerIndex];
-    final moves = gameController.statisticMoves[playerIndex];
+    final rolls = gameController.statisticRolls;
+    final moves = gameController.statisticMoves;
 
     return Card(
       elevation: 4,
@@ -107,7 +107,7 @@ class StatisticsDialog extends StatelessWidget {
               children: List.generate(6, (j) {
                 return Text(
                   'Wynik: ${j + 1}  |  '
-                  'ile razy wyrzucono: ${rolls[j]}  |  ruchy: ${moves[j]}',
+                  'ile razy wyrzucono: ${rolls[6*playerIndex+j]}  |  ruchy: ${moves[6*playerIndex+j]}',
                 );
               }),
             ),
