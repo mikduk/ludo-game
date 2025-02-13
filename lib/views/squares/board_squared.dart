@@ -58,7 +58,7 @@ class _BoardSquareState extends State<BoardSquare> with SingleTickerProviderStat
     // Obx – reagujemy na zmiany w kontrolerze (waitForMove, board, itp.)
     return Obx(() {
       // Sprawdzamy, czy należy migać polem
-      final highlight = (controller.waitForMove.value && isPossibleMove(controller));
+      final highlight = (controller.waitForMove.value && !controller.fieldActionFlag.value && isPossibleMove(controller));
 
       // Jeśli warunek się zmienił na "migaj"
       if (highlight && !_isHighlighted) {
@@ -133,7 +133,7 @@ class _BoardSquareState extends State<BoardSquare> with SingleTickerProviderStat
   // Obsługa kliknięcia na pole
   Future<void> fieldAction(GamePageController controller) async {
     int result = controller.board[widget.index];
-    if (result == 0) {
+    if (result == 0 || controller.fieldActionFlag.value) {
       return;
     }
     int currentPlayerIndex = controller.getCurrentPlayer();
@@ -145,7 +145,9 @@ class _BoardSquareState extends State<BoardSquare> with SingleTickerProviderStat
       }
     }
     if (foundPawn >= 0 && foundPawn <= 3) {
+      controller.setFieldActionFlag(value: true);
       await controller.movePawn(pawnNumber: foundPawn);
+      controller.setFieldActionFlag(value: false);
     }
   }
 

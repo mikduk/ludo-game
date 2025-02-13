@@ -38,6 +38,7 @@ class GamePageController extends GetxController {
   RxBool teamWork = true.obs;
 
   bool rollDicePlayerFlag = false;
+  RxBool fieldActionFlag = false.obs;
 
   final SoundController soundController = Get.put(SoundController());
 
@@ -132,7 +133,7 @@ class GamePageController extends GetxController {
     }
     return currentPlayer.value;
   }
-  
+
   Future<void> rollDicePlayer({int player = -1, int possibilities = 6, int? result}) async {
     if (rollDicePlayerFlag) {
       return;
@@ -156,6 +157,11 @@ class GamePageController extends GetxController {
 
       await automaticallyMovePawn();
     }
+  }
+
+  void setFieldActionFlag({bool? value}) {
+    value ??= !fieldActionFlag.value;
+    fieldActionFlag.value = value;
   }
 
   static int getRandomValue(int possibilities, int? result) {
