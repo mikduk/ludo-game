@@ -30,6 +30,7 @@ class SoundController extends GetxController {
         await player.resume();
       } catch (e) {
         print('|playClickSound| $e');
+        playClickSound(sound: 'sounds/capture.mp3');
       }
     }
   }

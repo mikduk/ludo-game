@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:get/get.dart';
 import 'package:flutter/widgets.dart';
 
@@ -30,7 +32,21 @@ class ScreenController extends GetxController {
 
   double getBoardHeight() => isPortrait ? screenWidth * 1.1 : screenHeight;
   double getBoardWidth() => isPortrait ? screenWidth  : screenHeight;
-  double getFieldSize() => ((10/11) * getBoardHeight() ~/ 15) * 1.0;
+
+  double getFieldSize() {
+    List<double> d = [1024, 1366];
+    if (d.contains(screenWidth) && d.contains(screenHeight)) {
+      return min(((10/11) * getBoardHeight() ~/ 15) * 1.0, (isPortrait ? 62.0 : 61.0));
+    } else if (screenWidth == 768 && screenHeight == 1024) {
+      return 47.5;
+    } else if (screenWidth == 390.0 && screenHeight == 844.0) {
+      return ((10/11) * getBoardHeight() ~/ 15) * 1.0 - 0.5;
+    } else if (screenWidth == 375.0 && screenHeight == 667.0) {
+      return ((10/11) * getBoardHeight() ~/ 15) * 1.0 - 0.5;
+    }
+    return min(((10/11) * getBoardHeight() ~/ 15) * 1.0, (isPortrait ? 51.0 : 48.0));
+  }
+
   double getTopMargin() => isPortrait ? Get.mediaQuery.padding.top : 0;
   double getBottomMargin() => isPortrait ? Get.mediaQuery.padding.bottom : 0;
   double getRightMargin() => Get.mediaQuery.padding.right * 0.5;
@@ -48,7 +64,7 @@ class ScreenController extends GetxController {
     // Portret: 375 × 667
     // Poziom: 667 × 375
     if (screenWidth == 667 && screenHeight == 375) {
-      return true;
+      return false;
     } else if (screenWidth == 375 && screenHeight == 667) {
       return false;
     }
@@ -168,52 +184,76 @@ class ScreenController extends GetxController {
     return isPortrait;
   }
 
+  double getBoardTopPadding() {
+    print('Unknown device size: $screenWidth x $screenHeight');
+    if (screenWidth == 1080 && screenHeight == 810) {
+      return 12;
+    } else if (screenWidth == 1180 && screenHeight == 820) {
+      return 14;
+    } else if (screenWidth == 1366 && screenHeight == 1024) {
+      return 14;
+    } else if (screenWidth == 1024 && screenHeight == 768) {
+      return 7;
+    } else if (screenWidth == 1194 && screenHeight == 834) {
+      return 18;
+    } else if (screenWidth == 1133 && screenHeight == 744) {
+      return 1;
+    } else if (screenWidth == 667 && screenHeight == 375) {
+      return 10;
+    } else if (screenWidth == 926 && screenHeight == 428) {
+      return 10;
+    }
+    return 0;
+  }
+
+  double getRightScoreBoardPosition() {
+    if (screenWidth == 1080 && screenHeight == 810) {
+      return screenWidth * 0.012;
+    } else if (screenWidth == 1180 && screenHeight == 820) {
+      return screenWidth * 0.032;
+    } else if (screenWidth == 1366 && screenHeight == 1024) {
+      return screenWidth * 0.028;
+    } else if (screenWidth == 1194 && screenHeight == 834) {
+      return screenWidth * 0.028;
+    } else if (screenWidth == 1133 && screenHeight == 744) {
+      return screenWidth * 0.028;
+    } else if (screenWidth == 844 && screenHeight == 390) {
+      return screenWidth * 0.05;
+    } else if (screenWidth == 667 && screenHeight == 375) {
+      return screenWidth * 0.032;
+    } else if (screenWidth == 926 && screenHeight == 428) {
+      return screenWidth * 0.038;
+    }
+    return screenWidth * 0.1;
+  }
+
+  double getButtonWidth() {
+    if (screenWidth == 844 && screenHeight == 390) {
+      return screenWidth * 0.23;
+    } else if (screenWidth == 926 && screenHeight == 428) {
+      return screenWidth * 0.26;
+    }
+    return screenWidth * 0.2;
+  }
+
+  double getWidthTwoByTwo() {
+    if (screenWidth == 375 && screenHeight == 667) {
+      return 0;
+    }
+    return 8;
+  }
+
+  double getHeightTwoByTwo() {
+    if (screenWidth == 375 && screenHeight == 667) {
+      return 2;
+    }
+    return 16;
+  }
+
+  double getTopButtonsWidth() {
+    if (screenWidth == 375 && screenHeight == 667) {
+      return Get.width * 0.4;
+    }
+    return Get.width * 0.45;
+  }
 }
-
-/// CHCEMY TRUE:
-/// flutter: ------
-// flutter: 1180.0
-// flutter: 820.0
-// flutter: false
-// flutter: 820.0
-// flutter: 820.0
-// flutter: 0.0
-// flutter: 0.0
-// flutter: 0.0
-// flutter: ~~~~~~~~~
-
-/// CHCEMY FALSE:
-/// flutter: ------
-// flutter: 820.0
-// flutter: 1180.0
-// flutter: true
-// flutter: 902.0000000000001
-// flutter: 820.0
-// flutter: 24.0
-// flutter: 25.0
-// flutter: 0.0
-// flutter: ~~~~~~~~~
-
-/// CHCEMY TRUE:
-/// flutter: ------
-// flutter: 428.0
-// flutter: 926.0
-// flutter: true
-// flutter: 470.8
-// flutter: 428.0
-// flutter: 47.0
-// flutter: 34.0
-// flutter: 0.0
-// flutter: ~~~~~~~~~
-
-/// CHCEMY FALSE:
-/// flutter: ------
-// flutter: 926.0
-// flutter: 428.0
-// flutter: false
-// flutter: 428.0
-// flutter: 428.0
-// flutter: 0.0
-// flutter: 0.0
-// flutter: 23.5
-// flutter: ~~~~~~~~~

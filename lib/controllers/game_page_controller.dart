@@ -60,7 +60,6 @@ class GamePageController extends GetxController {
     }
     print('KONIEC GRY');
     soundController.playClickSound(sound: 'sounds/end.mp3');
-    showStatistics();
     showStatisticsDialog();
   }
 
@@ -194,9 +193,11 @@ class GamePageController extends GetxController {
 
   void printForYellow(String x) {
     if (currentPlayer.value == 3) {
-      print('[printForYELLOW] $x');
+      String timestamp = DateTime.now().toIso8601String();
+      print('[printForYELLOW] [$timestamp] $x');
     }
   }
+
 
   Future<void> automaticallyMovePawn() async {
     if (scores.value.contains('666')) {
