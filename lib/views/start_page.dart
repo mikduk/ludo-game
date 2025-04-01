@@ -1,7 +1,8 @@
-import 'package:chinczyk/views/game_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter/services.dart';
+import '/views/game_page.dart';
 
 class StartPage extends StatelessWidget {
   const StartPage({super.key});
@@ -13,8 +14,15 @@ class StartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final double screenWidth = Get.width;
     final double screenHeight = Get.height;
+
+    if (screenWidth > 1.8 * screenHeight) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -49,7 +57,7 @@ class StartPage extends StatelessWidget {
                         fontSize: screenWidth * 0.05,
                       ),
                     ),
-                    child: const Text('Nowa Gra'),
+                    child: Text('new_game'.tr),
                   ),
                 ],
               ),
@@ -57,40 +65,26 @@ class StartPage extends StatelessWidget {
             FutureBuilder<String>(
               future: _getAppVersion(),
               builder: (context, snapshot) {
+                String versionText;
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: screenHeight * 0.02),
-                    child: Text(
-                      'Wersja ładuje się...',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: screenWidth * 0.03,
-                      ),
-                    ),
-                  );
+                  versionText = 'loading_version'.tr;
                 } else if (snapshot.hasError) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: screenHeight * 0.02),
-                    child: Text(
-                      'Błąd pobierania wersji',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: screenWidth * 0.03,
-                      ),
-                    ),
-                  );
+                  versionText = 'error_version'.tr;
                 } else {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: screenHeight * 0.02),
-                    child: Text(
-                      'Wersja ${snapshot.data}',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: screenWidth * 0.03,
-                      ),
-                    ),
-                  );
+                  versionText =
+                      'version'.trParams({'version': snapshot.data ?? ''});
                 }
+
+                return Padding(
+                  padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+                  child: Text(
+                    versionText,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: screenWidth * 0.03,
+                    ),
+                  ),
+                );
               },
             ),
           ],
