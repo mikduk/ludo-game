@@ -609,8 +609,10 @@ class GamePageController extends GetxController {
   }
 
   Future<void> capture(int x, int pow) async {
-    soundController.playClickSound();
-    soundController.playRandomlyLaugh();
+    if (soundOn.isTrue) {
+      soundController.playClickSound();
+      soundController.playRandomlyLaugh();
+    }
     print('|capture| x: $x, pow: $pow');
     int result = board[x];
     board[x] = pow; // TODO
