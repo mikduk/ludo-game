@@ -615,7 +615,7 @@ class GamePageController extends GetxController {
     }
     print('|capture| x: $x, pow: $pow');
     int result = board[x];
-    board[x] = pow; // TODO
+    board[x] = result + pow - getOpponentPow(pow, result);
     int opponent = tenLog(result);
     for (int i = 0; i < 4; i++) {
       if (positionPawns[4 * opponent + i] == x) {
@@ -627,6 +627,34 @@ class GamePageController extends GetxController {
     }
     print('|capture| kills++');
     kills.value += 1;
+  }
+
+  int getOpponentPow(int attackerPow, int result) {
+    List<int> digits = result
+        .toString()
+        .padLeft(4, '0')
+        .split('')
+        .map(int.parse)
+        .toList()
+        .reversed
+        .toList();
+    List<int> possibleOpponentIndexes = [0, 1, 2, 3];
+    possibleOpponentIndexes.remove(tenLog(attackerPow));
+    if (teamWork.isTrue) {
+      possibleOpponentIndexes.remove((tenLog(attackerPow) + 2) % 4);
+    }
+    int sum = 0;
+    for (int i in possibleOpponentIndexes) {
+      sum += digits[i];
+    }
+    if (sum == 1) {
+      for (int i in possibleOpponentIndexes) {
+        if (digits[i] == 1) {
+          return tenPow(i);
+        }
+      }
+    }
+    return 0;
   }
 
   Future<void> endTurn() async {

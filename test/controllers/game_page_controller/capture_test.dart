@@ -111,12 +111,12 @@ void main() {
       expect(controller.board[40], greaterThan(1000));
     });
 
-    test('Yellow attacks field with Yellow and Blue - team mode', () async {
+    test('Yellow attacks field with Yellow and Red - team mode', () async {
       controller.teamWork.value = true;
-      controller.board[40] = 1000 + 1; // Yellow (1000) + Blue (1)
+      controller.board[40] = 1000 + 10; // Yellow (1000) + Red (10)
 
       bool canCapture = controller.canCapture(40, 1000);
-      expect(canCapture, isFalse); // Team: Yellow i Blue są w jednej drużynie
+      expect(canCapture, isFalse); // Team: Yellow i Red są w jednej drużynie
     });
 
     test('Yellow attacks field with two Greens - solo mode', () async {
@@ -124,10 +124,10 @@ void main() {
       controller.board[41] = 100 + 100; // 2x Green (100)
 
       bool canCapture = controller.canCapture(41, 1000);
-      expect(canCapture, isTrue); // Solo: Yellow może bić Green
+      expect(canCapture, isFalse);
 
       await controller.capture(41, 1000);
-      expect(controller.board[41], greaterThan(1000));
+      expect(controller.board[41], equals(1200));
     });
 
     test('Yellow attacks field with two Greens - team mode', () async {
@@ -135,54 +135,54 @@ void main() {
       controller.board[41] = 100 + 100; // 2x Green (100)
 
       bool canCapture = controller.canCapture(41, 1000);
-      expect(canCapture, isTrue); // Team: Yellow i Green są przeciwnikami
+      expect(canCapture, isFalse);
 
       await controller.capture(41, 1000);
-      expect(controller.board[41], greaterThan(1000));
-    });
-
-    test('Yellow attacks field with Green and Blue - solo mode', () async {
-      controller.teamWork.value = false;
-      controller.board[42] = 100 + 1; // Green + Blue
-
-      bool canCapture = controller.canCapture(42, 1000);
-      expect(canCapture, isTrue); // Solo: Yellow może zbić Green
-
-      await controller.capture(42, 1000);
-      expect(controller.board[42], greaterThan(1000));
-    });
-
-    test('Yellow attacks field with Green and Blue - team mode', () async {
-      controller.teamWork.value = true;
-      controller.board[42] = 100 + 1; // Green + Blue
-
-      bool canCapture = controller.canCapture(42, 1000);
-      expect(canCapture, isTrue); // Team: Yellow bije Green (wroga drużyna)
-
-      await controller.capture(42, 1000);
-      expect(controller.board[42], greaterThan(1000));
+      expect(controller.board[41], equals(1200));
     });
 
     test('Yellow attacks field with Green and Red - solo mode', () async {
       controller.teamWork.value = false;
-      controller.board[43] = 100 + 10; // Green + Red
+      controller.board[42] = 100 + 10; // Green + Red
 
-      bool canCapture = controller.canCapture(43, 1000);
-      expect(canCapture, isTrue); // Solo: Yellow może zbić Green lub Red
+      bool canCapture = controller.canCapture(42, 1000);
+      expect(canCapture, isFalse);
 
-      await controller.capture(43, 1000);
-      expect(controller.board[43], greaterThan(1000));
+      await controller.capture(42, 1000);
+      expect(controller.board[42], equals(1110));
     });
 
     test('Yellow attacks field with Green and Red - team mode', () async {
       controller.teamWork.value = true;
-      controller.board[43] = 100 + 10; // Green + Red
+      controller.board[42] = 100 + 10; // Green + Red
+
+      bool canCapture = controller.canCapture(42, 1000);
+      expect(canCapture, isTrue);
+
+      await controller.capture(42, 1000);
+      expect(controller.board[42], equals(1010));
+    });
+
+    test('Yellow attacks field with Green and Blue - solo mode', () async {
+      controller.teamWork.value = false;
+      controller.board[43] = 100 + 1; // Green + Blue
 
       bool canCapture = controller.canCapture(43, 1000);
-      expect(canCapture, isTrue); // Team: Yellow może zbić Green lub Red
+      expect(canCapture, isFalse);
 
       await controller.capture(43, 1000);
-      expect(controller.board[43], greaterThan(1000));
+      expect(controller.board[43], equals(1101));
+    });
+
+    test('Yellow attacks field with Green and Blue - team mode', () async {
+      controller.teamWork.value = true;
+      controller.board[43] = 100 + 1; // Green + Blue
+
+      bool canCapture = controller.canCapture(43, 1000);
+      expect(canCapture, isFalse);
+
+      await controller.capture(43, 1000);
+      expect(controller.board[43], equals(1101));
     });
   });
 
