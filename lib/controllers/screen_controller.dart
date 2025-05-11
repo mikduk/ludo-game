@@ -4,14 +4,30 @@ import 'package:get/get.dart';
 import 'package:flutter/widgets.dart';
 
 class ScreenController extends GetxController {
-  double screenWidth = Get.size.width;
-  double screenHeight = Get.size.height;
-  bool isPortrait = Get.size.height > Get.size.width;
+  late double screenWidth;
+  late double screenHeight;
+  late bool isPortrait;
 
   @override
   void onInit() {
+    screenWidth = 0;
+    screenHeight = 0;
+    isPortrait = true;
     super.onInit();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    _updateSize();
     _listenOrientation();
+  }
+
+  void _updateSize() {
+    final size = Get.mediaQuery.size;
+    screenWidth  = size.width;
+    screenHeight = size.height;
+    isPortrait   = screenHeight > screenWidth;
   }
 
   void _listenOrientation() {

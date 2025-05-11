@@ -12,7 +12,7 @@ class GamePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GamePageController gameController = Get.put(GamePageController());
-    final ScreenController screenController = Get.put(ScreenController());
+    final ScreenController screenController = Get.find();
 
     return Scaffold(
         body: Stack(alignment: AlignmentDirectional.center, children: <Widget>[

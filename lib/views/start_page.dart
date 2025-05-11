@@ -1,108 +1,113 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:flutter/services.dart';
+import '../controllers/screen_controller.dart';
 import '/views/game_page.dart';
 
 class StartPage extends StatelessWidget {
-  const StartPage({super.key});
+  StartPage({super.key});
 
-  Future<String> _getAppVersion() async {
-    final info = await PackageInfo.fromPlatform();
-    return info.version;
-  }
+  final screenController = Get.put(ScreenController());
 
   @override
   Widget build(BuildContext context) {
+    return GetBuilder<ScreenController>(
+      builder: (c) {
 
-    final double screenWidth = Get.width;
-    final double screenHeight = Get.height;
+        print(c.screenWidth);
 
-    if (screenWidth > 1.8 * screenHeight) {
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-      ]);
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              flex: 4,
-              child: Center(
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  width: screenWidth * 0.5,
-                  height: screenWidth * 0.5,
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 4,
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: min(c.screenHeight, c.screenWidth) * 0.5,
+                      height: min(c.screenHeight, c.screenWidth) * 0.5,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Expanded(
-              flex: 3,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: null,
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.1,
-                        vertical: screenHeight * 0.02,
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _menuButton(
+                        text: 'continue_game'.tr,
+                        onPressed: null,
+                        c: c,
                       ),
-                      textStyle: TextStyle(
-                        fontSize: screenWidth * 0.05,
+                      SizedBox(height: ((c.screenHeight > c.screenWidth) ? 0.016 : 0) * c.screenHeight),
+                      _menuButton(
+                        text: 'new_game'.tr,
+                        onPressed: () => Get.off(() => const GamePage()),
+                        c: c,
                       ),
-                    ),
-                    child: Text('continue_game'.tr),
+                    ],
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Get.off(() => const GamePage());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.1,
-                        vertical: screenHeight * 0.02,
-                      ),
-                      textStyle: TextStyle(
-                        fontSize: screenWidth * 0.05,
-                      ),
-                    ),
-                    child: Text('new_game'.tr),
-                  ),
-                ],
-              ),
+                ),
+                _versionLabel(c),
+              ],
             ),
-            FutureBuilder<String>(
-              future: _getAppVersion(),
-              builder: (context, snapshot) {
-                String versionText;
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  versionText = 'loading_version'.tr;
-                } else if (snapshot.hasError) {
-                  versionText = 'error_version'.tr;
-                } else {
-                  versionText =
-                      'version'.trParams({'version': snapshot.data ?? ''});
-                }
-
-                return Padding(
-                  padding: EdgeInsets.only(bottom: screenHeight * 0.02),
-                  child: Text(
-                    versionText,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: screenWidth * 0.03,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
+
+  // mały helper dla przycisków
+  Widget _menuButton({
+    required String text,
+    required VoidCallback? onPressed,
+    required ScreenController c,
+  }) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.symmetric(
+          horizontal: c.screenWidth * 0.1,
+          vertical: c.screenHeight * 0.02,
+        ),
+        fixedSize: Size(min(c.screenHeight, c.screenWidth) * 0.72, c.screenHeight * 0.07),
+        textStyle: TextStyle(fontSize: min(c.screenHeight, c.screenWidth) * 0.05),
+      ),
+      child: Text(text),
+    );
+  }
+
+  // etykieta z wersją
+  Widget _versionLabel(ScreenController c) {
+    return FutureBuilder<String>(
+      future: _getAppVersion(),
+      builder: (context, snapshot) {
+        final txt = switch (snapshot.connectionState) {
+          ConnectionState.waiting => 'loading_version'.tr,
+          ConnectionState.done    =>
+          snapshot.hasError
+              ? 'error_version'.tr
+              : 'version'.trParams({'version': snapshot.data ?? ''}),
+          _ => '',
+        };
+        return Padding(
+          padding: EdgeInsets.only(bottom: c.screenHeight * 0.02),
+          child: Text(
+            txt,
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: min(c.screenHeight, c.screenWidth) * 0.03,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<String> _getAppVersion() async =>
+      (await PackageInfo.fromPlatform()).version;
 }
