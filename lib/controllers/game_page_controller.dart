@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../models/players.dart';
 import '../views/statistics_dialog.dart';
 import 'sound_controller.dart';
@@ -39,6 +41,8 @@ class GamePageController extends GetxController {
 
   bool rollDicePlayerFlag = false;
   RxBool fieldActionFlag = false.obs;
+
+  List<String> logs = [];
 
   final SoundController soundController = Get.put(SoundController());
 
@@ -154,6 +158,8 @@ class GamePageController extends GetxController {
       scores.value += result.toString();
       statisticRolls[6 * currentPlayer.value + result-1] += 1;
 
+      printForYellow('Wyrzucono: $score => $scores');
+
       await automaticallyMovePawn();
     }
   }
@@ -176,6 +182,32 @@ class GamePageController extends GetxController {
 
   void startStopGame() {
     stopGame.value = !stopGame.value;
+    if (stopGame.value) {
+      showLogsDialog();
+    }
+  }
+
+  void showLogsDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Logi'),
+        content: SizedBox(
+          width: double.maxFinite,          // żeby lista mogła się rozszerzyć
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: logs.length,
+            itemBuilder: (_, i) => Text(logs[i], style: const TextStyle(fontSize: 8)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),     // zamknij okno
+            child: const Text('Zamknij'),
+          ),
+        ],
+      ),
+      barrierDismissible: true,
+    );
   }
 
   void soundSwitch() {
@@ -195,6 +227,7 @@ class GamePageController extends GetxController {
     if (currentPlayer.value == 3) {
       String timestamp = DateTime.now().toIso8601String();
       print('[printForYELLOW] [$timestamp] $x');
+      logs.add('[$timestamp]\n$x\n');
     }
   }
 
@@ -203,14 +236,14 @@ class GamePageController extends GetxController {
     if (scores.value.contains('666')) {
       statisticTrippleSix[currentPlayer.value] += 1;
       await Future.delayed(longerDuration, getNextPlayer);
-      printForYellow('1');
+      printForYellow('666 (trzecia szóstka)');
     } else if (everyoneInFinish()) {
-      printForYellow('2a');
+      printForYellow('(everyoneInFinish)');
       if (teamWork.value &&
           !everyoneInBaseOrFinishOrCannotGo(player: getPlayerFriend())) {
         setWaitForMoveValue(true);
       } else {
-        printForYellow('2');
+        printForYellow('else (everyoneInFinish)');
         await Future.delayed(normalDuration, getNextPlayer);
       }
     } else if (everyoneInBaseOrFinish()) {
@@ -218,17 +251,17 @@ class GamePageController extends GetxController {
         if (onlyYouInBaseOrFinish()) {
           soundController.playRandomlyLaugh();
         }
-        printForYellow('3');
+        printForYellow('<] != 6 [> (everyoneInBaseOrFinish)');
         await Future.delayed(normalDuration, getNextPlayer);
       } else {
-        printForYellow('X3X');
+        printForYellow('else (everyoneInBaseOrFinish)');
         setWaitForMoveValue(true);
       }
     } else if (everyoneInBaseOrFinishOrCannotGo()) {
-      printForYellow('4');
+      printForYellow('(everyoneInBaseOrFinishOrCannotGo)');
       await Future.delayed(normalDuration, getNextPlayer);
     } else {
-      printForYellow('8L');
+      printForYellow('ELSE');
       setWaitForMoveValue(true);
     }
   }
@@ -311,7 +344,7 @@ class GamePageController extends GetxController {
     int currentIndex = getCurrentPlayer();
     int pow = tenPow(currentIndex);
 
-    printForYellow('A');
+    printForYellow('|movePlayerPawn| currentIndex: $currentIndex, pow: $pow');
     print('|movePlayerPawn| currentIndex: $currentIndex, pow: $pow');
 
     // Pierwszy ruch
@@ -331,6 +364,7 @@ class GamePageController extends GetxController {
       await goToField(x, pow, pawnNumber ?? 0);
       await endTurn();
     } else {
+      printForYellow('Pionek $pawnNumber. $currentPlayer nie może się ruszyć.');
       throw ArgumentError(
           'Pionek $pawnNumber. $currentPlayer nie może się ruszyć.');
     }
@@ -363,6 +397,7 @@ class GamePageController extends GetxController {
           translatedI += n;
         }
       } else if (translatedI == 55) {
+        printForYellow('ERROR - tu nie powinno być pionka: $i');
         print('ERROR - tu nie powinno być pionka: $i');
       } else if (translatedI >= 48 && translatedI <= 54) {
         translatedI += 1 + n;

@@ -43,6 +43,8 @@ class ScreenController extends GetxController {
       return ((10/11) * getBoardHeight() ~/ 15) * 1.0 - 0.5;
     } else if (screenWidth == 375.0 && screenHeight == 667.0) {
       return ((10/11) * getBoardHeight() ~/ 15) * 1.0 - 0.5;
+    } else if (screenWidth == 360.0 && screenHeight == 732.0) {
+      return ((10/11) * getBoardHeight() ~/ 15) * 1.0 - 0.5;
     }
     return min(((10/11) * getBoardHeight() ~/ 15) * 1.0, (isPortrait ? 51.0 : 48.0));
   }
@@ -66,6 +68,13 @@ class ScreenController extends GetxController {
     if (screenWidth == 667 && screenHeight == 375) {
       return false;
     } else if (screenWidth == 375 && screenHeight == 667) {
+      return false;
+    }
+
+    // Samsung A35
+    if (screenWidth >= 700 && screenWidth <= 710 && screenHeight == 360) {
+      return false;
+    } else if (screenWidth == 360 && screenHeight == 732) {
       return false;
     }
 
@@ -129,6 +138,13 @@ class ScreenController extends GetxController {
       return false;
     }
 
+    // RealMe
+    if (screenWidth >= 900 && screenWidth <= 920 && screenHeight >= 410 && screenHeight <= 430) {
+      return true;
+    } else if (screenHeight >= 900 && screenHeight <= 920 && screenWidth >= 410 && screenWidth <= 430) {
+      return false;
+    }
+
     //
     // iPad 9. gen (10.2")
     // Portret: 810 × 1080
@@ -180,12 +196,12 @@ class ScreenController extends GetxController {
     }
 
     // Jeśli żaden wariant nie pasuje, wyrzucamy w logu wymiary
-    print('Unknown device size: $screenWidth x $screenHeight');
+    print('[1] Unknown device size: $screenWidth x $screenHeight');
     return isPortrait;
   }
 
   double getBoardTopPadding() {
-    print('Unknown device size: $screenWidth x $screenHeight');
+    print('[2] Unknown device size: $screenWidth x $screenHeight');
     if (screenWidth == 1080 && screenHeight == 810) {
       return 12;
     } else if (screenWidth == 1180 && screenHeight == 820) {
@@ -232,6 +248,8 @@ class ScreenController extends GetxController {
       return screenWidth * 0.23;
     } else if (screenWidth == 926 && screenHeight == 428) {
       return screenWidth * 0.26;
+    } else if (screenWidth == 732 && screenHeight == 360) {
+      return screenWidth * 0.1;
     }
     return screenWidth * 0.2;
   }
@@ -239,12 +257,16 @@ class ScreenController extends GetxController {
   double getWidthTwoByTwo() {
     if (screenWidth == 375 && screenHeight == 667) {
       return 0;
+    } else if (screenWidth == 360 && screenHeight == 732) {
+      return 0;
     }
     return 8;
   }
 
   double getHeightTwoByTwo() {
     if (screenWidth == 375 && screenHeight == 667) {
+      return 2;
+    } else if (screenWidth == 360 && screenHeight == 732) {
       return 2;
     }
     return 16;

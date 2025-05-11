@@ -36,7 +36,7 @@ class ScoreBoard extends StatelessWidget {
         ],
       ),
       SizedBox(
-        height: vertical ? 0 : 10,
+        height: vertical ? 0 : 2,
         width: vertical ? 15 * h : 0,
       ),
       Column(
@@ -123,6 +123,7 @@ class ScoreBoard extends StatelessWidget {
           Text(
             currentName,
             style: Get.textTheme.headlineSmall?.copyWith(
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: color[gameController.currentPlayer.value],
             ),

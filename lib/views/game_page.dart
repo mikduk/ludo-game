@@ -97,7 +97,7 @@ class GamePage extends StatelessWidget {
           double topPosition = screenController.getTopMargin() +
               screenController.screenHeight * 0.03;
           double leftPosition = screenController.screenWidth * 0.05;
-          double buttonWidth = screenController.screenWidth * 0.9;
+          double buttonWidth = screenController.screenWidth * 0.94;
 
           return Positioned(
             top: topPosition,
