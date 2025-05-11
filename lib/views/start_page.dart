@@ -45,6 +45,19 @@ class StartPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
+                    onPressed: null,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.1,
+                        vertical: screenHeight * 0.02,
+                      ),
+                      textStyle: TextStyle(
+                        fontSize: screenWidth * 0.05,
+                      ),
+                    ),
+                    child: Text('continue_game'.tr),
+                  ),
+                  ElevatedButton(
                     onPressed: () {
                       Get.off(() => const GamePage());
                     },

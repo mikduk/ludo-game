@@ -196,7 +196,7 @@ class GamePageController extends GetxController {
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: logs.length,
-            itemBuilder: (_, i) => Text(logs[i], style: const TextStyle(fontSize: 8)),
+            itemBuilder: (_, i) => Text(logs[logs.length - i - 1], style: const TextStyle(fontSize: 8)),
           ),
         ),
         actions: [
@@ -254,6 +254,7 @@ class GamePageController extends GetxController {
         printForYellow('<] != 6 [> (everyoneInBaseOrFinish)');
         await Future.delayed(normalDuration, getNextPlayer);
       } else {
+        soundController.playRandomlyCongrats();
         printForYellow('else (everyoneInBaseOrFinish)');
         setWaitForMoveValue(true);
       }
@@ -431,6 +432,7 @@ class GamePageController extends GetxController {
     positionPawns[4 * tenLog(pow) + pawnNumber] = x;
     if ([61, 67, 73, 79].contains(x)) {
       finished.value += 1;
+      soundController.playClickSound(sound: 'sounds/complete.mp3');
     }
     // await endTurn();
   }
