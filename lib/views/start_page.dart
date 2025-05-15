@@ -13,26 +13,30 @@ class StartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    screenController.onReady();
     return GetBuilder<ScreenController>(
       builder: (c) {
-
-        print(c.screenWidth);
+        final shortest = min(c.screenHeight, c.screenWidth);
 
         return Scaffold(
           backgroundColor: Colors.white,
           body: SafeArea(
             child: Column(
               children: [
+                /// ---------------- logo ----------------
                 Expanded(
                   flex: 4,
                   child: Center(
                     child: Image.asset(
                       'assets/images/logo.png',
-                      width: min(c.screenHeight, c.screenWidth) * 0.5,
-                      height: min(c.screenHeight, c.screenWidth) * 0.5,
+                      width: shortest * 0.5,
+                      height: shortest * 0.5,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
+
+                /// --------------- przyciski -------------
                 Expanded(
                   flex: 3,
                   child: Column(
@@ -41,18 +45,25 @@ class StartPage extends StatelessWidget {
                       _menuButton(
                         text: 'continue_game'.tr,
                         onPressed: null,
+                        shortest: shortest,
                         c: c,
                       ),
-                      SizedBox(height: ((c.screenHeight > c.screenWidth) ? 0.016 : 0) * c.screenHeight),
+                      SizedBox(
+                        height: (c.screenHeight > c.screenWidth ? 0.016 : 0) *
+                            c.screenHeight,
+                      ),
                       _menuButton(
                         text: 'new_game'.tr,
                         onPressed: () => Get.off(() => const GamePage()),
+                        shortest: shortest,
                         c: c,
                       ),
                     ],
                   ),
                 ),
-                _versionLabel(c),
+
+                /// ---------- etykieta z wersją ----------
+                _versionLabel(shortest),
               ],
             ),
           ),
@@ -61,10 +72,11 @@ class StartPage extends StatelessWidget {
     );
   }
 
-  // mały helper dla przycisków
+  // ---------------- helper buttonów ----------------
   Widget _menuButton({
     required String text,
     required VoidCallback? onPressed,
+    required double shortest,
     required ScreenController c,
   }) {
     return ElevatedButton(
@@ -74,34 +86,31 @@ class StartPage extends StatelessWidget {
           horizontal: c.screenWidth * 0.1,
           vertical: c.screenHeight * 0.02,
         ),
-        fixedSize: Size(min(c.screenHeight, c.screenWidth) * 0.72, c.screenHeight * 0.07),
-        textStyle: TextStyle(fontSize: min(c.screenHeight, c.screenWidth) * 0.05),
+        fixedSize: Size(shortest * 0.72, c.screenHeight * 0.07),
+        textStyle: TextStyle(fontSize: shortest * 0.05),
       ),
       child: Text(text),
     );
   }
 
-  // etykieta z wersją
-  Widget _versionLabel(ScreenController c) {
+  // -------------- labelka z wersją -----------------
+  Widget _versionLabel(double shortest) {
     return FutureBuilder<String>(
       future: _getAppVersion(),
-      builder: (context, snapshot) {
-        final txt = switch (snapshot.connectionState) {
+      builder: (context, snap) {
+        final txt = switch (snap.connectionState) {
           ConnectionState.waiting => 'loading_version'.tr,
-          ConnectionState.done    =>
-          snapshot.hasError
+          ConnectionState.done =>
+          snap.hasError
               ? 'error_version'.tr
-              : 'version'.trParams({'version': snapshot.data ?? ''}),
+              : 'version'.trParams({'version': snap.data ?? ''}),
           _ => '',
         };
         return Padding(
-          padding: EdgeInsets.only(bottom: c.screenHeight * 0.02),
+          padding: EdgeInsets.only(bottom: shortest * 0.08),
           child: Text(
             txt,
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: min(c.screenHeight, c.screenWidth) * 0.03,
-            ),
+            style: TextStyle(color: Colors.grey, fontSize: shortest * 0.03),
           ),
         );
       },
@@ -111,3 +120,4 @@ class StartPage extends StatelessWidget {
   Future<String> _getAppVersion() async =>
       (await PackageInfo.fromPlatform()).version;
 }
+

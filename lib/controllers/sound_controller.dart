@@ -7,7 +7,7 @@ import 'game_page_controller.dart';
 
 class SoundController extends GetxController {
   void playRandomSound() async {
-    List<String> sounds = ['capture', 'goOut', 'bravo', 'laugh1', 'laugh2', 'complete', 'congratulations'];
+    List<String> sounds = ['fail_roll', 'capture', 'false_success_fail', 'goOut', 'bravo', 'laugh1', 'laugh2', 'complete', 'congratulations'];
     int i = Random().nextInt(sounds.length);
     playClickSound(sound: 'sounds/${sounds[i]}.mp3');
   }
