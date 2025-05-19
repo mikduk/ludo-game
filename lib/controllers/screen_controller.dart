@@ -61,6 +61,8 @@ class ScreenController extends GetxController {
       return ((10/11) * getBoardHeight() ~/ 15) * 1.0 - 0.5;
     } else if (screenWidth == 360.0 && screenHeight == 732.0) {
       return ((10/11) * getBoardHeight() ~/ 15) * 1.0 - 0.5;
+    } else if (screenWidth == 360.0 && screenHeight == 752.0) {
+      return ((10/11) * getBoardHeight() ~/ 15) * 1.0 - 0.5;
     }
     return min(((10/11) * getBoardHeight() ~/ 15) * 1.0, (isPortrait ? 51.0 : 48.0));
   }
@@ -211,6 +213,12 @@ class ScreenController extends GetxController {
       return true;
     }
 
+    if (screenWidth == 752 && screenHeight == 360) {
+      return false;
+    } else if (screenWidth == 360 && screenHeight == 752) {
+      return false;
+    }
+
     // Jeśli żaden wariant nie pasuje, wyrzucamy w logu wymiary
     print('[1] Unknown device size: $screenWidth x $screenHeight');
     return isPortrait;
@@ -233,6 +241,8 @@ class ScreenController extends GetxController {
     } else if (screenWidth == 667 && screenHeight == 375) {
       return 10;
     } else if (screenWidth == 926 && screenHeight == 428) {
+      return 10;
+    } else if (screenWidth == 360 && screenHeight == 752) {
       return 10;
     }
     return 0;

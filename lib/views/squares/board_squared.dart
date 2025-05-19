@@ -132,6 +132,7 @@ class _BoardSquareState extends State<BoardSquare> with SingleTickerProviderStat
 
   // Obsługa kliknięcia na pole
   Future<void> fieldAction(GamePageController controller) async {
+    controller.printForLogs('|fieldAction| ${widget.index}');
     int result = controller.board[widget.index];
     if (result == 0 || controller.fieldActionFlag.value) {
       return;

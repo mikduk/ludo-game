@@ -56,7 +56,7 @@ class BaseSquare extends StatelessWidget {
     if (controller.positionPawns[index] >= 4) {
       return;
     }
-
+    controller.printForLogs('|base_squared| [fieldAction] controller.movePawn(pawnNumber: ${index % 4})');
     await controller.movePawn(pawnNumber: index % 4);
   }
 
