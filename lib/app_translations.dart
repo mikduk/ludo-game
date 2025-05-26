@@ -11,7 +11,9 @@ class AppTranslations extends Translations {
       'version': 'Version @version',
       'logs': 'Logs',
       'share': 'Share',
-      'close': 'Close'
+      'close': 'Close',
+      'current_player': 'Current player:',
+      'next_player': 'Next player:',
     },
     'pl_PL': {
       'new_game': 'Nowa Gra',
@@ -21,7 +23,9 @@ class AppTranslations extends Translations {
       'version': 'Wersja @version',
       'logs': 'Logi',
       'share': 'Udostępnij',
-      'close': 'Zamknij'
+      'close': 'Zamknij',
+      'current_player': 'Aktualny gracz:',
+      'next_player': 'Następny gracz:',
     },
   };
 }

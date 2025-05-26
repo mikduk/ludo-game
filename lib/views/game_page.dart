@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/game_page_controller.dart';
 import '../controllers/screen_controller.dart';
 import 'board.dart';
+import 'expandable_gear_menu.dart';
 import 'player_dice.dart';
 import 'score_board.dart';
 
@@ -57,12 +58,12 @@ class GamePage extends StatelessWidget {
         },
       ),
       GetBuilder<ScreenController>(builder: (screenController) {
-        double x = (screenController.horizontalScoreBoard()) ? 0.03 : 0.08;
+        double x = (screenController.horizontalScoreBoard()) ? 0.03 : 0.3;
         double topPosition = screenController.screenHeight * (0.36 - x);
         double buttonWidth = screenController.getButtonWidth();
 
         return Positioned(
-            top: topPosition,
+            // top: topPosition,
             right: screenController.getRightScoreBoardPosition(),
             child: SizedBox(
                 width: buttonWidth,
@@ -108,22 +109,22 @@ class GamePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  PlayerDice(
-                      player: 1,
-                      color: Colors.red,
-                      gameController: gameController),
+                  // PlayerDice(
+                  //     player: 1,
+                  //     color: Colors.red,
+                  //     gameController: gameController),
                   if (screenController.isPortrait)
                     SizedBox(
                         width: screenController.getTopButtonsWidth(),
-                        child: screenController.getBoardWidth() >= 600
-                            ? _buildSingleRowLayout(
-                                gameController, screenController)
-                            : _buildTwoByTwoLayout(
-                                gameController, screenController)),
-                  PlayerDice(
-                      player: 2,
-                      color: Colors.green,
-                      gameController: gameController),
+                        child: Container()),
+                  // PlayerDice(
+                  //     player: 2,
+                  //     color: Colors.green,
+                  //     gameController: gameController),
+                  ExpandableGameMenu(
+                    gameController: gameController,
+                    screenController: screenController,
+                  ),
                 ],
               ),
             ),
@@ -146,14 +147,14 @@ class GamePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  PlayerDice(
-                      player: 0,
-                      color: Colors.blue,
-                      gameController: gameController),
-                  PlayerDice(
-                      player: 3,
-                      color: Colors.yellow,
-                      gameController: gameController),
+                  // PlayerDice(
+                  //     player: 0,
+                  //     color: Colors.blue,
+                  //     gameController: gameController),
+                  // PlayerDice(
+                  //     player: 3,
+                  //     color: Colors.yellow,
+                  //     gameController: gameController),
                 ],
               ),
             ),
@@ -184,172 +185,9 @@ class GamePage extends StatelessWidget {
                                 width: screenController.getBoardHeight() >= 600
                                     ? 0.04 * Get.width
                                     : null,
-                                child: screenController.getBoardHeight() >= 600
-                                    ? _buildSingleColumnLayout(
-                                        gameController, screenController)
-                                    : _buildTwoByTwoLayout(
-                                        gameController, screenController))),
+                                child: Container())),
                     ])));
       }),
     ]));
-  }
-
-  Widget _buildSingleColumnLayout(
-      GamePageController gameController, ScreenController screenController) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ChangeModeButton(gameController: gameController),
-        FloatingActionButton(
-          heroTag: 'btn10',
-          mini: true,
-          backgroundColor: Colors.lightBlueAccent,
-          onPressed: () {
-            gameController.regenerateBoard();
-            screenController.update();
-          },
-          tooltip: 'Regenerate board',
-          child: const Icon(Icons.refresh),
-        ),
-        FloatingActionButton(
-          heroTag: 'btn11',
-          mini: true,
-          backgroundColor: Colors.limeAccent,
-          onPressed: gameController.soundSwitch,
-          tooltip: 'Switch sound',
-          child: Obx(() => gameController.soundOn.value
-              ? const Icon(Icons.music_note_outlined)
-              : const Icon(Icons.music_off_outlined)),
-        ),
-        FloatingActionButton(
-          heroTag: 'btn12',
-          mini: true,
-          backgroundColor: Colors.deepOrangeAccent,
-          onPressed: gameController.startStopGame,
-          tooltip: 'Start/stop game',
-          child: Obx(() => gameController.stopGame.value
-              ? const Icon(Icons.pause)
-              : const Icon(Icons.play_arrow)),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSingleRowLayout(
-      GamePageController gameController, ScreenController screenController) {
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-      ChangeModeButton(gameController: gameController),
-      FloatingActionButton(
-        heroTag: 'btn10',
-        mini: true,
-        backgroundColor: Colors.lightBlueAccent,
-        onPressed: () {
-          gameController.regenerateBoard();
-          screenController.update();
-        },
-        tooltip: 'Regenerate board',
-        child: const Icon(Icons.refresh),
-      ),
-      FloatingActionButton(
-        heroTag: 'btn11',
-        mini: true,
-        backgroundColor: Colors.limeAccent,
-        onPressed: gameController.soundSwitch,
-        tooltip: 'Switch sound',
-        child: Obx(() => gameController.soundOn.value
-            ? const Icon(Icons.music_note_outlined)
-            : const Icon(Icons.music_off_outlined)),
-      ),
-      FloatingActionButton(
-        heroTag: 'btn12',
-        mini: true,
-        backgroundColor: Colors.deepOrangeAccent,
-        onPressed: gameController.startStopGame,
-        tooltip: 'Start/stop game',
-        child: Obx(() => gameController.stopGame.value
-            ? const Icon(Icons.pause)
-            : const Icon(Icons.play_arrow)),
-      ),
-    ]);
-  }
-
-  Widget _buildTwoByTwoLayout(
-      GamePageController gameController, ScreenController screenController) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Pierwszy wiersz (2 przyciski)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ChangeModeButton(gameController: gameController),
-            SizedBox(width: screenController.getWidthTwoByTwo()),
-            FloatingActionButton(
-              heroTag: 'btn10',
-              mini: true,
-              backgroundColor: Colors.lightBlueAccent,
-              onPressed: () {
-                gameController.regenerateBoard();
-                screenController.update();
-              },
-              tooltip: 'Regenerate board',
-              child: const Icon(Icons.refresh),
-            ),
-          ],
-        ),
-        SizedBox(height: screenController.getHeightTwoByTwo()),
-
-        // Drugi wiersz (2 przyciski)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FloatingActionButton(
-              heroTag: 'btn11',
-              mini: true,
-              backgroundColor: Colors.limeAccent,
-              onPressed: gameController.soundSwitch,
-              tooltip: 'Switch sound',
-              child: Obx(() => gameController.soundOn.value
-                  ? const Icon(Icons.music_note_outlined)
-                  : const Icon(Icons.music_off_outlined)),
-            ),
-            SizedBox(width: screenController.getWidthTwoByTwo()),
-            FloatingActionButton(
-              heroTag: 'btn12',
-              mini: true,
-              backgroundColor: Colors.deepOrangeAccent,
-              onPressed: gameController.startStopGame,
-              tooltip: 'Start/stop game',
-              child: Obx(() => gameController.stopGame.value
-                  ? const Icon(Icons.pause)
-                  : const Icon(Icons.play_arrow)),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class ChangeModeButton extends StatelessWidget {
-  const ChangeModeButton({
-    super.key,
-    required this.gameController,
-  });
-
-  final GamePageController gameController;
-
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton(
-      heroTag: 'btn9',
-      mini: true,
-      backgroundColor: Colors.tealAccent,
-      onPressed: gameController.changeMode,
-      tooltip: 'Change mode',
-      child: Obx(() => gameController.teamWork.value
-          ? const Icon(Icons.people)
-          : const Icon(Icons.person)),
-    );
   }
 }

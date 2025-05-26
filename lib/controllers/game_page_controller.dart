@@ -86,23 +86,17 @@ class GamePageController extends GetxController {
     scores = ''.obs;
 
     board[0] = 4;
-    board[1] = 0;
+    board[1] = 40;
     board[2] = 400;
-    board[3] = 0;
+    board[3] = 4000;
 
     for (int i = 0; i < 16; i++) {
       positionPawns[i] = i ~/ 4;
     }
 
-    positionPawns[4] = 67;
-    positionPawns[5] = 67;
-    positionPawns[6] = 67;
-    positionPawns[7] = 66;
-
-    positionPawns[12] = 74;
-    positionPawns[13] = 74;
-    positionPawns[14] = 77;
-    positionPawns[15] = 76;
+    bots[0] = true;
+    bots[2] = true;
+    bots[3] = true;
 
     regenerateBoard();
 

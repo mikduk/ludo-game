@@ -23,7 +23,7 @@ class SoundController extends GetxController {
   void playRandomlyCongrats() async {
     List<String> sounds = ['congratulations'];
     int i = Random().nextInt(sounds.length);
-    if (Random().nextInt(100) >= 99) {
+    if (Random().nextInt(100) >= 92) {
       playClickSound(sound: 'sounds/${sounds[i]}.mp3');
     }
   }

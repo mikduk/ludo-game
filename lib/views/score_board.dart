@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../controllers/game_page_controller.dart';
 import '../controllers/screen_controller.dart';
+import 'player_dice.dart';
 
 class ScoreBoard extends StatelessWidget {
   final GamePageController gameController;
@@ -17,6 +18,12 @@ class ScoreBoard extends StatelessWidget {
     vertical = screenController.horizontalScoreBoard();
 
     List<Widget> children = [
+      if (vertical)
+        const PlayerDice(),
+      SizedBox(
+        height: vertical ? 0 : 2,
+        width: vertical ? 15 * h : 0,
+      ),
       Column(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -24,10 +31,11 @@ class ScoreBoard extends StatelessWidget {
           _buildCurrentPlayerInfo(),
           if (vertical && screenController.showNextPlayerString())
             Text(
-              'Następny gracz:',
-              style: Get.textTheme.bodyLarge?.copyWith(
+              'next_player'.tr,
+              style: TextStyle(
                 color: Colors.black38,
-              ),
+                fontSize: screenController.getFontSize()
+              )
             ),
           if (vertical)
             SizedBox(height: h),
@@ -53,23 +61,33 @@ class ScoreBoard extends StatelessWidget {
           height: vertical ? 0 : 0,
           width: vertical ? 20 : 0,
         ),
-      if (!vertical && screenController.showNextPlayerString()
-          && screenController.getBoardHeight() > 600)
+      if (!vertical && screenController.showNextPlayerString())
         Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'Następny gracz:',
-              style: Get.textTheme.bodyLarge?.copyWith(
-                color: Colors.grey,
-              ),
+                'next_player'.tr,
+                style: TextStyle(
+                    color: Colors.black38,
+                    fontSize: screenController.getFontSize()
+                )
             ),
             SizedBox(height: h),
             _buildNextPlayerInfo(),
           ],
         ),
+      SizedBox(
+        height: vertical ? 0 : 2,
+        width: vertical ? 15 * h : 0,
+      ),
+      if (!vertical)
+        const SizedBox(height: 4),
+      if (!vertical)
+        const PlayerDice(),
+      if (!vertical)
+        const SizedBox(height: 10),
     ];
 
     return Center(
@@ -113,17 +131,17 @@ class ScoreBoard extends StatelessWidget {
       ];
       return Column(
         children: [
-          if (screenController.getBoardHeight() > 600)
-            Text(
-              'Aktualny gracz:',
-              style: Get.textTheme.titleMedium,
-            ),
-          if (screenController.getBoardHeight() > 600)
-            const SizedBox(height: 4),
+          Text(
+              'current_player'.tr,
+              style: TextStyle(
+                  color: Colors.black38,
+                  fontSize: screenController.getFontSize()
+              )
+          ),
+          const SizedBox(height: 4),
           Text(
             currentName,
             style: Get.textTheme.headlineSmall?.copyWith(
-              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: color[gameController.currentPlayer.value],
             ),
@@ -170,7 +188,7 @@ class ScoreBoard extends StatelessWidget {
 
   /// Buduje "twarz" kostki dla wyniku 1–6 za pomocą Stacka i kropek.
   Widget _buildDiceFace(double size, int score, bool portait, {Key? key}) {
-    double s = 0.01 * size * (portait ? 1.3 : 2);
+    double s = 0.01 * size * (portait ? 1.9 : 2.2);
     return Container(
       key: key,
       width: 100 * s,
