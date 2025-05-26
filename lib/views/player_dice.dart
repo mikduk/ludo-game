@@ -21,21 +21,45 @@ class PlayerDice extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 0, right: 0, left: 0),
       child: Obx(() {
-
         final int current = gameController.currentPlayer.value;
         final bool isBot = gameController.bots[current];
 
-        return FloatingActionButton(
-          heroTag: 'btn$current',
-          backgroundColor: isBot ? Colors.grey.shade400 : colors[current],
-          onPressed: isBot
-              ? null
-              : () => gameController.rollDicePlayer(player: current),
-          tooltip: 'Roll dice (1 to 6)',
-          child: Icon(
-            Icons.casino,
-            color: isBot ? Colors.grey.shade700 : null,
-          ),
+        return Stack(
+          alignment: Alignment.bottomLeft,
+          children: [
+            InkWell(
+              highlightColor: Colors.transparent,
+              splashColor: Colors.transparent,
+              splashFactory: NoSplash.splashFactory,
+              onTap: isBot
+                  ? null
+                  : () => gameController.rollDicePlayer(player: current),
+              onLongPress:
+                  isBot ? null : () => gameController.autoMovesSwitch(current),
+              child: Padding(
+                  padding: const EdgeInsets.only(left: 6, bottom: 10),
+                  child: FloatingActionButton(
+                    heroTag: 'btn$current',
+                    backgroundColor:
+                        isBot ? Colors.grey.shade400 : colors[current],
+                    onPressed: null,
+                    tooltip: null,
+                    child: Icon(
+                      Icons.casino,
+                      color: isBot ? Colors.grey.shade700 : null,
+                    ),
+                  )),
+            ),
+            if (!isBot)
+              CircleAvatar(
+                  radius: 12.5,
+                  backgroundColor: Colors.white70,
+                  child: Icon(
+                      gameController.autoMoves[current]
+                          ? Icons.directions_run_outlined
+                          : Icons.touch_app_sharp,
+                      color: Colors.black38)),
+          ],
         );
       }),
     );
