@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/game_page_controller.dart';
 import '../../controllers/screen_controller.dart';
+import '../pawn_base.dart';
 
 class BaseSquare extends StatelessWidget {
   final int index;
@@ -22,14 +23,10 @@ class BaseSquare extends StatelessWidget {
           decoration: BoxDecoration(
               color: color ?? Colors.grey.shade100, border: Border.all()),
           child: Center(
-            child: Text(
-              showPawn(controller
-                  .positionPawns[index]), // Wyświetla wartość board[index]
-              style: TextStyle(
-                fontSize: getSize(controller.positionPawns[index]),
-                color: Colors.black87,
-                fontWeight: FontWeight.bold,
-              ),
+            child: PawnBase(
+              letter: showPawn(controller.positionPawns[index]),
+              currentPlayer: controller.currentPlayer.value,
+              waitForMove: controller.waitForMove.value && controller.score.value == 6 && !controller.bots[controller.getCurrentPlayer()],
             ),
           ),
         )));

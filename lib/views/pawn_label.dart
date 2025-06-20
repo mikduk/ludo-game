@@ -53,7 +53,7 @@ class PawnLabel extends StatelessWidget {
       listTarget.addAll(
         List.generate(
           counts[digit],
-              (_) => _PawnIcon(
+              (_) => PawnIcon(
             color: _digitColors[digit],
             size: iconSize,
             isActive: isActive,
@@ -90,12 +90,12 @@ class PawnLabel extends StatelessWidget {
 
 /* ──────────────────── pojedynczy pionek ──────────────────── */
 
-class _PawnIcon extends StatelessWidget {
+class PawnIcon extends StatelessWidget {
   final Color color;
   final double size;
   final bool isActive;
 
-  const _PawnIcon({
+  const PawnIcon({
     required this.color,
     required this.size,
     required this.isActive,
