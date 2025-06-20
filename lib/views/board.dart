@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../controllers/game_page_controller.dart';
 import 'squares/base_squared.dart';
 import 'squares/board_squared.dart';
 import 'squares/diagonal_squared.dart';
@@ -8,9 +10,9 @@ import 'squares/four_color_squared.dart';
 class Board extends StatelessWidget {
   const Board(
       {super.key,
-        required this.height,
-        required this.width,
-        required this.fieldSize});
+      required this.height,
+      required this.width,
+      required this.fieldSize});
 
   final double height;
   final double width;
@@ -21,6 +23,7 @@ class Board extends StatelessWidget {
     double s = fieldSize;
     double t = s * 7;
     double l = (height > width) ? (width - fieldSize * 15) * 0.5 : 0;
+    final GamePageController gameController = Get.find();
 
     return Padding(
         padding: EdgeInsets.only(
@@ -29,6 +32,10 @@ class Board extends StatelessWidget {
         ),
         child: Stack(
           children: <Widget>[
+            dogPicture(t - s * 4.5, l + s * 2, 3 * s, 1, gameController),
+            dogPicture(t - s * 7, l + s * 11.5, 3 * s, 2, gameController),
+            dogPicture(t + s * 5, l + s * 0.75, 3 * s, 0, gameController),
+            dogPicture(t + s * 2.5, l + s * 10.25, 3 * s, 3, gameController),
             Positioned(
               top: t - s * 1,
               left: l + s * 6,
@@ -87,7 +94,7 @@ class Board extends StatelessWidget {
                 top: t,
                 left: l,
                 child: BoardSquare(
-                    index: 15, size: s + 1, color: Colors.red.shade100)),
+                    index: 15, size: s + 1, color: Colors.red.shade50)),
             Positioned(
                 top: t - s * 1,
                 left: l,
@@ -95,7 +102,8 @@ class Board extends StatelessWidget {
             Positioned(
                 top: t - s * 1,
                 left: l + s * 1,
-                child: BoardSquare(index: 17, size: s + 1, color: Colors.red)),
+                child: BoardSquare(
+                    index: 17, size: s + 1, color: Colors.red.shade100)),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 2,
@@ -128,8 +136,8 @@ class Board extends StatelessWidget {
             Positioned(
                 top: t - s * 5,
                 left: l + s * 6,
-                child:
-                BoardSquare(index: 25, size: s + 1, color: Colors.black38)),
+                child: BoardSquare(
+                    index: 25, size: s + 1, color: Colors.grey[400])),
             Positioned(
                 top: t - s * 6,
                 left: l + s * 6,
@@ -143,7 +151,7 @@ class Board extends StatelessWidget {
                 top: t - s * 7,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 28, size: s + 1, color: Colors.green.shade100)),
+                    index: 28, size: s + 1, color: Colors.green.shade50)),
             Positioned(
                 top: t - s * 7,
                 left: l + s * 8,
@@ -151,8 +159,8 @@ class Board extends StatelessWidget {
             Positioned(
                 top: t - s * 6,
                 left: l + s * 8,
-                child:
-                BoardSquare(index: 30, size: s + 1, color: Colors.green)),
+                child: BoardSquare(
+                    index: 30, size: s + 1, color: Colors.green.shade100)),
             Positioned(
                 top: t - s * 5,
                 left: l + s * 8,
@@ -185,8 +193,8 @@ class Board extends StatelessWidget {
             Positioned(
                 top: t - s * 1,
                 left: l + s * 12,
-                child:
-                BoardSquare(index: 38, size: s + 1, color: Colors.black38)),
+                child: BoardSquare(
+                    index: 38, size: s + 1, color: Colors.grey[400])),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 13,
@@ -199,7 +207,7 @@ class Board extends StatelessWidget {
                 top: t - s * 0,
                 left: l + s * 14,
                 child: BoardSquare(
-                    index: 41, size: s + 1, color: Colors.yellow.shade100)),
+                    index: 41, size: s + 1, color: Colors.yellow.shade50)),
             //
             Positioned(
                 top: t + s * 1,
@@ -208,8 +216,8 @@ class Board extends StatelessWidget {
             Positioned(
                 top: t + s * 1,
                 left: l + s * 13,
-                child:
-                BoardSquare(index: 43, size: s + 1, color: Colors.yellow)),
+                child: BoardSquare(
+                    index: 43, size: s + 1, color: Colors.yellow.shade200)),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 12,
@@ -242,8 +250,8 @@ class Board extends StatelessWidget {
             Positioned(
                 top: t + s * 5,
                 left: l + s * 8,
-                child:
-                BoardSquare(index: 51, size: s + 1, color: Colors.black38)),
+                child: BoardSquare(
+                    index: 51, size: s + 1, color: Colors.grey[400])),
             Positioned(
                 top: t + s * 6,
                 left: l + s * 8,
@@ -257,7 +265,7 @@ class Board extends StatelessWidget {
                 top: t + s * 7,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 54, size: s + 1, color: Colors.blue.shade100)),
+                    index: 54, size: s + 1, color: Colors.blue.shade50)),
             Positioned(
                 top: t + s * 7,
                 left: l + s * 6,
@@ -266,7 +274,8 @@ class Board extends StatelessWidget {
             Positioned(
                 top: t + s * 6,
                 left: l + s * 6,
-                child: BoardSquare(index: 4, size: s + 1, color: Colors.blue)),
+                child: BoardSquare(
+                    index: 4, size: s + 1, color: Colors.blue.shade100)),
             Positioned(
                 top: t + s * 5,
                 left: l + s * 6,
@@ -299,8 +308,8 @@ class Board extends StatelessWidget {
             Positioned(
                 top: t + s * 1,
                 left: l + s * 2,
-                child:
-                BoardSquare(index: 12, size: s + 1, color: Colors.black38)),
+                child: BoardSquare(
+                    index: 12, size: s + 1, color: Colors.grey[400])),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 1,
@@ -410,12 +419,12 @@ class Board extends StatelessWidget {
                 top: t + s * 0,
                 left: l + s * 13,
                 child: BoardSquare(
-                    index: 74, size: s + 1, color: Colors.yellow.shade200)),
+                    index: 74, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 0,
                 left: l + s * 12,
                 child: BoardSquare(
-                    index: 75, size: s + 1, color: Colors.yellow.shade200)),
+                    index: 75, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 0,
                 left: l + s * 11,
@@ -438,7 +447,7 @@ class Board extends StatelessWidget {
                 top: t + s * 0,
                 left: l + s * 9,
                 child: BoardSquare(
-                    index: 78, size: s + 1, color: Colors.yellow.shade400)),
+                    index: 78, size: s + 1, color: Colors.yellow.shade300)),
             //
             Positioned(
                 top: t + s * 5.5,
@@ -507,23 +516,73 @@ class Board extends StatelessWidget {
                 top: t + s * 3,
                 left: l + s * 12.5,
                 child: BaseSquare(
-                    index: 12, size: s + 1, color: Colors.yellow.shade200)),
+                    index: 12, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 3,
                 left: l + s * 13.5,
                 child: BaseSquare(
-                    index: 13, size: s + 1, color: Colors.yellow.shade200)),
+                    index: 13, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 4,
                 left: l + s * 12.5,
                 child: BaseSquare(
-                    index: 14, size: s + 1, color: Colors.yellow.shade200)),
+                    index: 14, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 4,
                 left: l + s * 13.5,
                 child: BaseSquare(
-                    index: 15, size: s + 1, color: Colors.yellow.shade200)),
+                    index: 15, size: s + 1, color: Colors.yellow.shade300)),
           ],
         ));
+  }
+
+  DogPicture dogPicture(double top, double left, double size, int player,
+      GamePageController controller) {
+    return DogPicture(
+        top: top,
+        left: left,
+        size: size,
+        player: player,
+        controller: controller);
+  }
+}
+
+class DogPicture extends StatelessWidget {
+  final double top;
+  final double left;
+  final double size;
+  final int player;
+  final GamePageController controller;
+
+  const DogPicture({
+    super.key,
+    required this.top,
+    required this.left,
+    required this.size,
+    required this.player,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: top,
+      left: left,
+      child: Center(
+          child: Opacity(
+        opacity: 0.3,
+        child: Obx(() {
+          final role = controller.bots[player] ? 'bot' : 'player';
+          final path = 'assets/images/dogs/${player}_$role.png';
+
+          return Image.asset(
+            path,
+            width: size,
+            height: size,
+            fit: BoxFit.contain,
+          );
+        }),
+      )),
+    );
   }
 }

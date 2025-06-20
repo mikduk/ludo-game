@@ -2,17 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/game_page_controller.dart';
 import '../controllers/screen_controller.dart';
+import '../models/game_modes.dart';
 import 'board.dart';
 import 'expandable_gear_menu.dart';
 import 'player_dice.dart';
 import 'score_board.dart';
 
 class GamePage extends StatelessWidget {
-  const GamePage({super.key});
+
+  final List<String> namesOfPlayers;
+  final List<bool> valuesOfBots;
+  final GameModes gameMode;
+
+  const GamePage({super.key, required this.namesOfPlayers, required this.valuesOfBots, required this.gameMode});
 
   @override
   Widget build(BuildContext context) {
-    final GamePageController gameController = Get.put(GamePageController());
+    final GamePageController gameController = Get.put(GamePageController(namesOfPlayers: namesOfPlayers, valuesOfBots: valuesOfBots, gameMode: gameMode));
     final ScreenController screenController = Get.find();
 
     return Scaffold(

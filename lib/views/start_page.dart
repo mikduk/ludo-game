@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../controllers/screen_controller.dart';
-import '/views/game_page.dart';
+import '/views/team_setup_page.dart';
 
 class StartPage extends StatelessWidget {
   StartPage({super.key});
@@ -54,7 +54,8 @@ class StartPage extends StatelessWidget {
                       ),
                       _menuButton(
                         text: 'new_game'.tr,
-                        onPressed: () => Get.off(() => const GamePage()),
+                        // onPressed: () => Get.off(() => const GamePage()),
+                        onPressed: () => Get.off(() => TeamSetupPage()),
                         shortest: shortest,
                         c: c,
                       ),
@@ -87,7 +88,7 @@ class StartPage extends StatelessWidget {
           vertical: c.screenHeight * 0.02,
         ),
         fixedSize: Size(shortest * 0.72, c.screenHeight * 0.07),
-        textStyle: TextStyle(fontSize: shortest * 0.05),
+        textStyle: TextStyle(fontSize: min(shortest * 0.04, 24)),
       ),
       child: Text(text),
     );

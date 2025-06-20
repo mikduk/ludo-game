@@ -3,26 +3,31 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/game_page_controller.dart';
 import '../../controllers/screen_controller.dart';
+import '../pawn_label.dart';
 
 class BoardSquare extends StatefulWidget {
-  final int index;    // Indeks elementu board, który ma być wyświetlany
+  final int index; // Indeks elementu board, który ma być wyświetlany
   final double size;
   final Color? color;
   final bool border;
+  final bool borderHorizontal;
+  final bool borderVertical;
 
-  const BoardSquare({
-    super.key,
-    required this.index,
-    required this.size,
-    this.color,
-    this.border = true,
-  });
+  const BoardSquare(
+      {super.key,
+      required this.index,
+      required this.size,
+      this.color,
+      this.border = true,
+      this.borderHorizontal = true,
+      this.borderVertical = true});
 
   @override
   State<BoardSquare> createState() => _BoardSquareState();
 }
 
-class _BoardSquareState extends State<BoardSquare> with SingleTickerProviderStateMixin {
+class _BoardSquareState extends State<BoardSquare>
+    with SingleTickerProviderStateMixin {
   late AnimationController _blinkController;
   late Animation<Color?> _colorAnimation;
 
@@ -58,7 +63,9 @@ class _BoardSquareState extends State<BoardSquare> with SingleTickerProviderStat
     // Obx – reagujemy na zmiany w kontrolerze (waitForMove, board, itp.)
     return Obx(() {
       // Sprawdzamy, czy należy migać polem
-      final highlight = (controller.waitForMove.value && !controller.fieldActionFlag.value && isPossibleMove(controller));
+      final highlight = (controller.waitForMove.value &&
+          !controller.fieldActionFlag.value &&
+          isPossibleMove(controller));
 
       // Jeśli warunek się zmienił na "migaj"
       if (highlight && !_isHighlighted) {
@@ -91,19 +98,23 @@ class _BoardSquareState extends State<BoardSquare> with SingleTickerProviderStat
               height: widget.size,
               decoration: BoxDecoration(
                 color: color,
-                border: widget.border ? Border.all() : null,
+                border: widget.border
+                    ? Border.symmetric(
+                        horizontal: widget.borderHorizontal
+                            ? const BorderSide(width: 1, color: Colors.black)
+                            : BorderSide.none,
+                        vertical: widget.borderVertical
+                            ? const BorderSide(width: 1, color: Colors.black)
+                            : BorderSide.none,
+                      )
+                    : null,
               ),
               child: Center(
-                child: Text(
-                  showPawn(
-                    controller.board[widget.index],
-                    controller.regenerateBoard,
-                  ),
-                  style: TextStyle(
-                    fontSize: getSize(controller.board[widget.index]),
-                    color: getColor(controller.board[widget.index], controller.getCurrentPlayer()),
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: PawnLabel(
+                  fieldValue: controller.board[widget.index],
+                  currentPlayer: controller.getCurrentPlayer(),
+                  regenerate: controller.regenerateBoard,
+                  waitForMove: controller.waitForMove.value && !controller.bots[controller.getCurrentPlayer()],
                 ),
               ),
             ),
@@ -116,7 +127,8 @@ class _BoardSquareState extends State<BoardSquare> with SingleTickerProviderStat
   // Sprawdza, czy ruch jest możliwy na to pole (Twoja oryginalna logika)
   bool isPossibleMove(GamePageController controller) {
     int cpv = controller.getCurrentPlayer();
-    if (controller.waitForMove.value && !controller.bots[controller.currentPlayer.value]) {
+    if (controller.waitForMove.value &&
+        !controller.bots[controller.currentPlayer.value]) {
       List<int> possMoves = List.filled(4, -1);
       for (int i = 0; i < 4; i++) {
         int position = controller.positionPawns[4 * cpv + i];
@@ -132,15 +144,16 @@ class _BoardSquareState extends State<BoardSquare> with SingleTickerProviderStat
 
   // Obsługa kliknięcia na pole
   Future<void> fieldAction(GamePageController controller) async {
-    controller.printForLogs('|fieldAction| ${widget.index}');
     int result = controller.board[widget.index];
     if (result == 0 || controller.fieldActionFlag.value) {
       return;
     }
+    controller.printForLogs('|fieldAction| ${widget.index}');
     int currentPlayerIndex = controller.getCurrentPlayer();
     int foundPawn = -1;
     for (int i = 0; i < 4; i++) {
-      if (controller.positionPawns[4 * currentPlayerIndex + i] == widget.index) {
+      if (controller.positionPawns[4 * currentPlayerIndex + i] ==
+          widget.index) {
         foundPawn = i;
         break;
       }
@@ -152,67 +165,4 @@ class _BoardSquareState extends State<BoardSquare> with SingleTickerProviderStat
     }
   }
 
-  // Ustala wielkość czcionki w zależności od wartości w polu (Twoja oryginalna logika)
-  double? getSize(int result) {
-    final ScreenController screen = Get.find<ScreenController>();
-    double ratio = screen.getFieldSize() / 29;
-    switch (result) {
-      case 0:
-        return null;
-      case 1:
-      case 10:
-      case 100:
-      case 1000:
-        return 12 * ratio;
-      case 11:
-      case 101:
-      case 110:
-      case 1001:
-      case 1010:
-      case 1100:
-      case 2:
-      case 20:
-      case 200:
-      case 2000:
-        return 10.5 * ratio;
-      default:
-        return 9 * ratio;
-    }
-  }
-
-  // Ustala kolor tekstu pola (Twoja oryginalna logika)
-  Color? getColor(int field, int activePlayerColor) {
-    String fieldString = field.toString().padLeft(4, '0');
-    if (fieldString[3 - activePlayerColor] != '0') {
-      return Colors.black;
-    }
-    return Colors.black54;
-  }
-
-  // Tworzy oznaczenia pionków (Y, G, R, B) w zależności od wartości w polu (Twoja oryginalna logika)
-  String showPawn(int field, Function()? regenerate) {
-    try {
-      if (field == 0) {
-        return '';
-      }
-      String r = field.toString();
-      String result = '';
-      while (r.length < 4) {
-        r = '0$r';
-      }
-      List<String> names = ['Y', 'G', 'R', 'B'];
-      for (int ind = 0; ind <= 3; ind++) {
-        if (r[ind] != '0') {
-          for (int i = 0; i < int.parse(r[ind]); i++) {
-            result += names[ind];
-          }
-        }
-      }
-      return result;
-    } catch (e) {
-      print('|BOARD SQUARE| $e');
-      Future.delayed(const Duration(seconds: 1), regenerate);
-      return 'E';
-    }
-  }
 }

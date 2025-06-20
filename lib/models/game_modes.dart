@@ -1,0 +1,4 @@
+enum GameModes {
+  classic,
+  cooperation
+}

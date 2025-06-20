@@ -41,7 +41,7 @@ class PlayerDice extends StatelessWidget {
                   child: FloatingActionButton(
                     heroTag: 'btn$current',
                     backgroundColor:
-                        isBot ? Colors.grey.shade400 : colors[current],
+                    (isBot || gameController.waitForMove.value) ? Colors.grey.shade400 : colors[current],
                     onPressed: null,
                     tooltip: null,
                     child: Icon(
@@ -51,6 +51,14 @@ class PlayerDice extends StatelessWidget {
                   )),
             ),
             if (!isBot)
+              InkWell(
+                  highlightColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  splashFactory: NoSplash.splashFactory,
+                  onTap: null,
+                  onLongPress:
+                  isBot ? null : () => gameController.autoMovesSwitch(current),
+                  child:
               CircleAvatar(
                   radius: 12.5,
                   backgroundColor: Colors.white70,
@@ -58,7 +66,7 @@ class PlayerDice extends StatelessWidget {
                       gameController.autoMoves[current]
                           ? Icons.directions_run_outlined
                           : Icons.touch_app_sharp,
-                      color: Colors.black38)),
+                      color: Colors.black38))),
           ],
         );
       }),
