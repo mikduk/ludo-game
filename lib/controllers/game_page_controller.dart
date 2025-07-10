@@ -116,14 +116,6 @@ class GamePageController extends GetxController {
       positionPawns[i] = i ~/ 4;
     }
 
-    positionPawns[0] = 8;
-    positionPawns[4] = 8;
-
-    positionPawns[8] = 8;
-    positionPawns[9] = 8;
-    positionPawns[13] = 8;
-    positionPawns[14] = 8;
-
     regenerateBoard();
 
     statsController.reset();
