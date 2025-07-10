@@ -319,6 +319,7 @@ class GamePageController extends GetxController {
       await Future.delayed(normalDuration, getNextPlayer);
     } else {
       printForLogs('|AMP| ELSE - będzie normalny ruch (result: $score)');
+      statsController.resetTurnsWithoutMove(player);
       setWaitForMoveValue(true);
     }
   }
