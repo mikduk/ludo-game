@@ -294,6 +294,7 @@ class GamePageController extends GetxController {
       printForLogs('|AMP| (everyoneInFinish)');
       if (rollForFriend &&
           !everyoneInBaseOrFinishOrCannotGo(player: getPlayerFriend())) {
+        statsController.resetTurnsWithoutMove(getPlayerFriend());
         setWaitForMoveValue(true);
       } else {
         printForLogs('|AMP| else (everyoneInFinish)');
@@ -308,14 +309,17 @@ class GamePageController extends GetxController {
         }
         printForLogs('|AMP| n != 6 (everyoneInBaseOrFinish)');
         statsController.recordSkip(player, score.value, rollForFriend);
+        statsController.increaseTurnsWithoutMove(player);
         await Future.delayed(normalDuration, getNextPlayer);
       } else {
+        statsController.resetTurnsWithoutMove(player);
         soundController.playRandomlyCongrats();
         printForLogs('|AMP| n == 6 (everyoneInBaseOrFinish)');
         setWaitForMoveValue(true);
       }
     } else if (everyoneInBaseOrFinishOrCannotGo()) {
       printForLogs('|AMP| (everyoneInBaseOrFinishOrCannotGo)');
+      statsController.increaseTurnsWithoutMove(player);
       statsController.recordSkip(player, score.value, false);
       soundController.playClickSound(sound: 'sounds/fail_roll.mp3');
       await Future.delayed(normalDuration, getNextPlayer);

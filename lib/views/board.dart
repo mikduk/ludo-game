@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -569,20 +571,138 @@ class DogPicture extends StatelessWidget {
       top: top,
       left: left,
       child: Center(
-          child: Opacity(
-        opacity: 0.3,
         child: Obx(() {
           final role = controller.bots[player] ? 'bot' : 'player';
           final path = 'assets/images/dogs/${player}_$role.png';
+          final counter = controller.statsController.turnsWithoutMove[player];
 
-          return Image.asset(
-            path,
-            width: size,
-            height: size,
-            fit: BoxFit.contain,
+          return Stack(
+            alignment: (player == 0 || player == 3)
+                ? AlignmentDirectional.topStart
+                : AlignmentDirectional.topEnd,
+            children: [
+              Opacity(
+                  opacity: 0.3,
+                  child: Image.asset(
+                    path,
+                    width: size,
+                    height: size,
+                    fit: BoxFit.contain,
+                  )),
+              BlockedTurnsBadge(counter: counter),
+            ],
           );
         }),
-      )),
+      ),
     );
   }
+}
+
+class BlockedTurnsBadge extends StatelessWidget {
+  final int counter;
+
+  const BlockedTurnsBadge({super.key, required this.counter});
+
+  @override
+  Widget build(BuildContext context) {
+    if (counter <= 2) return const SizedBox.shrink();
+
+    Color backgroundColor;
+    Color textColor = Colors.white;
+    double size = 24;
+
+    if (counter <= 4) {
+      backgroundColor = Colors.orange;
+    } else if (counter <= 7) {
+      backgroundColor = Colors.red;
+      size = 27;
+    } else {
+      backgroundColor = Colors.red.shade900;
+      size = 30 + counter * 1.0;
+    }
+
+    size = min(size, 46);
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CustomPaint(
+            size: Size(size, size),
+            painter: OctagonPainter(
+              color: backgroundColor,
+              shadow: counter > 9
+                  ? BoxShadow(
+                color: Colors.redAccent.shade400,
+                blurRadius: 6,
+                spreadRadius: 2,
+              )
+                  : null,
+            ),
+          ),
+          Text(
+            '$counter',
+            style: TextStyle(
+              fontSize: 0.75 * (size - 12),
+              fontWeight: FontWeight.bold,
+              color: textColor,
+              letterSpacing: -4.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class OctagonPainter extends CustomPainter {
+  final Color color;
+  final BoxShadow? shadow;
+
+  OctagonPainter({required this.color, this.shadow});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+
+    // cień
+    if (shadow != null) {
+      final shadowPaint = Paint()
+        ..color = shadow!.color
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, shadow!.blurRadius);
+      _drawOctagon(canvas, center, size.width / 2 + shadow!.spreadRadius, shadowPaint);
+    }
+
+    // biały "ramka" – większy ośmiokąt
+    final borderPaint = Paint()..color = Colors.white;
+    const borderWidth = 2.0; // w pikselach
+    _drawOctagon(canvas, center, size.width / 2, borderPaint);
+
+    // kolorowe wypełnienie – mniejszy ośmiokąt
+    final fillPaint = Paint()..color = color;
+    _drawOctagon(canvas, center, size.width / 2 - borderWidth, fillPaint);
+  }
+
+  void _drawOctagon(Canvas canvas, Offset center, double radius, Paint paint) {
+    final path = Path();
+    const int sides = 8;
+    const angle = 2 * pi / sides;
+
+    for (int i = 0; i < sides; i++) {
+      final x = center.dx + radius * cos(angle * i - pi / 8);
+      final y = center.dy + radius * sin(angle * i - pi / 8);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

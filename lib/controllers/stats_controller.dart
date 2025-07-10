@@ -2,18 +2,19 @@ import 'package:get/get.dart';
 
 class StatsController extends GetxController {
 
-  final kills           = List<int>.filled(4, 0).obs;
-  final killsFriend     = List<int>.filled(4, 0).obs;
-  final deaths          = List<int>.filled(4, 0).obs;
-  final tripleSix       = List<int>.filled(4, 0).obs;
-  final tripleSixFriend = List<int>.filled(4, 0).obs;
+  final kills            = List<int>.filled(4, 0).obs;
+  final killsFriend      = List<int>.filled(4, 0).obs;
+  final deaths           = List<int>.filled(4, 0).obs;
+  final tripleSix        = List<int>.filled(4, 0).obs;
+  final tripleSixFriend  = List<int>.filled(4, 0).obs;
+  final turnsWithoutMove = List<int>.filled(4, 0).obs;
 
-  final rolls           = List<int>.filled(24, 0).obs;
-  final moves           = List<int>.filled(24, 0).obs;
-  final skips           = List<int>.filled(24, 0).obs;
-  final rollsFriend     = List<int>.filled(24, 0).obs;
-  final movesFriend     = List<int>.filled(24, 0).obs;
-  final skipsFriend     = List<int>.filled(24, 0).obs;
+  final rolls            = List<int>.filled(24, 0).obs;
+  final moves            = List<int>.filled(24, 0).obs;
+  final skips            = List<int>.filled(24, 0).obs;
+  final rollsFriend      = List<int>.filled(24, 0).obs;
+  final movesFriend      = List<int>.filled(24, 0).obs;
+  final skipsFriend      = List<int>.filled(24, 0).obs;
 
   final finishedAndHelped = List<int>.filled(0, 0).obs;
 
@@ -23,11 +24,9 @@ class StatsController extends GetxController {
   int _friend(int player) => (player + 2) % 4;
 
   void reset() {
-    kills.fillRange(0, 4, 0);
-    killsFriend.fillRange(0, 4, 0);
-    deaths.fillRange(0, 4, 0);
-    tripleSix.fillRange(0, 4, 0);
-    tripleSixFriend.fillRange(0, 4, 0);
+    for (var l in [kills, killsFriend, deaths, tripleSix, tripleSixFriend, turnsWithoutMove]) {
+      l.fillRange(0, 4, 0);
+    }
     for (var l in [rolls, moves, skips, rollsFriend, movesFriend, skipsFriend]) {
       l.fillRange(0, 24, 0);
     }
@@ -38,6 +37,7 @@ class StatsController extends GetxController {
   /* ---------- PUBLIC API ---------- */
 
   void recordRoll(int player, int dice, bool forFriend) {
+    _validatePlayerValue(player);
     rolls[_idx(player, dice)]++;
     if (forFriend) {
       rollsFriend[_idx(player, dice)]++;
@@ -45,15 +45,19 @@ class StatsController extends GetxController {
     }
   }
 
-  void recordMove(int player, int dice) =>
-      moves[_idx(player, dice)]++;
+  void recordMove(int player, int dice) {
+    _validatePlayerValue(player);
+    moves[_idx(player, dice)]++;
+  }
 
-  void recordMoveFriend(int player, int dice) { 
+  void recordMoveFriend(int player, int dice) {
+    _validatePlayerValue(player);
     movesFriend[_idx(player, dice)]++;
     movesFriend[_idx(_friend(player), dice)]++;
   }
 
   void recordSkip(int player, int dice, bool forFriend) {
+    _validatePlayerValue(player);
     skips[_idx(player, dice)]++;
     if (forFriend) {
       skipsFriend[_idx(player, dice)]++;
@@ -71,6 +75,7 @@ class StatsController extends GetxController {
   }
 
   void recordTripleSix(int player, bool forFriend) {
+    _validatePlayerValue(player);
     tripleSix[player]++;
     if (forFriend) {
       tripleSixFriend[player]++;
@@ -81,13 +86,26 @@ class StatsController extends GetxController {
   void nextTurn() => turnsCounter++;
 
   void setFinished(player) {
+    _validatePlayerValue(player);
     if (!finishedAndHelped.contains(player)) {
       finishedAndHelped.add(player);
     }
   }
 
+  void increaseTurnsWithoutMove(int player) {
+    _validatePlayerValue(player);
+    turnsWithoutMove[player]++;
+  }
+
+  void resetTurnsWithoutMove(int player) {
+    _validatePlayerValue(player);
+    if (turnsWithoutMove[player] > 0) {
+     turnsWithoutMove[player] = 0;
+    }
+  }
+
   bool playerRolledForFriend(int player, {int minSum = 0}) {
-    assert(player >= 0 && player < 4, 'player index out of range (0-3)');
+    _validatePlayerValue(player);
 
     final start = player * 6;
     final total = rollsFriend
@@ -95,5 +113,9 @@ class StatsController extends GetxController {
         .fold<int>(0, (sum, v) => sum + v);
 
     return total > minSum;
+  }
+
+  void _validatePlayerValue(int player) {
+    assert(player >= 0 && player < 4, 'player index out of range (0-3)');
   }
 }
