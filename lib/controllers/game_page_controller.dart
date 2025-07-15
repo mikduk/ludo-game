@@ -47,7 +47,6 @@ class GamePageController extends GetxController {
 
   var autoMoves = List.filled(4, false).obs;
 
-  RxBool soundOn = true.obs;
   RxBool stopGame = false.obs;
 
   bool rollDicePlayerFlag = false;
@@ -75,7 +74,7 @@ class GamePageController extends GetxController {
       await Future.delayed(nextBotDuration);
     }
     print('KONIEC GRY');
-    soundController.playClickSound(sound: 'sounds/end.mp3');
+    soundController.playEndSound();
     showStatisticsDialog();
   }
 
@@ -124,12 +123,10 @@ class GamePageController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    print('Kontroler jest gotowy!');
   }
 
   @override
   void onClose() {
-    print('Kontroler został zamknięty');
     super.onClose();
   }
 
@@ -255,10 +252,7 @@ class GamePageController extends GetxController {
     );
   }
 
-  void soundSwitch() {
-    soundOn.value = !soundOn.value;
-    soundController.playRandomSound();
-  }
+  void soundSwitch() => soundController.soundSwitch();
 
   void changeBotFlag(int player) {
     bots[player] = !bots[player];
@@ -287,7 +281,7 @@ class GamePageController extends GetxController {
     bool rollForFriend = everyoneInFinish(player: player) && teamWork.value;
     if (scores.value.contains('666')) {
       statsController.recordTripleSix(player, rollForFriend);
-      soundController.playClickSound(sound: 'sounds/false_success_fail.mp3');
+      soundController.playFalseSuccessFailSound();
       printForLogs('|AMP| 666 (trzecia szóstka) gracz: $player');
       await Future.delayed(longerDuration, getNextPlayer);
     } else if (everyoneInFinish()) {
@@ -299,7 +293,7 @@ class GamePageController extends GetxController {
       } else {
         printForLogs('|AMP| else (everyoneInFinish)');
         statsController.recordSkip(player, score.value, rollForFriend);
-        soundController.playClickSound(sound: 'sounds/fail_roll.mp3');
+        soundController.playFailRollSound();
         await Future.delayed(normalDuration, getNextPlayer);
       }
     } else if (everyoneInBaseOrFinish()) {
@@ -321,7 +315,7 @@ class GamePageController extends GetxController {
       printForLogs('|AMP| (everyoneInBaseOrFinishOrCannotGo)');
       statsController.increaseTurnsWithoutMove(player);
       statsController.recordSkip(player, score.value, false);
-      soundController.playClickSound(sound: 'sounds/fail_roll.mp3');
+      soundController.playFailRollSound();
       await Future.delayed(normalDuration, getNextPlayer);
     } else {
       printForLogs('|AMP| ELSE - będzie normalny ruch (result: $score)');
@@ -436,7 +430,7 @@ class GamePageController extends GetxController {
       if (x == i) {
         board[i] += pow;
         printForLogs(
-            'Pionek $pawnNumber. ${colors[currentPlayer.value]} nie może się ruszyć.');
+            '${'pawn'.tr.capitalizeFirst} $pawnNumber. ${colors[currentPlayer.value]} nie może się ruszyć.');
         return;
       }
       printForLogs('|movePlayerPawn| PÓJŚĆCIE NA POLE $x, x: $x =?= i: $i');
@@ -447,9 +441,9 @@ class GamePageController extends GetxController {
       await goToField(x, pow, pawnNumber ?? 0);
       await endTurn();
     } else {
-      printForLogs('Pionek $pawnNumber. $currentPlayer nie może się ruszyć.');
+      printForLogs('${'pawn'.tr.capitalizeFirst} $pawnNumber. $currentPlayer nie może się ruszyć.');
       throw ArgumentError(
-          'Pionek $pawnNumber. $currentPlayer nie może się ruszyć.');
+          '${'pawn'.tr.capitalizeFirst} $pawnNumber. $currentPlayer nie może się ruszyć.');
     }
   }
 
@@ -516,7 +510,7 @@ class GamePageController extends GetxController {
     positionPawns[4 * tenLog(pow) + pawnNumber] = x;
     if ([61, 67, 73, 79].contains(x)) {
       finished.value += 1;
-      soundController.playClickSound(sound: 'sounds/complete.mp3');
+      soundController.playCompleteSound();
     }
     // await endTurn();
   }
@@ -540,7 +534,7 @@ class GamePageController extends GetxController {
           break;
       }
     } else if ([0, 1, 2, 3].contains(from)) {
-      soundController.playClickSound(sound: 'sounds/goOut.mp3');
+      soundController.playGoOutSound();
     }
     while (from != to) {
       if ((3 < from && to < 56 && to == originalPosition) ||
@@ -690,7 +684,7 @@ class GamePageController extends GetxController {
 
     if (x < 4 || x > 55 || safeFields.contains(x) || pow == result) {
       printForLogs(
-          '|canCapture| (pole: $x, $pow) BRAK BICIA (baza, meta, bezpieczne pole lub swój pionek)');
+          '|canCapture| (pole: $x, $pow) BRAK BICIA (baza, meta, bezpieczne pole lub swój ${'pawn'.tr})');
       return false;
     } else if (teamMode &&
         (pow == 1 || pow == 100) &&
@@ -700,7 +694,7 @@ class GamePageController extends GetxController {
         (pow == 10 || pow == 1000) &&
         attackMovesB.contains(result)) {
       printForLogs(
-          '|canCapture| (pole: $x, $pow) BICIE (tryb współpracy, dokładnie jeden niebieski albo zielony pionek)');
+          '|canCapture| (pole: $x, $pow) BICIE (tryb współpracy, dokładnie jeden niebieski albo zielony ${'pawn'.tr})');
       return true;
     } else if (!teamMode && attackMoves.contains(result)) {
       return true;
@@ -726,7 +720,7 @@ class GamePageController extends GetxController {
           if ([1001, 1002, 1003, 1010, 1020, 1030, 1100, 1200, 1300]
               .contains(result)) {
             printForLogs(
-                '|canCapture| (pole: $x, $pow) BICIE (tryb solo, dokładnie jeden nieżółty pionek)');
+                '|canCapture| (pole: $x, $pow) BICIE (tryb solo, dokładnie jeden nieżółty ${'pawn'.tr})');
             return true;
           }
           break;
@@ -738,8 +732,8 @@ class GamePageController extends GetxController {
   }
 
   Future<void> capture(int x, int pow) async {
-    if (soundOn.isTrue) {
-      soundController.playClickSound();
+    if (soundController.soundOn.isTrue) {
+      soundController.playCaptureSound();
       soundController.playRandomlyLaugh();
     }
     print('|capture| x: $x, pow: $pow');
@@ -820,7 +814,7 @@ class GamePageController extends GetxController {
 
       if (everyoneInFinish() && !teamWork.value) {
         printForLogs('|END TURN| Wszyscy na mecie (tryb solo)');
-        soundController.playClickSound(sound: 'sounds/bravo.mp3');
+        soundController.playBravoSound();
       } else {
         statsController.setFinished(currentPlayer.value);
         return;

@@ -104,7 +104,7 @@ class ExpandableGameMenu extends StatelessWidget {
         heroTag: 'btn11',
         color: Colors.limeAccent,
         onTap: gameController.soundSwitch,
-        child: Obx(() => gameController.soundOn.value
+        child: Obx(() => gameController.soundController.soundOn.value
             ? const Icon(Icons.music_note_outlined)
             : const Icon(Icons.music_off_outlined)),
       ),

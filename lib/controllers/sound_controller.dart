@@ -1,45 +1,97 @@
 import 'dart:math';
-
-import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
-import 'game_page_controller.dart';
+import 'package:soundpool/soundpool.dart';
 
 class SoundController extends GetxController {
-  void playRandomSound() async {
-    List<String> sounds = ['fail_roll', 'capture', 'false_success_fail', 'goOut', 'bravo', 'laugh1', 'laugh2', 'complete', 'congratulations'];
-    int i = Random().nextInt(sounds.length);
-    playClickSound(sound: 'sounds/${sounds[i]}.mp3');
+
+  RxBool soundOn = true.obs;
+  late final Soundpool _pool;
+  final Map<String, int> _soundIds = {};
+  static const _allSounds = [
+    'bravo',
+    'capture',
+    'complete',
+    'congratulations',
+    'end',
+    'fail_roll',
+    'false_success_fail',
+    'goOut',
+    'laugh1',
+    'laugh2'
+  ];
+
+  @override
+  void onInit() {
+    super.onInit();
+    _pool = Soundpool.fromOptions(
+      options: const SoundpoolOptions(),
+    );
+    _initSounds();
   }
 
-  void playRandomlyLaugh() async {
-    List<String> sounds = ['laugh1', 'laugh2'];
-    int i = Random().nextInt(sounds.length);
+  Future<void> _initSounds() async {
+    for (var key in _allSounds) {
+      final bytes = await rootBundle.load('assets/sounds/$key.mp3');
+      final id = await _pool.load(bytes);
+      _soundIds[key] = id;
+    }
+  }
+
+  @override
+  void onClose() {
+    _pool.release();
+    super.onClose();
+  }
+
+  void soundSwitch() {
+    soundOn.value = !soundOn.value;
+    if (soundOn.value) {
+      playRandomSound();
+    }
+  }
+
+  void playRandomSound() {
+    final i = Random().nextInt(_allSounds.length);
+    _playByKey(_allSounds[i]);
+  }
+
+  void playRandomlyLaugh() {
     if (Random().nextInt(10) >= 9) {
-      playClickSound(sound: 'sounds/${sounds[i]}.mp3');
+      final laughKeys = ['laugh1', 'laugh2'];
+      _playByKey(laughKeys[Random().nextInt(laughKeys.length)]);
     }
   }
 
-  void playRandomlyCongrats() async {
-    List<String> sounds = ['congratulations'];
-    int i = Random().nextInt(sounds.length);
+  void playRandomlyCongrats() {
     if (Random().nextInt(100) >= 92) {
-      playClickSound(sound: 'sounds/${sounds[i]}.mp3');
+      _playByKey('congratulations');
     }
   }
 
-  void playClickSound({String sound = 'sounds/capture.mp3'}) async {
-    final GamePageController controller = Get.find();
-    if (controller.soundOn.value) {
-      print('|playClickSound| sound: $sound');
-      try {
-        final player = AudioPlayer();
-        await player.setSource(AssetSource(sound));
-        await player.resume();
-      } catch (e) {
-        print('|playClickSound| $e');
-        playClickSound(sound: 'sounds/capture.mp3');
-      }
+  void playBravoSound() => _playByKey('bravo');
+
+  void playCaptureSound() => _playByKey('capture');
+
+  void playCompleteSound() => _playByKey('complete');
+
+  void playEndSound() => _playByKey('end');
+
+  void playFailRollSound() => _playByKey('fail_roll');
+
+  void playFalseSuccessFailSound() => _playByKey('false_success_fail');
+
+  void playGoOutSound() => _playByKey('goOut');
+
+  void _playByKey(String key) {
+    if (!soundOn.value) return;
+
+    final id = _soundIds[key];
+    if (id != null) {
+      _pool.play(id);
+    } else {
+      final defaultId = _soundIds['capture'];
+      if (defaultId != null) _pool.play(defaultId);
     }
   }
 }

@@ -16,7 +16,8 @@ class AppTranslations extends Translations {
       'next_player': 'Next player:',
       'select_game_mode': 'Select game mode',
       'select_player_type': 'Select player type',
-      'start_game': 'Start game'
+      'start_game': 'Start game',
+      'pawn': 'pawn'
     },
     'pl_PL': {
       'new_game': 'Nowa Gra',
@@ -31,7 +32,8 @@ class AppTranslations extends Translations {
       'next_player': 'Następny gracz:',
       'select_game_mode': 'Wybierz tryb gry',
       'select_player_type': 'Wybierz rodzaj gracza',
-      'start_game': 'Rozpocznij grę'
+      'start_game': 'Rozpocznij grę',
+      'pawn': 'pionek'
     },
   };
 }
