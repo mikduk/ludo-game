@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../models/game_modes.dart';
+import '../models/keys/game_page_controller_keys.dart';
 import '../models/players.dart';
 import '../views/statistics_dialog.dart';
 import 'sound_controller.dart';
@@ -13,11 +15,16 @@ class GamePageController extends GetxController {
   final List<String> namesOfPlayers;
   final List<bool> valuesOfBots;
   final GameModes gameMode;
+  final bool clearOnLoad;
+  final bool useGetStorage;
+  final GetStorage _storage = GetStorage();
 
   GamePageController({
     this.namesOfPlayers = const ['Blue', 'Red', 'Green', 'Yellow'],
     this.valuesOfBots = const [true, false, true, true],
     this.gameMode = GameModes.classic,
+    this.clearOnLoad = true,
+    this.useGetStorage = true,
   }) : assert(
           namesOfPlayers.length == valuesOfBots.length,
           'The number of player names must match the number of bot flags.',
@@ -58,10 +65,25 @@ class GamePageController extends GetxController {
   final StatsController statsController = Get.put(StatsController());
 
   @override
-  void onInit({bool test = false}) {
+  void onInit() {
     super.onInit();
+    _init();
+  }
+
+  Future<void> _init() async {
+    if (useGetStorage && clearOnLoad) {
+      clearStorage();
+    }
     initializePlayers();
     initializeBoard();
+    statsController.reset();
+    if (useGetStorage && !clearOnLoad) {
+      _loadFromStorage();
+    }
+    regenerateBoard();
+    if (useGetStorage) {
+      ever(statsController.turnsCounter, (_) => _saveToStorage());
+    }
     executePeriodicallyBots();
   }
 
@@ -114,20 +136,6 @@ class GamePageController extends GetxController {
     for (int i = 0; i < 16; i++) {
       positionPawns[i] = i ~/ 4;
     }
-
-    regenerateBoard();
-
-    statsController.reset();
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 
   void regenerateBoard() {
@@ -319,6 +327,7 @@ class GamePageController extends GetxController {
       await Future.delayed(normalDuration, getNextPlayer);
     } else {
       printForLogs('|AMP| ELSE - będzie normalny ruch (result: $score)');
+      statsController.resetTurnsWithoutMove(player);
       setWaitForMoveValue(true);
     }
   }
@@ -1084,6 +1093,99 @@ class GamePageController extends GetxController {
         }
         await endTurn();
       }
+    }
+  }
+
+  Future<void> clearStorage() async {
+    if (useGetStorage) {
+      await _storageClear();
+      await statsController.storageClearAll();
+    }
+  }
+
+  Future<void> _storageClear() async {
+    await _storage.remove(GamePageControllerKeys.score);
+    await _storage.remove(GamePageControllerKeys.scores);
+    await _storage.remove(GamePageControllerKeys.currentPlayer);
+    await _storage.remove(GamePageControllerKeys.nextPlayer);
+    await _storage.remove(GamePageControllerKeys.waitForMove);
+    await _storage.remove(GamePageControllerKeys.board);
+    await _storage.remove(GamePageControllerKeys.kills);
+    await _storage.remove(GamePageControllerKeys.finished);
+    await _storage.remove(GamePageControllerKeys.processedCapture);
+    await _storage.remove(GamePageControllerKeys.positionPawns);
+    await _storage.remove(GamePageControllerKeys.bots);
+    await _storage.remove(GamePageControllerKeys.autoMoves);
+    await _storage.remove(GamePageControllerKeys.teamWork);
+  }
+
+  void _saveToStorage() {
+    _saveStateToStorage();
+    statsController.storageSaveAll();
+  }
+
+  void _saveStateToStorage() {
+    try {
+      _storage.write(GamePageControllerKeys.score,              score.value);
+      _storage.write(GamePageControllerKeys.scores,             scores.value);
+      _storage.write(GamePageControllerKeys.currentPlayer,      currentPlayer.value);
+      _storage.write(GamePageControllerKeys.nextPlayer,         nextPlayer.value);
+      _storage.write(GamePageControllerKeys.waitForMove,        waitForMove.value);
+
+      _storage.write(GamePageControllerKeys.board,              board.toList());
+      _storage.write(GamePageControllerKeys.kills,              kills.value);
+      _storage.write(GamePageControllerKeys.finished,           finished.value);
+      _storage.write(GamePageControllerKeys.processedCapture,   processedCapture.value);
+      _storage.write(GamePageControllerKeys.positionPawns,      positionPawns.toList());
+
+      _storage.write(GamePageControllerKeys.bots,               bots.toList());
+      _storage.write(GamePageControllerKeys.autoMoves,          autoMoves.toList());
+      _storage.write(GamePageControllerKeys.teamWork,           teamWork.value);
+
+    } catch (e, st) {
+      printForLogs('Error saving GamePageController state: $e\n$st');
+    }
+  }
+
+  void _loadFromStorage() {
+    _loadStateFromStorage();
+    statsController.storageLoadAll();
+  }
+
+  void _loadStateFromStorage() {
+    try {
+      score.value            = _storage.read<int>(GamePageControllerKeys.score)              ?? score.value;
+      scores.value           = _storage.read<String>(GamePageControllerKeys.scores)          ?? scores.value;
+      currentPlayer.value    = _storage.read<int>(GamePageControllerKeys.currentPlayer)      ?? currentPlayer.value;
+      nextPlayer.value       = _storage.read<int>(GamePageControllerKeys.nextPlayer)         ?? nextPlayer.value;
+      waitForMove.value      = _storage.read<bool>(GamePageControllerKeys.waitForMove)       ?? waitForMove.value;
+
+      final rawBoard = _storage.read<List<dynamic>>(GamePageControllerKeys.board);
+      if (rawBoard != null && rawBoard.length == board.length) {
+        board.value = rawBoard.cast<int>();
+      }
+
+      kills.value            = _storage.read<int>(GamePageControllerKeys.kills)             ?? kills.value;
+      finished.value         = _storage.read(GamePageControllerKeys.finished)          ?? finished.value;
+      processedCapture.value = _storage.read<bool>(GamePageControllerKeys.processedCapture) ?? processedCapture.value;
+      teamWork.value = _storage.read<bool>(GamePageControllerKeys.teamWork) ?? teamWork.value;
+
+      final rawPos = _storage.read<List<dynamic>>(GamePageControllerKeys.positionPawns);
+      if (rawPos != null && rawPos.length == positionPawns.length) {
+        positionPawns.value = rawPos.cast<int>();
+      }
+
+      final rawBots = _storage.read<List<dynamic>>(GamePageControllerKeys.bots);
+      if (rawBots != null && rawBots.length == bots.length) {
+        bots.value = rawBots.cast<bool>();
+      }
+      final rawAuto = _storage.read<List<dynamic>>(GamePageControllerKeys.autoMoves);
+      if (rawAuto != null && rawAuto.length == autoMoves.length) {
+        autoMoves.value = rawAuto.cast<bool>();
+      }
+
+    } catch (e, st) {
+      printForLogs('Error loading GamePageController state: $e\n$st');
     }
   }
 }
