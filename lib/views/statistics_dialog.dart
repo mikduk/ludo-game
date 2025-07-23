@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
+import '../controllers/game_page_controller.dart';
 import '../controllers/stats_controller.dart';
 import 'start_page.dart';
 
 class StatisticsDialog extends StatelessWidget {
-  const StatisticsDialog({super.key, required this.statsController});
+  StatisticsDialog({super.key, required this.statsController});
   final StatsController statsController;
+  final GamePageController gamePageController = Get.find<GamePageController>();
+
 
   @override
   Widget build(BuildContext context) => Dialog(
@@ -41,13 +44,18 @@ class StatisticsDialog extends StatelessWidget {
           // ───── Nowa gra ─────
           ElevatedButton.icon(
             icon: const Icon(Icons.refresh),
-            label: const Text('Nowa gra'),
-            onPressed: () => Get.offAll(StartPage()),
+            label: Text('new_game'.tr),
+            onPressed: _clearCacheAndGoToStartPage,
           ),
         ],
       ),
     ),
   );
+
+  void _clearCacheAndGoToStartPage() {
+    gamePageController.clearStorage();
+    Get.offAll(StartPage());
+  }
 
   /// Buduje kartę z danymi jednego gracza.
   Widget _buildPlayerStatsCard(int playerIndex) {
