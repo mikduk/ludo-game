@@ -9,16 +9,34 @@ import 'player_dice.dart';
 import 'score_board.dart';
 
 class GamePage extends StatelessWidget {
+  final List<String>? namesOfPlayers;
+  final List<bool>? valuesOfBots;
+  final GameModes? gameMode;
 
-  final List<String> namesOfPlayers;
-  final List<bool> valuesOfBots;
-  final GameModes gameMode;
-
-  const GamePage({super.key, required this.namesOfPlayers, required this.valuesOfBots, required this.gameMode});
+  const GamePage({
+    super.key,
+    this.namesOfPlayers,
+    this.valuesOfBots,
+    this.gameMode,
+  })  : assert(
+          (namesOfPlayers == null &&
+                  valuesOfBots == null &&
+                  gameMode == null) ||
+              (namesOfPlayers != null &&
+                  valuesOfBots != null &&
+                  gameMode != null),
+          'params error',
+        );
 
   @override
   Widget build(BuildContext context) {
-    final GamePageController gameController = Get.put(GamePageController(namesOfPlayers: namesOfPlayers, valuesOfBots: valuesOfBots, gameMode: gameMode));
+    final GamePageController gameController =
+    namesOfPlayers != null
+    ? Get.put(GamePageController(
+        namesOfPlayers: namesOfPlayers!,
+        valuesOfBots: valuesOfBots!,
+        gameMode: gameMode!))
+    : Get.put(GamePageController(clearOnLoad: false));
     final ScreenController screenController = Get.find();
 
     return Scaffold(

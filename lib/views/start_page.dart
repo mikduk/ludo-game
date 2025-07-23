@@ -2,14 +2,18 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../controllers/screen_controller.dart';
+import '../models/keys/stats_controller_keys.dart';
 import '/views/team_setup_page.dart';
+import 'game_page.dart';
 
 class StartPage extends StatelessWidget {
   StartPage({super.key});
 
   final screenController = Get.put(ScreenController());
+  final GetStorage _storage = GetStorage();
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +21,9 @@ class StartPage extends StatelessWidget {
     return GetBuilder<ScreenController>(
       builder: (c) {
         final shortest = min(c.screenHeight, c.screenWidth);
+        final turnCounter = _storage.read<int>(StatsControllerKeys.keyTurnsCounter) ?? 0;
+
+        print('turnCounter: $turnCounter');
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -44,7 +51,7 @@ class StartPage extends StatelessWidget {
                     children: [
                       _menuButton(
                         text: 'continue_game'.tr,
-                        onPressed: null,
+                        onPressed: ((turnCounter > 0) ? () => Get.off(() => const GamePage()) : null),
                         shortest: shortest,
                         c: c,
                       ),
