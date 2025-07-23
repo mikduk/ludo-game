@@ -201,7 +201,6 @@ class StatsController extends GetxController {
 
   void increaseTurnsWithoutMove(int player) {
     _validatePlayerValue(player);
-    print('SKIP++');
     turnsWithoutMove[player]++;
   }
 

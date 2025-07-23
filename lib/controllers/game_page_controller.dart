@@ -16,13 +16,15 @@ class GamePageController extends GetxController {
   final List<bool> valuesOfBots;
   final GameModes gameMode;
   final bool clearOnLoad;
+  final bool useGetStorage;
   final GetStorage _storage = GetStorage();
 
   GamePageController({
     this.namesOfPlayers = const ['Blue', 'Red', 'Green', 'Yellow'],
     this.valuesOfBots = const [true, false, true, true],
     this.gameMode = GameModes.classic,
-    this.clearOnLoad = true
+    this.clearOnLoad = true,
+    this.useGetStorage = true,
   }) : assert(
           namesOfPlayers.length == valuesOfBots.length,
           'The number of player names must match the number of bot flags.',
@@ -69,17 +71,19 @@ class GamePageController extends GetxController {
   }
 
   Future<void> _init() async {
-    if (clearOnLoad) {
+    if (useGetStorage && clearOnLoad) {
       _clearStorage();
     }
     initializePlayers();
     initializeBoard();
     statsController.reset();
-    if (!clearOnLoad) {
+    if (useGetStorage && !clearOnLoad) {
       _loadFromStorage();
     }
     regenerateBoard();
-    ever(statsController.turnsCounter, (_) => _saveToStorage());
+    if (useGetStorage) {
+      ever(statsController.turnsCounter, (_) => _saveToStorage());
+    }
     executePeriodicallyBots();
   }
 
@@ -949,7 +953,6 @@ class GamePageController extends GetxController {
     finished.value = 0;
 
     if (preIndex > currentIndex) {
-      printForLogs('COUNTER++');
       statsController.nextTurn();
     }
 
