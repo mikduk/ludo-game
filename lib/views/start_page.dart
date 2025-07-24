@@ -56,7 +56,7 @@ class StartPage extends StatelessWidget {
                         c: c,
                       ),
                       SizedBox(
-                        height: (c.screenHeight > c.screenWidth ? 0.016 : 0) *
+                        height: (c.screenHeight > c.screenWidth ? 0.016 : 0.008) *
                             c.screenHeight,
                       ),
                       _menuButton(
@@ -87,6 +87,10 @@ class StartPage extends StatelessWidget {
     required double shortest,
     required ScreenController c,
   }) {
+
+    double width = min(shortest * 0.72, c.screenHeight * 0.52);
+    double height = max(shortest * 0.085, c.screenHeight * 0.07);
+
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -94,7 +98,7 @@ class StartPage extends StatelessWidget {
           horizontal: c.screenWidth * 0.1,
           vertical: c.screenHeight * 0.02,
         ),
-        fixedSize: Size(shortest * 0.72, c.screenHeight * 0.07),
+        fixedSize: Size(width, height),
         textStyle: TextStyle(fontSize: min(shortest * 0.04, 24)),
       ),
       child: Text(text),
