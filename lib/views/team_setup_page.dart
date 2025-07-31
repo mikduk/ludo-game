@@ -11,98 +11,153 @@ class TeamSetupPage extends StatelessWidget {
 
   final ScreenController screenController = Get.find<ScreenController>();
   final TeamSetupController teamSetupController =
-      Get.put(TeamSetupController(), permanent: true);
+      Get.put(TeamSetupController());
 
   @override
   Widget build(BuildContext context) {
     screenController.onReady();
     return GetBuilder<ScreenController>(
       builder: (c) {
-        final shortest = min(c.screenHeight, c.screenWidth);
+        final shortest = min(c.screenHeight, c.screenWidth) * 0.828;
 
         return Scaffold(
           backgroundColor: Colors.white,
-          body: SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _text('select_game_mode'.tr),
-                        SizedBox(height: shortest * 0.02),
-                        ModeSelector(
-                          size: shortest * 0.36,
-                          opacity: 1.0,
-                          controller: teamSetupController,
-                        ),
-                        SizedBox(height: shortest * 0.01),
-                        Obx(() {
-                          final mode = teamSetupController.teamWork.value
-                              ? GameModes.cooperation
-                              : GameModes.classic;
-
-                          return Text(mode.name.tr);
-                        }),
-                        SizedBox(height: shortest * 0.08),
-                        _text('select_player_type'.tr),
-                        SizedBox(height: shortest * 0.02),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            DogSelector(
-                              size: shortest * 0.36,
-                              opacity: 1.0,
-                              player: 1,
-                              controller: teamSetupController,
-                            ),
-                            SizedBox(width: shortest * 0.02),
-                            DogSelector(
-                              size: shortest * 0.36,
-                              opacity: 1.0,
-                              player: 2,
-                              controller: teamSetupController,
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: shortest * 0.02),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            DogSelector(
-                              size: shortest * 0.36,
-                              opacity: 1.0,
-                              player: 0,
-                              controller: teamSetupController,
-                            ),
-                            SizedBox(width: shortest * 0.02),
-                            DogSelector(
-                              size: shortest * 0.36,
-                              opacity: 1.0,
-                              player: 3,
-                              controller: teamSetupController,
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: shortest * 0.06),
-                        _menuButton(
-                          text: 'start_game'.tr,
-                          onPressed: () => Get.off(() => GamePage(
-                              namesOfPlayers: teamSetupController.colors,
-                              valuesOfBots: teamSetupController.bots,
-                              gameMode: teamSetupController.getGameMode())),
-                          shortest: shortest,
-                          c: c,
-                        ),
-                      ],
-                    ),
-                  ),
+          body: LayoutBuilder(builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
                 ),
-              ],
-            ),
-          ),
+                child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: shortest * 0.08 +
+                                0.25 * (c.screenHeight - shortest),
+                            bottom: 0.25 * (c.screenHeight - shortest)),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _text('select_game_mode'.tr),
+                              SizedBox(height: shortest * 0.02),
+                              ModeSelector(
+                                size: shortest * 0.3,
+                                opacity: 1.0,
+                                controller: teamSetupController,
+                              ),
+                              SizedBox(height: shortest * 0.01),
+                              Obx(() {
+                                final mode = teamSetupController.teamWork.value
+                                    ? GameModes.cooperation
+                                    : GameModes.classic;
+
+                                return Text(mode.name.tr);
+                              }),
+                              SizedBox(height: shortest * 0.08),
+                              _text('select_player_type'.tr),
+                              // PRZED buttonem _menuButton
+                              SizedBox(height: shortest * 0.02),
+                              c.screenWidth > c.screenHeight
+                                  ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  DogSelector(
+                                    size: shortest * 0.3,
+                                    opacity: 1.0,
+                                    player: 0,
+                                    controller: teamSetupController,
+                                  ),
+                                  SizedBox(width: shortest * 0.02),
+                                  DogSelector(
+                                    size: shortest * 0.3,
+                                    opacity: 1.0,
+                                    player: 1,
+                                    controller: teamSetupController,
+                                  ),
+                                  SizedBox(width: shortest * 0.02),
+                                  DogSelector(
+                                    size: shortest * 0.3,
+                                    opacity: 1.0,
+                                    player: 2,
+                                    controller: teamSetupController,
+                                  ),
+                                  SizedBox(width: shortest * 0.02),
+                                  DogSelector(
+                                    size: shortest * 0.3,
+                                    opacity: 1.0,
+                                    player: 3,
+                                    controller: teamSetupController,
+                                  ),
+                                ],
+                              )
+                                  : Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      DogSelector(
+                                        size: shortest * 0.3,
+                                        opacity: 1.0,
+                                        player: 1,
+                                        controller: teamSetupController,
+                                      ),
+                                      SizedBox(width: shortest * 0.02),
+                                      DogSelector(
+                                        size: shortest * 0.3,
+                                        opacity: 1.0,
+                                        player: 2,
+                                        controller: teamSetupController,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: shortest * 0.02),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      DogSelector(
+                                        size: shortest * 0.3,
+                                        opacity: 1.0,
+                                        player: 0,
+                                        controller: teamSetupController,
+                                      ),
+                                      SizedBox(width: shortest * 0.02),
+                                      DogSelector(
+                                        size: shortest * 0.3,
+                                        opacity: 1.0,
+                                        player: 3,
+                                        controller: teamSetupController,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+
+                              SizedBox(height: shortest * 0.06),
+                              _menuButton(
+                                text: 'start_game'.tr,
+                                onPressed: () =>
+                                    Get.off(() =>
+                                        GamePage(
+                                            namesOfPlayers: teamSetupController
+                                                .colors,
+                                            valuesOfBots: teamSetupController
+                                                .bots,
+                                            gameMode:
+                                            teamSetupController.getGameMode())),
+                                shortest: min(c.screenHeight, c.screenWidth),
+                                c: c,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ]
+                ),
+              ),
+            );
+          }),
         );
       },
     );
@@ -117,6 +172,9 @@ class TeamSetupPage extends StatelessWidget {
     required double shortest,
     required ScreenController c,
   }) {
+    double width = min(shortest * 0.72, c.screenHeight * 0.52);
+    double height = max(shortest * 0.085, c.screenHeight * 0.07);
+
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -124,8 +182,8 @@ class TeamSetupPage extends StatelessWidget {
           horizontal: c.screenWidth * 0.1,
           vertical: c.screenHeight * 0.02,
         ),
-        fixedSize: Size(shortest * 0.72, c.screenHeight * 0.07),
-        textStyle: TextStyle(fontSize: min(shortest * 0.04, 24)),
+        fixedSize: Size(width, height),
+        textStyle: TextStyle(fontSize: min(shortest * 0.04, 20)),
       ),
       child: Text(text),
     );

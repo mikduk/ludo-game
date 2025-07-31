@@ -21,61 +21,64 @@ class StartPage extends StatelessWidget {
     return GetBuilder<ScreenController>(
       builder: (c) {
         final shortest = min(c.screenHeight, c.screenWidth);
-        final turnCounter = _storage.read<int>(StatsControllerKeys.keyTurnsCounter) ?? 0;
-
-        print('turnCounter: $turnCounter');
+        final turnCounter =
+            _storage.read<int>(StatsControllerKeys.keyTurnsCounter) ?? 0;
 
         return Scaffold(
-          backgroundColor: Colors.white,
-          body: SafeArea(
-            child: Column(
-              children: [
-                /// ---------------- logo ----------------
-                Expanded(
-                  flex: 4,
-                  child: Center(
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      width: shortest * 0.5,
-                      height: shortest * 0.5,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-
-                /// --------------- przyciski -------------
-                Expanded(
-                  flex: 3,
+            backgroundColor: Colors.white,
+            body: LayoutBuilder(builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _menuButton(
-                        text: 'continue_game'.tr,
-                        onPressed: ((turnCounter > 0) ? () => Get.off(() => const GamePage()) : null),
-                        shortest: shortest,
-                        c: c,
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: shortest * 0.08 +
+                                0.25 * (c.screenHeight - shortest),
+                            bottom: 0.25 * (c.screenHeight - shortest)),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            width: shortest * 0.5,
+                            height: shortest * 0.5,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
-                      SizedBox(
-                        height: (c.screenHeight > c.screenWidth ? 0.016 : 0.008) *
-                            c.screenHeight,
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: c.screenHeight * 0.04),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _menuButton(
+                              text: 'continue_game'.tr,
+                              onPressed: ((turnCounter > 0)
+                                  ? () => Get.off(() => const GamePage())
+                                  : null),
+                              shortest: shortest,
+                              c: c,
+                            ),
+                            SizedBox(
+                              height: c.screenHeight * 0.01,
+                            ),
+                            _menuButton(
+                              text: 'new_game'.tr,
+                              // onPressed: () => Get.off(() => const GamePage()),
+                              onPressed: () => Get.to(() => TeamSetupPage()),
+                              shortest: shortest,
+                              c: c,
+                            ),
+                          ],
+                        ),
                       ),
-                      _menuButton(
-                        text: 'new_game'.tr,
-                        // onPressed: () => Get.off(() => const GamePage()),
-                        onPressed: () => Get.off(() => TeamSetupPage()),
-                        shortest: shortest,
-                        c: c,
-                      ),
+                      _versionLabel(shortest),
                     ],
                   ),
                 ),
-
-                /// ---------- etykieta z wersją ----------
-                _versionLabel(shortest),
-              ],
-            ),
-          ),
-        );
+              );
+            }));
       },
     );
   }
@@ -87,19 +90,18 @@ class StartPage extends StatelessWidget {
     required double shortest,
     required ScreenController c,
   }) {
-
-    double width = min(shortest * 0.72, c.screenHeight * 0.52);
-    double height = max(shortest * 0.085, c.screenHeight * 0.07);
+    double width = 0.62 * shortest;
+    double height = shortest * 0.09;
 
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(
-          horizontal: c.screenWidth * 0.1,
-          vertical: c.screenHeight * 0.02,
+          horizontal: shortest * 0.1,
+          vertical: shortest * 0.02,
         ),
         fixedSize: Size(width, height),
-        textStyle: TextStyle(fontSize: min(shortest * 0.04, 24)),
+        textStyle: TextStyle(fontSize: min(shortest * 0.04, 20)),
       ),
       child: Text(text),
     );
@@ -112,14 +114,13 @@ class StartPage extends StatelessWidget {
       builder: (context, snap) {
         final txt = switch (snap.connectionState) {
           ConnectionState.waiting => 'loading_version'.tr,
-          ConnectionState.done =>
-          snap.hasError
+          ConnectionState.done => snap.hasError
               ? 'error_version'.tr
               : 'version'.trParams({'version': snap.data ?? ''}),
           _ => '',
         };
         return Padding(
-          padding: EdgeInsets.only(bottom: shortest * 0.08),
+          padding: EdgeInsets.only(bottom: shortest * 0.002),
           child: Text(
             txt,
             style: TextStyle(color: Colors.grey, fontSize: shortest * 0.03),
@@ -132,4 +133,3 @@ class StartPage extends StatelessWidget {
   Future<String> _getAppVersion() async =>
       (await PackageInfo.fromPlatform()).version;
 }
-
