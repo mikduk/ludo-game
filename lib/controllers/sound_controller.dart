@@ -1,14 +1,16 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/services.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:get/get.dart';
-import 'package:soundpool/soundpool.dart';
+import 'package:path_provider/path_provider.dart';
 
 class SoundController extends GetxController {
 
   RxBool soundOn = true.obs;
-  late final Soundpool _pool;
-  final Map<String, int> _soundIds = {};
-  static const _allSounds = [
+  late final FlutterSoundPlayer _player;
+  final Map<String, String> _soundPaths = {};
+  static const _allSounds = <String>[
     'bravo',
     'capture',
     'complete',
@@ -24,23 +26,24 @@ class SoundController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _pool = Soundpool.fromOptions(
-      options: const SoundpoolOptions(),
-    );
+    _player = FlutterSoundPlayer();
+    _player.openPlayer();
     _initSounds();
   }
 
   Future<void> _initSounds() async {
-    for (var key in _allSounds) {
+    final tmp = await getTemporaryDirectory();
+    for (final key in _allSounds) {
       final bytes = await rootBundle.load('assets/sounds/$key.mp3');
-      final id = await _pool.load(bytes);
-      _soundIds[key] = id;
+      final file = File('${tmp.path}$key.mp3');
+      await file.writeAsBytes(bytes.buffer.asUint8List(), flush: true);
+      _soundPaths[key] = file.path;
     }
   }
 
   @override
   void onClose() {
-    _pool.release();
+    _player.closePlayer();
     super.onClose();
   }
 
@@ -52,6 +55,7 @@ class SoundController extends GetxController {
   }
 
   void playRandomSound() {
+    if (!soundOn.value) return;
     final i = Random().nextInt(_allSounds.length);
     _playByKey(_allSounds[i]);
   }
@@ -83,15 +87,12 @@ class SoundController extends GetxController {
 
   void playGoOutSound() => _playByKey('goOut');
 
-  void _playByKey(String key) {
+  Future<void> _playByKey(String key) async {
     if (!soundOn.value) return;
-
-    final id = _soundIds[key];
-    if (id != null) {
-      _pool.play(id);
-    } else {
-      final defaultId = _soundIds['capture'];
-      if (defaultId != null) _pool.play(defaultId);
-    }
+    final path = _soundPaths[key]!;
+    await _player.startPlayer(
+      fromURI: path,
+      codec: Codec.mp3,
+    );
   }
 }

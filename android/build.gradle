@@ -1,3 +1,15 @@
+buildscript {
+    ext.kotlin_version = '1.8.21'  // lub inna wersja Kotlin DSL, której używasz
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.4.2'                  // dopasuj do wersji AGP
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
 allprojects {
     repositories {
         google()
@@ -10,9 +22,19 @@ rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
     project.evaluationDependsOn(':app')
+}
 
+// Po wczytaniu wszystkich projektów nadpisujemy kompilację
+gradle.projectsEvaluated {
+    // JavaCompile → bajtkod i API Java 8
     tasks.withType(JavaCompile).configureEach {
-        options.release = 17
+        options.release = 8
+    }
+    // KotlinCompile → jvmTarget = 1.8
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
     }
 }
 

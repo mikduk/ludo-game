@@ -24,9 +24,10 @@ class ScreenController extends GetxController {
   }
 
   void _updateSize() {
-    final size = Get.mediaQuery.size;
+    final mq = Get.mediaQuery;
+    final size = mq.size;
     screenWidth  = size.width;
-    screenHeight = size.height;
+    screenHeight = max(size.height - mq.padding.top - mq.padding.bottom, 10);
     isPortrait   = screenHeight > screenWidth;
   }
 

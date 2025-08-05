@@ -7,9 +7,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../controllers/screen_controller.dart';
 import '../models/keys/stats_controller_keys.dart';
 import '/views/team_setup_page.dart';
+import 'basic_page.dart';
 import 'game_page.dart';
 
-class StartPage extends StatelessWidget {
+class StartPage extends BasicPage {
   StartPage({super.key});
 
   final screenController = Get.put(ScreenController());
@@ -21,101 +22,82 @@ class StartPage extends StatelessWidget {
     return GetBuilder<ScreenController>(
       builder: (c) {
         final shortest = min(c.screenHeight, c.screenWidth);
-        final turnCounter = _storage.read<int>(StatsControllerKeys.keyTurnsCounter) ?? 0;
-
-        print('turnCounter: $turnCounter');
+        final turnCounter =
+            _storage.read<int>(StatsControllerKeys.keyTurnsCounter) ?? 0;
 
         return Scaffold(
-          backgroundColor: Colors.white,
-          body: SafeArea(
-            child: Column(
-              children: [
-                /// ---------------- logo ----------------
-                Expanded(
-                  flex: 4,
-                  child: Center(
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      width: shortest * 0.5,
-                      height: shortest * 0.5,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-
-                /// --------------- przyciski -------------
-                Expanded(
-                  flex: 3,
+            backgroundColor: Colors.white,
+            body: LayoutBuilder(builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _menuButton(
-                        text: 'continue_game'.tr,
-                        onPressed: ((turnCounter > 0) ? () => Get.off(() => const GamePage()) : null),
-                        shortest: shortest,
-                        c: c,
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: shortest * 0.08 +
+                                0.25 * (c.screenHeight - shortest),
+                            bottom: 0.25 * (c.screenHeight - shortest)),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            width: shortest * 0.5,
+                            height: shortest * 0.5,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
-                      SizedBox(
-                        height: (c.screenHeight > c.screenWidth ? 0.016 : 0) *
-                            c.screenHeight,
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: c.screenHeight * 0.04),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            menuButton(
+                              text: 'continue_game'.tr,
+                              onPressed: ((turnCounter > 0)
+                                  ? () => Get.off(() => const GamePage())
+                                  : null),
+                              shortest: shortest,
+                              c: c,
+                            ),
+                            SizedBox(
+                              height: c.screenHeight * 0.01,
+                            ),
+                            menuButton(
+                              text: 'new_game'.tr,
+                              // onPressed: () => Get.off(() => const GamePage()),
+                              onPressed: () => Get.to(() => TeamSetupPage()),
+                              shortest: shortest,
+                              c: c,
+                            ),
+                          ],
+                        ),
                       ),
-                      _menuButton(
-                        text: 'new_game'.tr,
-                        // onPressed: () => Get.off(() => const GamePage()),
-                        onPressed: () => Get.off(() => TeamSetupPage()),
-                        shortest: shortest,
-                        c: c,
-                      ),
+                      _versionLabel(shortest),
                     ],
                   ),
                 ),
-
-                /// ---------- etykieta z wersją ----------
-                _versionLabel(shortest),
-              ],
-            ),
-          ),
-        );
+              );
+            }));
       },
     );
   }
 
-  // ---------------- helper buttonów ----------------
-  Widget _menuButton({
-    required String text,
-    required VoidCallback? onPressed,
-    required double shortest,
-    required ScreenController c,
-  }) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.symmetric(
-          horizontal: c.screenWidth * 0.1,
-          vertical: c.screenHeight * 0.02,
-        ),
-        fixedSize: Size(shortest * 0.72, c.screenHeight * 0.07),
-        textStyle: TextStyle(fontSize: min(shortest * 0.04, 24)),
-      ),
-      child: Text(text),
-    );
-  }
-
-  // -------------- labelka z wersją -----------------
   Widget _versionLabel(double shortest) {
     return FutureBuilder<String>(
       future: _getAppVersion(),
       builder: (context, snap) {
         final txt = switch (snap.connectionState) {
           ConnectionState.waiting => 'loading_version'.tr,
-          ConnectionState.done =>
-          snap.hasError
+          ConnectionState.done => snap.hasError
               ? 'error_version'.tr
               : 'version'.trParams({'version': snap.data ?? ''}),
           _ => '',
         };
         return Padding(
-          padding: EdgeInsets.only(bottom: shortest * 0.08),
+          padding: EdgeInsets.only(bottom: shortest * 0.02),
           child: Text(
             txt,
             style: TextStyle(color: Colors.grey, fontSize: shortest * 0.03),
@@ -128,4 +110,3 @@ class StartPage extends StatelessWidget {
   Future<String> _getAppVersion() async =>
       (await PackageInfo.fromPlatform()).version;
 }
-
