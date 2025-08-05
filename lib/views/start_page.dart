@@ -7,9 +7,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../controllers/screen_controller.dart';
 import '../models/keys/stats_controller_keys.dart';
 import '/views/team_setup_page.dart';
+import 'basic_page.dart';
 import 'game_page.dart';
 
-class StartPage extends StatelessWidget {
+class StartPage extends BasicPage {
   StartPage({super.key});
 
   final screenController = Get.put(ScreenController());
@@ -31,6 +32,7 @@ class StartPage extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
                         padding: EdgeInsets.only(
@@ -52,7 +54,7 @@ class StartPage extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _menuButton(
+                            menuButton(
                               text: 'continue_game'.tr,
                               onPressed: ((turnCounter > 0)
                                   ? () => Get.off(() => const GamePage())
@@ -63,7 +65,7 @@ class StartPage extends StatelessWidget {
                             SizedBox(
                               height: c.screenHeight * 0.01,
                             ),
-                            _menuButton(
+                            menuButton(
                               text: 'new_game'.tr,
                               // onPressed: () => Get.off(() => const GamePage()),
                               onPressed: () => Get.to(() => TeamSetupPage()),
@@ -83,31 +85,6 @@ class StartPage extends StatelessWidget {
     );
   }
 
-  // ---------------- helper buttonów ----------------
-  Widget _menuButton({
-    required String text,
-    required VoidCallback? onPressed,
-    required double shortest,
-    required ScreenController c,
-  }) {
-    double width = 0.62 * shortest;
-    double height = shortest * 0.09;
-
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.symmetric(
-          horizontal: shortest * 0.1,
-          vertical: shortest * 0.02,
-        ),
-        fixedSize: Size(width, height),
-        textStyle: TextStyle(fontSize: min(shortest * 0.04, 20)),
-      ),
-      child: Text(text),
-    );
-  }
-
-  // -------------- labelka z wersją -----------------
   Widget _versionLabel(double shortest) {
     return FutureBuilder<String>(
       future: _getAppVersion(),
@@ -120,7 +97,7 @@ class StartPage extends StatelessWidget {
           _ => '',
         };
         return Padding(
-          padding: EdgeInsets.only(bottom: shortest * 0.002),
+          padding: EdgeInsets.only(bottom: shortest * 0.02),
           child: Text(
             txt,
             style: TextStyle(color: Colors.grey, fontSize: shortest * 0.03),
