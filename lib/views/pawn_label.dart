@@ -21,13 +21,15 @@ class PawnLabel extends StatelessWidget {
   final int currentPlayer;         // 0-Blue, 1-Red, 2-Green, 3-Yellow
   final VoidCallback? regenerate;  // Ewentualne odświeżenie przy błędzie
   final bool waitForMove;
+  final bool lastField;
 
   const PawnLabel({
     super.key,
     required this.fieldValue,
     required this.currentPlayer,
     this.regenerate,
-    this.waitForMove = false
+    this.waitForMove = false,
+    this.lastField = false,
   });
 
   /* ───────────────────── kolory dla cyfr ───────────────────── */
@@ -36,6 +38,13 @@ class PawnLabel extends StatelessWidget {
     Color(0xFF388E3C), // G – Green 700
     Color(0xFFD32F2F), // R – Red 700
     Color(0xFF1976D2), // B – Blue 700
+  ];
+
+  static const _backgroundColors = [
+    Colors.red,
+    Colors.yellow,
+    Colors.green,
+    Colors.blue,
   ];
 
   @override
@@ -66,7 +75,7 @@ class PawnLabel extends StatelessWidget {
             counts[digit],
                 (_) => PawnIcon(
               color: _digitColors[digit],
-              size: iconSize,
+              size: (lastField ? 0.8 : 1) * iconSize ,
               isActive: isActive,
             ),
           ),
@@ -102,13 +111,41 @@ class PawnLabel extends StatelessWidget {
               children: [pawns[3], pawns[0]]),
         ],
       )
-      : Wrap(
+      : (
+          lastField
+          ? Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(flex: 3, child: Container()),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [Expanded(flex: 3, child: Container()), pawns.length >= 3 ? pawns[2] : emptyPawn(iconSize), Expanded(flex: 2, child: Container()), pawns.length >= 2 ? pawns[1] : emptyPawn(iconSize), Expanded(flex: 3, child: Container())]),
+              Expanded(flex: 2, child: Container()),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [Expanded(flex: 3, child: Container()), pawns.length >= 4 ? pawns[3] : emptyPawn(iconSize), Expanded(flex: 2, child: Container()), pawns.isNotEmpty ? pawns[0] : emptyPawn(iconSize), Expanded(flex: 3, child: Container())]),
+              Expanded(flex: 2, child: Container()),
+            ],
+          )
+          : Wrap(
         alignment: WrapAlignment.center,
         spacing: spacing,
         runSpacing: spacing,
         children: pawns.map((p) => Transform.scale(scale: pawnScale, child: p)).toList(),
-      ));
+      ))
+      );
 
+  }
+
+  PawnIcon emptyPawn(double iconSize) {
+    return PawnIcon(
+  color: Colors.transparent,
+  size: 0.8 * iconSize ,
+  isActive: false,
+  );
   }
 
   /* ───────────────────── helpers ───────────────────── */
@@ -131,7 +168,7 @@ class PawnIcon extends StatelessWidget {
   final double size;
   final bool isActive;
 
-  const PawnIcon({
+  const PawnIcon({super.key,
     required this.color,
     required this.size,
     required this.isActive,

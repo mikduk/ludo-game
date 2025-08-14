@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/game_page_controller.dart';
+import '../models/fields.dart';
+import '../models/pawns.dart';
 import 'squares/base_squared.dart';
 import 'squares/board_squared.dart';
 import 'squares/diagonal_squared.dart';
 import 'squares/four_color_squared.dart';
+import 'squares/finish_squared.dart';
 
 class Board extends StatelessWidget {
   const Board(
@@ -96,318 +99,318 @@ class Board extends StatelessWidget {
                 top: t,
                 left: l,
                 child: BoardSquare(
-                    index: 15, size: s + 1, color: Colors.red.shade50)),
+                    field: Field.blue11redEntrance, size: s + 1, color: Colors.red.shade50)),
             Positioned(
                 top: t - s * 1,
                 left: l,
-                child: BoardSquare(index: 16, size: s + 1)),
+                child: BoardSquare(field: Field.blue12, size: s + 1)),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 1,
                 child: BoardSquare(
-                    index: 17, size: s + 1, color: Colors.red.shade100)),
+                    field: Field.redStart, size: s + 1, color: Colors.red.shade100)),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 2,
-                child: BoardSquare(index: 18, size: s + 1)),
+                child: BoardSquare(field: Field.red1, size: s + 1)),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 3,
-                child: BoardSquare(index: 19, size: s + 1)),
+                child: BoardSquare(field: Field.red2, size: s + 1)),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 4,
-                child: BoardSquare(index: 20, size: s + 1)),
+                child: BoardSquare(field: Field.red3, size: s + 1)),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 5,
-                child: BoardSquare(index: 21, size: s + 1)),
+                child: BoardSquare(field: Field.red4, size: s + 1)),
             //
             Positioned(
                 top: t - s * 2,
                 left: l + s * 6,
-                child: BoardSquare(index: 22, size: s + 1)),
+                child: BoardSquare(field: Field.red5, size: s + 1)),
             Positioned(
                 top: t - s * 3,
                 left: l + s * 6,
-                child: BoardSquare(index: 23, size: s + 1)),
+                child: BoardSquare(field: Field.red6, size: s + 1)),
             Positioned(
                 top: t - s * 4,
                 left: l + s * 6,
-                child: BoardSquare(index: 24, size: s + 1)),
+                child: BoardSquare(field: Field.red7, size: s + 1)),
             Positioned(
                 top: t - s * 5,
                 left: l + s * 6,
                 child: BoardSquare(
-                    index: 25, size: s + 1, color: Colors.grey[400])),
+                    field: Field.red8Safe, size: s + 1, color: Colors.grey[400])),
             Positioned(
                 top: t - s * 6,
                 left: l + s * 6,
-                child: BoardSquare(index: 26, size: s + 1)),
+                child: BoardSquare(field: Field.red9, size: s + 1)),
             Positioned(
                 top: t - s * 7,
                 left: l + s * 6,
-                child: BoardSquare(index: 27, size: s + 1)),
+                child: BoardSquare(field: Field.red10, size: s + 1)),
             //
             Positioned(
                 top: t - s * 7,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 28, size: s + 1, color: Colors.green.shade50)),
+                    field: Field.red11greenEntrance, size: s + 1, color: Colors.green.shade50)),
             Positioned(
                 top: t - s * 7,
                 left: l + s * 8,
-                child: BoardSquare(index: 29, size: s + 1)),
+                child: BoardSquare(field: Field.red12, size: s + 1)),
             Positioned(
                 top: t - s * 6,
                 left: l + s * 8,
                 child: BoardSquare(
-                    index: 30, size: s + 1, color: Colors.green.shade100)),
+                    field: Field.greenStart, size: s + 1, color: Colors.green.shade100)),
             Positioned(
                 top: t - s * 5,
                 left: l + s * 8,
-                child: BoardSquare(index: 31, size: s + 1)),
+                child: BoardSquare(field: Field.green1, size: s + 1)),
             Positioned(
                 top: t - s * 4,
                 left: l + s * 8,
-                child: BoardSquare(index: 32, size: s + 1)),
+                child: BoardSquare(field: Field.green2, size: s + 1)),
             Positioned(
                 top: t - s * 3,
                 left: l + s * 8,
-                child: BoardSquare(index: 33, size: s + 1)),
+                child: BoardSquare(field: Field.green3, size: s + 1)),
             Positioned(
                 top: t - s * 2,
                 left: l + s * 8,
-                child: BoardSquare(index: 34, size: s + 1)),
+                child: BoardSquare(field: Field.green4, size: s + 1)),
             //
             Positioned(
                 top: t - s * 1,
                 left: l + s * 9,
-                child: BoardSquare(index: 35, size: s + 1)),
+                child: BoardSquare(field: Field.green5, size: s + 1)),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 10,
-                child: BoardSquare(index: 36, size: s + 1)),
+                child: BoardSquare(field: Field.green6, size: s + 1)),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 11,
-                child: BoardSquare(index: 37, size: s + 1)),
+                child: BoardSquare(field: Field.green7, size: s + 1)),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 12,
                 child: BoardSquare(
-                    index: 38, size: s + 1, color: Colors.grey[400])),
+                    field: Field.green8Safe, size: s + 1, color: Colors.grey[400])),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 13,
-                child: BoardSquare(index: 39, size: s + 1)),
+                child: BoardSquare(field: Field.green9, size: s + 1)),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 14,
-                child: BoardSquare(index: 40, size: s + 1)),
+                child: BoardSquare(field: Field.green10, size: s + 1)),
             Positioned(
                 top: t - s * 0,
                 left: l + s * 14,
                 child: BoardSquare(
-                    index: 41, size: s + 1, color: Colors.yellow.shade50)),
+                    field: Field.green11yellowEntrance, size: s + 1, color: Colors.yellow.shade50)),
             //
             Positioned(
                 top: t + s * 1,
                 left: l + s * 14,
-                child: BoardSquare(index: 42, size: s + 1)),
+                child: BoardSquare(field: Field.green12, size: s + 1)),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 13,
                 child: BoardSquare(
-                    index: 43, size: s + 1, color: Colors.yellow.shade200)),
+                    field: Field.yellowStart, size: s + 1, color: Colors.yellow.shade200)),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 12,
-                child: BoardSquare(index: 44, size: s + 1)),
+                child: BoardSquare(field: Field.yellow1, size: s + 1)),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 11,
-                child: BoardSquare(index: 45, size: s + 1)),
+                child: BoardSquare(field: Field.yellow2, size: s + 1)),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 10,
-                child: BoardSquare(index: 46, size: s + 1)),
+                child: BoardSquare(field: Field.yellow3, size: s + 1)),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 9,
-                child: BoardSquare(index: 47, size: s + 1)),
+                child: BoardSquare(field: Field.yellow4, size: s + 1)),
             //
             Positioned(
                 top: t + s * 2,
                 left: l + s * 8,
-                child: BoardSquare(index: 48, size: s + 1)),
+                child: BoardSquare(field: Field.yellow5, size: s + 1)),
             Positioned(
                 top: t + s * 3,
                 left: l + s * 8,
-                child: BoardSquare(index: 49, size: s + 1)),
+                child: BoardSquare(field: Field.yellow6, size: s + 1)),
             Positioned(
                 top: t + s * 4,
                 left: l + s * 8,
-                child: BoardSquare(index: 50, size: s + 1)),
+                child: BoardSquare(field: Field.yellow7, size: s + 1)),
             Positioned(
                 top: t + s * 5,
                 left: l + s * 8,
                 child: BoardSquare(
-                    index: 51, size: s + 1, color: Colors.grey[400])),
+                    field: Field.yellow8Safe, size: s + 1, color: Colors.grey[400])),
             Positioned(
                 top: t + s * 6,
                 left: l + s * 8,
-                child: BoardSquare(index: 52, size: s + 1)),
+                child: BoardSquare(field: Field.yellow9, size: s + 1)),
             //
             Positioned(
                 top: t + s * 7,
                 left: l + s * 8,
-                child: BoardSquare(index: 53, size: s + 1)),
+                child: BoardSquare(field: Field.yellow10, size: s + 1)),
             Positioned(
                 top: t + s * 7,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 54, size: s + 1, color: Colors.blue.shade50)),
+                    field: Field.yellow11blueEntrance, size: s + 1, color: Colors.blue.shade50)),
             Positioned(
                 top: t + s * 7,
                 left: l + s * 6,
-                child: BoardSquare(index: 55, size: s + 1)),
+                child: BoardSquare(field: Field.yellow12, size: s + 1)),
             //
             Positioned(
                 top: t + s * 6,
                 left: l + s * 6,
                 child: BoardSquare(
-                    index: 4, size: s + 1, color: Colors.blue.shade100)),
+                    field: Field.blueStart, size: s + 1, color: Colors.blue.shade100)),
             Positioned(
                 top: t + s * 5,
                 left: l + s * 6,
-                child: BoardSquare(index: 5, size: s + 1)),
+                child: BoardSquare(field: Field.blue1, size: s + 1)),
             Positioned(
                 top: t + s * 4,
                 left: l + s * 6,
-                child: BoardSquare(index: 6, size: s + 1)),
+                child: BoardSquare(field: Field.blue2, size: s + 1)),
             Positioned(
                 top: t + s * 3,
                 left: l + s * 6,
-                child: BoardSquare(index: 7, size: s + 1)),
+                child: BoardSquare(field: Field.blue3, size: s + 1)),
             Positioned(
                 top: t + s * 2,
                 left: l + s * 6,
-                child: BoardSquare(index: 8, size: s + 1)),
+                child: BoardSquare(field: Field.blue4, size: s + 1)),
             //
             Positioned(
                 top: t + s * 1,
                 left: l + s * 5,
-                child: BoardSquare(index: 9, size: s + 1)),
+                child: BoardSquare(field: Field.blue5, size: s + 1)),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 4,
-                child: BoardSquare(index: 10, size: s + 1)),
+                child: BoardSquare(field: Field.blue6, size: s + 1)),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 3,
-                child: BoardSquare(index: 11, size: s + 1)),
+                child: BoardSquare(field: Field.blue7, size: s + 1)),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 2,
                 child: BoardSquare(
-                    index: 12, size: s + 1, color: Colors.grey[400])),
+                    field: Field.blue8Safe, size: s + 1, color: Colors.grey[400])),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 1,
-                child: BoardSquare(index: 13, size: s + 1)),
+                child: BoardSquare(field: Field.blue9, size: s + 1)),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 0,
-                child: BoardSquare(index: 14, size: s + 1)),
+                child: BoardSquare(field: Field.blue10, size: s + 1)),
             //
             Positioned(
                 top: t + s * 6,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 56, size: s + 1, color: Colors.blue.shade200)),
+                    field: Field.blueCorridor1, size: s + 1, color: Colors.blue.shade200)),
             Positioned(
                 top: t + s * 5,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 57, size: s + 1, color: Colors.blue.shade200)),
+                    field: Field.blueCorridor2, size: s + 1, color: Colors.blue.shade200)),
             Positioned(
                 top: t + s * 4,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 58, size: s + 1, color: Colors.blue.shade200)),
+                    field: Field.blueCorridor3, size: s + 1, color: Colors.blue.shade200)),
             Positioned(
                 top: t + s * 3,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 59, size: s + 1, color: Colors.blue.shade200)),
+                    field: Field.blueCorridor4, size: s + 1, color: Colors.blue.shade200)),
             Positioned(
                 top: t + s * 1,
                 left: l + s * 7,
-                child: BoardSquare(
-                    index: 61, size: s + 1, color: Colors.blue, border: false)),
+                child: FinishSquare(
+                    field: Field.blueFinish, size: s + 1, color: Colors.blue, border: false)),
             Positioned(
                 top: t + s * 2,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 60, size: s + 1, color: Colors.blue.shade200)),
+                    field: Field.blueCorridor5, size: s + 1, color: Colors.blue.shade200)),
             //
             Positioned(
                 top: t + s * 0,
                 left: l + s * 1,
                 child: BoardSquare(
-                    index: 62, size: s + 1, color: Colors.red.shade200)),
+                    field: Field.redCorridor1, size: s + 1, color: Colors.red.shade200)),
             Positioned(
                 top: t + s * 0,
                 left: l + s * 2,
                 child: BoardSquare(
-                    index: 63, size: s + 1, color: Colors.red.shade200)),
+                    field: Field.redCorridor2, size: s + 1, color: Colors.red.shade200)),
             Positioned(
                 top: t + s * 0,
                 left: l + s * 3,
                 child: BoardSquare(
-                    index: 64, size: s + 1, color: Colors.red.shade200)),
+                    field: Field.redCorridor3, size: s + 1, color: Colors.red.shade200)),
             Positioned(
                 top: t + s * 0,
                 left: l + s * 4,
                 child: BoardSquare(
-                    index: 65, size: s + 1, color: Colors.red.shade200)),
+                    field: Field.redCorridor4, size: s + 1, color: Colors.red.shade200)),
             Positioned(
                 top: t + s * 0,
                 left: l + s * 6,
-                child: BoardSquare(
-                    index: 67, size: s + 1, color: Colors.red, border: false)),
+                child: FinishSquare(
+                    field: Field.redFinish, size: s + 1, color: Colors.red, border: false)),
             Positioned(
                 top: t + s * 0,
                 left: l + s * 5,
                 child: BoardSquare(
-                    index: 66, size: s + 1, color: Colors.red.shade200)),
+                    field: Field.redCorridor5, size: s + 1, color: Colors.red.shade200)),
             //
             Positioned(
                 top: t - s * 6,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 68, size: s + 1, color: Colors.green.shade200)),
+                    field: Field.greenCorridor1, size: s + 1, color: Colors.green.shade200)),
             Positioned(
                 top: t - s * 5,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 69, size: s + 1, color: Colors.green.shade200)),
+                    field: Field.greenCorridor2, size: s + 1, color: Colors.green.shade200)),
             Positioned(
                 top: t - s * 4,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 70, size: s + 1, color: Colors.green.shade200)),
+                    field: Field.greenCorridor3, size: s + 1, color: Colors.green.shade200)),
             Positioned(
                 top: t - s * 3,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 71, size: s + 1, color: Colors.green.shade200)),
+                    field: Field.greenCorridor4, size: s + 1, color: Colors.green.shade200)),
             Positioned(
                 top: t - s * 1,
                 left: l + s * 7,
-                child: BoardSquare(
-                    index: 73,
+                child: FinishSquare(
+                    field: Field.greenFinish,
                     size: s + 1,
                     color: Colors.green,
                     border: false)),
@@ -415,33 +418,33 @@ class Board extends StatelessWidget {
                 top: t - s * 2,
                 left: l + s * 7,
                 child: BoardSquare(
-                    index: 72, size: s + 1, color: Colors.green.shade200)),
+                    field: Field.greenCorridor5, size: s + 1, color: Colors.green.shade200)),
             //
             Positioned(
                 top: t + s * 0,
                 left: l + s * 13,
                 child: BoardSquare(
-                    index: 74, size: s + 1, color: Colors.yellow.shade300)),
+                    field: Field.yellowCorridor1, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 0,
                 left: l + s * 12,
                 child: BoardSquare(
-                    index: 75, size: s + 1, color: Colors.yellow.shade300)),
+                    field: Field.yellowCorridor2, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 0,
                 left: l + s * 11,
                 child: BoardSquare(
-                    index: 76, size: s + 1, color: Colors.yellow.shade300)),
+                    field: Field.yellowCorridor3, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 0,
                 left: l + s * 10,
                 child: BoardSquare(
-                    index: 77, size: s + 1, color: Colors.yellow.shade300)),
+                    field: Field.yellowCorridor4, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 0,
                 left: l + s * 8,
-                child: BoardSquare(
-                    index: 79,
+                child: FinishSquare(
+                    field: Field.yellowFinish,
                     size: s + 1,
                     color: Colors.yellow,
                     border: false)),
@@ -449,91 +452,91 @@ class Board extends StatelessWidget {
                 top: t + s * 0,
                 left: l + s * 9,
                 child: BoardSquare(
-                    index: 78, size: s + 1, color: Colors.yellow.shade300)),
+                    field: Field.yellowCorridor5, size: s + 1, color: Colors.yellow.shade300)),
             //
             Positioned(
                 top: t + s * 5.5,
                 left: l + s * 3,
                 child: BaseSquare(
-                    index: 0, size: s + 1, color: Colors.blue.shade200)),
+                    pawn: Pawn.blue1, size: s + 1, color: Colors.blue.shade200)),
             Positioned(
                 top: t + s * 5.5,
                 left: l + s * 4,
                 child: BaseSquare(
-                    index: 1, size: s + 1, color: Colors.blue.shade200)),
+                    pawn: Pawn.blue2, size: s + 1, color: Colors.blue.shade200)),
             Positioned(
                 top: t + s * 6.5,
                 left: l + s * 3,
                 child: BaseSquare(
-                    index: 2, size: s + 1, color: Colors.blue.shade200)),
+                    pawn: Pawn.blue3, size: s + 1, color: Colors.blue.shade200)),
             Positioned(
                 top: t + s * 6.5,
                 left: l + s * 4,
                 child: BaseSquare(
-                    index: 3, size: s + 1, color: Colors.blue.shade200)),
+                    pawn: Pawn.blue4, size: s + 1, color: Colors.blue.shade200)),
             //
             Positioned(
                 top: t - s * 4,
                 left: l + s * 0.5,
                 child: BaseSquare(
-                    index: 4, size: s + 1, color: Colors.red.shade200)),
+                    pawn: Pawn.red1, size: s + 1, color: Colors.red.shade200)),
             Positioned(
                 top: t - s * 4,
                 left: l + s * 1.5,
                 child: BaseSquare(
-                    index: 5, size: s + 1, color: Colors.red.shade200)),
+                    pawn: Pawn.red2, size: s + 1, color: Colors.red.shade200)),
             Positioned(
                 top: t - s * 3,
                 left: l + s * 0.5,
                 child: BaseSquare(
-                    index: 6, size: s + 1, color: Colors.red.shade200)),
+                    pawn: Pawn.red3, size: s + 1, color: Colors.red.shade200)),
             Positioned(
                 top: t - s * 3,
                 left: l + s * 1.5,
                 child: BaseSquare(
-                    index: 7, size: s + 1, color: Colors.red.shade200)),
+                    pawn: Pawn.red4, size: s + 1, color: Colors.red.shade200)),
             //
             Positioned(
                 top: t - s * 6.5,
                 left: l + s * 10,
                 child: BaseSquare(
-                    index: 8, size: s + 1, color: Colors.green.shade200)),
+                    pawn: Pawn.green1, size: s + 1, color: Colors.green.shade200)),
             Positioned(
                 top: t - s * 6.5,
                 left: l + s * 11,
                 child: BaseSquare(
-                    index: 9, size: s + 1, color: Colors.green.shade200)),
+                    pawn: Pawn.green2, size: s + 1, color: Colors.green.shade200)),
             Positioned(
                 top: t - s * 5.5,
                 left: l + s * 10,
                 child: BaseSquare(
-                    index: 10, size: s + 1, color: Colors.green.shade200)),
+                    pawn: Pawn.green3, size: s + 1, color: Colors.green.shade200)),
             Positioned(
                 top: t - s * 5.5,
                 left: l + s * 11,
                 child: BaseSquare(
-                    index: 11, size: s + 1, color: Colors.green.shade200)),
+                    pawn: Pawn.green4, size: s + 1, color: Colors.green.shade200)),
             //
             Positioned(
                 top: t + s * 3,
                 left: l + s * 12.5,
                 child: BaseSquare(
-                    index: 12, size: s + 1, color: Colors.yellow.shade300)),
+                    pawn: Pawn.yellow1, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 3,
                 left: l + s * 13.5,
                 child: BaseSquare(
-                    index: 13, size: s + 1, color: Colors.yellow.shade300)),
+                    pawn: Pawn.yellow2, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 4,
                 left: l + s * 12.5,
                 child: BaseSquare(
-                    index: 14, size: s + 1, color: Colors.yellow.shade300)),
+                    pawn: Pawn.yellow3, size: s + 1, color: Colors.yellow.shade300)),
             Positioned(
                 top: t + s * 4,
                 left: l + s * 13.5,
                 child: BaseSquare(
-                    index: 15, size: s + 1, color: Colors.yellow.shade300)),
+                    pawn: Pawn.yellow4, size: s + 1, color: Colors.yellow.shade300)),
           ],
         ));
   }

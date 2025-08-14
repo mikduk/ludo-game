@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/game_page_controller.dart';
 import '../../controllers/screen_controller.dart';
+import '../../models/pawns.dart';
 import '../pawn_base.dart';
 
 class BaseSquare extends StatelessWidget {
-  final int index;
+  final Pawn pawn;
   final double size;
   final Color? color;
 
-  const BaseSquare({super.key, required this.index, required this.size, this.color});
+  const BaseSquare({super.key, required this.pawn, required this.size, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,7 @@ class BaseSquare extends StatelessWidget {
               color: color ?? Colors.grey.shade100, border: Border.all()),
           child: Center(
             child: PawnBase(
-              letter: showPawn(controller.positionPawns[index]),
+              letter: showPawn(controller.positionPawns[pawn.index]),
               currentPlayer: controller.currentPlayer.value,
               waitForMove: controller.waitForMove.value && controller.score.value == 6 && !controller.bots[controller.getCurrentPlayer()],
             ),
@@ -50,20 +51,20 @@ class BaseSquare extends StatelessWidget {
     if (controller.bots[controller.currentPlayer.value]) {
       return;
     }
-    if (controller.positionPawns[index] >= 4) {
+    if (controller.positionPawns[pawn.index] >= 4) {
       return;
     }
-    controller.printForLogs('|base_squared| [fieldAction] controller.movePawn(pawnNumber: ${index % 4})');
-    await controller.movePawn(pawnNumber: index % 4);
+    controller.printForLogs('|base_squared| [fieldAction] controller.movePawn(pawnNumber: ${pawn.index % 4})');
+    await controller.movePawn(pawnNumber: pawn.index % 4);
   }
 
-  String showPawn(int field) {
+  String showPawn(int playerIndex) {
     try {
-      if (field > 3) {
+      if (playerIndex > 3) {
         return '';
       }
       List<String> names = ['B', 'R', 'G', 'Y'];
-      return names[index ~/ 4];
+      return names[pawn.index ~/ 4];
     } catch (e) {
       print(e);
       return 'E';

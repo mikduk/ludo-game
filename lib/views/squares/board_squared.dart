@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/game_page_controller.dart';
-import '../../controllers/screen_controller.dart';
+import '../../models/fields.dart';
 import '../pawn_label.dart';
 
 class BoardSquare extends StatefulWidget {
-  final int index; // Indeks elementu board, który ma być wyświetlany
+  final Field field;
   final double size;
   final Color? color;
   final bool border;
@@ -15,13 +15,13 @@ class BoardSquare extends StatefulWidget {
 
   const BoardSquare(
       {super.key,
-      required this.index,
+      required this.field,
       required this.size,
       this.color,
       this.border = true,
       this.borderHorizontal = true,
       this.borderVertical = true});
-
+  
   @override
   State<BoardSquare> createState() => _BoardSquareState();
 }
@@ -111,7 +111,7 @@ class _BoardSquareState extends State<BoardSquare>
               ),
               child: Center(
                 child: PawnLabel(
-                  fieldValue: controller.board[widget.index],
+                  fieldValue: controller.board[widget.field.index],
                   currentPlayer: controller.getCurrentPlayer(),
                   regenerate: controller.regenerateBoard,
                   waitForMove: controller.waitForMove.value && !controller.bots[controller.getCurrentPlayer()],
@@ -135,7 +135,7 @@ class _BoardSquareState extends State<BoardSquare>
         int move = controller.whereToGo(position, controller.score.value, cpv);
         possMoves[i] = (position != move) ? move : -1;
       }
-      if (possMoves.contains(widget.index)) {
+      if (possMoves.contains(widget.field.index)) {
         return true;
       }
     }
@@ -144,16 +144,16 @@ class _BoardSquareState extends State<BoardSquare>
 
   // Obsługa kliknięcia na pole
   Future<void> fieldAction(GamePageController controller) async {
-    int result = controller.board[widget.index];
+    int result = controller.board[widget.field.index];
     if (result == 0 || controller.fieldActionFlag.value) {
       return;
     }
-    controller.printForLogs('|fieldAction| ${widget.index}');
+    controller.printForLogs('|fieldAction| ${widget.field.name} (${widget.field.index})');
     int currentPlayerIndex = controller.getCurrentPlayer();
     int foundPawn = -1;
     for (int i = 0; i < 4; i++) {
       if (controller.positionPawns[4 * currentPlayerIndex + i] ==
-          widget.index) {
+          widget.field.index) {
         foundPawn = i;
         break;
       }
