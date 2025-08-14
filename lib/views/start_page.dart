@@ -67,7 +67,6 @@ class StartPage extends BasicPage {
                             ),
                             menuButton(
                               text: 'new_game'.tr,
-                              // onPressed: () => Get.off(() => const GamePage()),
                               onPressed: () => Get.to(() => TeamSetupPage()),
                               shortest: shortest,
                               c: c,

@@ -5,19 +5,20 @@ import '../controllers/screen_controller.dart';
 import '../models/game_modes.dart';
 import 'board.dart';
 import 'expandable_gear_menu.dart';
-import 'player_dice.dart';
 import 'score_board.dart';
 
 class GamePage extends StatelessWidget {
   final List<String>? namesOfPlayers;
   final List<bool>? valuesOfBots;
   final GameModes? gameMode;
+  final bool testMode;
 
   const GamePage({
     super.key,
     this.namesOfPlayers,
     this.valuesOfBots,
     this.gameMode,
+    this.testMode = false
   })  : assert(
           (namesOfPlayers == null &&
                   valuesOfBots == null &&
@@ -35,7 +36,8 @@ class GamePage extends StatelessWidget {
     ? Get.put(GamePageController(
         namesOfPlayers: namesOfPlayers!,
         valuesOfBots: valuesOfBots!,
-        gameMode: gameMode!))
+        gameMode: gameMode!,
+        testMode: testMode))
     : Get.put(GamePageController(clearOnLoad: false));
     final ScreenController screenController = Get.find();
 
