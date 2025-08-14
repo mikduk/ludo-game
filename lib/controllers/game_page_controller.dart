@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../models/fields.dart';
 import '../models/game_modes.dart';
 import '../models/keys/game_page_controller_keys.dart';
 import '../models/players.dart';
@@ -17,6 +18,7 @@ class GamePageController extends GetxController {
   final GameModes gameMode;
   final bool clearOnLoad;
   final bool useGetStorage;
+  final bool testMode;
   final GetStorage _storage = GetStorage();
 
   GamePageController({
@@ -25,6 +27,7 @@ class GamePageController extends GetxController {
     this.gameMode = GameModes.classic,
     this.clearOnLoad = true,
     this.useGetStorage = true,
+    this.testMode = false,
   }) : assert(
           namesOfPlayers.length == valuesOfBots.length,
           'The number of player names must match the number of bot flags.',
@@ -136,6 +139,18 @@ class GamePageController extends GetxController {
     for (int i = 0; i < 16; i++) {
       positionPawns[i] = i ~/ 4;
     }
+
+    if (testMode) {
+      positionPawns[4] = 13;
+      positionPawns[5] = 11;
+      positionPawns[6] = 8;
+      positionPawns[7] = 10;
+      positionPawns[15] = 79;
+      positionPawns[14] = 79;
+      positionPawns[13] = 79;
+      positionPawns[12] = 79;
+    }
+
   }
 
   void regenerateBoard() {
@@ -352,13 +367,13 @@ class GamePageController extends GetxController {
   bool everyoneInFinish({int? player}) {
     player ??= currentPlayer.value;
     int pow = tenPow(player);
-    return (board[61 + player * 6] == 4 * pow);
+    return (board[Field.blueFinish.index + player * 6] == 4 * pow);
   }
 
   bool everyoneInBaseOrFinish({int? player}) {
     player ??= currentPlayer.value;
     int pow = tenPow(player);
-    return (board[player] + board[61 + player * 6] == 4 * pow);
+    return (board[player] + board[Field.blueFinish.index + player * 6] == 4 * pow);
   }
 
   bool onlyYouInBaseOrFinish({int? player}) {
@@ -380,7 +395,7 @@ class GamePageController extends GetxController {
     for (int i = 0; i < 4; i++) {
       int pawnField = positionPawns[4 * player + i];
       if (pawnField != player &&
-          (pawnField + score.value) <= (61 + player * 6)) {
+          (pawnField + score.value) <= (Field.blueFinish.index + player * 6)) {
         return false;
       } else if (score.value == 6 && pawnField == player) {
         return false;
@@ -527,53 +542,63 @@ class GamePageController extends GetxController {
   Future<void> goToFieldAnimate(int from, int to, int pow,
       {Duration delayTime = const Duration(milliseconds: 180)}) async {
     int originalPosition = to;
-    if ([0, 1, 2, 3].contains(to)) {
-      switch (to) {
-        case 0:
-          to = 4;
+    Field originalTo = Field.values[to];
+    Field originalFrom = Field.values[from];
+    if (Field.baseIndexes.contains(to)) {
+      Field toField = Field.values[to];
+      switch (toField) {
+        case Field.blueBase:
+          to = Field.blueStart.index;
           break;
-        case 1:
-          to = 17;
+        case Field.redBase:
+          to = Field.redStart.index;
           break;
-        case 2:
-          to = 30;
+        case Field.greenBase:
+          to = Field.greenStart.index;
           break;
-        case 3:
-          to = 43;
+        case Field.yellowBase:
+          to = Field.yellowStart.index;
+          break;
+        default:
+          printForLogs('|goToFieldAnimate| [if] SYNTAX ERROR (from: ${originalFrom.name}, to: ${originalTo.name}, pow: $pow)');
           break;
       }
-    } else if ([0, 1, 2, 3].contains(from)) {
+    } else if (Field.baseIndexes.contains(from)) {
       soundController.playGoOutSound();
     }
     while (from != to) {
-      if ((3 < from && to < 56 && to == originalPosition) ||
-          (from >= 56 && to >= 56)) {
+      if ((3 < from && to < Field.blueCorridor1.index && to == originalPosition) ||
+          (from >= 56 && to >= Field.blueCorridor1.index)) {
         from++;
-        if (from > 55 && to < 56) {
+        if (from > 55 && to < Field.blueCorridor1.index) {
           from = 4;
         }
         board[from] += pow;
-      } else if (to >= 56) {
+      } else if (to >= Field.blueCorridor1.index) {
         from++;
-        switch (from) {
-          case 16:
-            from = 62;
+        Field fromField = Field.values[from];
+        switch (fromField) {
+          case Field.blue12:
+            from = Field.redCorridor1.index;
             break;
-          case 29:
-            from = 68;
+          case Field.red12:
+            from = Field.greenCorridor1.index;
             break;
-          case 42:
-            from = 74;
+          case Field.green12:
+            from = Field.yellowCorridor1.index;
             break;
-          case 55:
-            from = 56;
+          case Field.yellow12:
+            from = Field.blueCorridor1.index;
+            break;
+          default:
+            printForLogs('|goToFieldAnimate| [while] SYNTAX ERROR (fromField: ${fromField.name})');
             break;
         }
         board[from] += pow;
-      } else if ([0, 1, 2, 3].contains(originalPosition)) {
+      } else if (Field.baseIndexes.contains(originalPosition)) {
         from--;
-        if (from < 4) {
-          from = 55;
+        if (from < Field.yellowBase.index) {
+          from = Field.yellow12.index;
         }
         board[from] += pow;
       } else {
@@ -585,7 +610,12 @@ class GamePageController extends GetxController {
   }
 
   bool canCapture(int x, int pow) {
-    List<int> safeFields = [4, 12, 17, 25, 30, 38, 43, 51];
+    List<int> safeFields = [
+      Field.blueStart.index, Field.blue8Safe.index,
+      Field.redStart.index, Field.red8Safe.index,
+      Field.greenStart.index, Field.green8Safe.index,
+      Field.yellowStart.index, Field.yellow8Safe.index
+    ];
     List<int> attackMoves = [1, 10, 100, 1000];
     List<int> attackMovesA = [
       10,

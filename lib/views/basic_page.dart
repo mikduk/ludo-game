@@ -8,6 +8,7 @@ abstract class BasicPage extends StatelessWidget {
   Widget menuButton({
     required String text,
     required VoidCallback? onPressed,
+    VoidCallback? onLongPressed,
     required double shortest,
     required ScreenController c,
   }) {
@@ -16,6 +17,7 @@ abstract class BasicPage extends StatelessWidget {
 
     return ElevatedButton(
       onPressed: onPressed,
+      onLongPress: onLongPressed,
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(
           horizontal: shortest * 0.1,

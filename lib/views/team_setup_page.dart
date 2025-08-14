@@ -134,6 +134,11 @@ class TeamSetupPage extends BasicPage {
                           namesOfPlayers: teamSetupController.colors,
                           valuesOfBots: teamSetupController.bots,
                           gameMode: teamSetupController.getGameMode())),
+                      onLongPressed: () => Get.offAll(() => GamePage(
+                          namesOfPlayers: const ['Blue Moon', 'Red Monkey', 'Green Day', 'Yellow Frog'],
+                          valuesOfBots: teamSetupController.bots,
+                          gameMode: teamSetupController.getGameMode(),
+                          testMode: true)),
                       shortest: min(c.screenHeight, c.screenWidth),
                       c: c,
                     ),
