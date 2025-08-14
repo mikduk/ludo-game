@@ -7,6 +7,7 @@ import '../models/game_modes.dart';
 import '../models/keys/game_page_controller_keys.dart';
 import '../models/players.dart';
 import '../views/statistics_dialog.dart';
+import 'auto_moves_controller.dart';
 import 'sound_controller.dart';
 import 'stats_controller.dart';
 import 'package:get/get.dart';
@@ -173,6 +174,10 @@ class GamePageController extends GetxController {
   Future<void> rollDicePlayer(
       {int player = -1, int possibilities = 6, int? result}) async {
     if (rollDicePlayerFlag) {
+      return;
+    }
+    if (autoMoves[player]) {
+      printForLogs('|rollDicePlayer| autoMoves[player: $player]');
       return;
     }
     rollDicePlayerFlag = true;
@@ -971,159 +976,31 @@ class GamePageController extends GetxController {
     int pow = tenPow(cpv);
     printForLogs(
         '|doBotTurn|[$hash] if (${waitForMove.value}[waitForMove]): dice: $dice, pow: $pow');
-    if (waitForMove.value) {
-      List<int> possMoves = List.filled(4, -1);
-      for (int i = 0; i < 4; i++) {
-        possMoves[i] = whereToGo(positionPawns[4 * cpv + i], dice, cpv);
-      }
-      printForLogs('|doBotTurn|[$hash] possMoves: $possMoves');
-      if (positionPawns[4 * cpv + 0] == positionPawns[4 * cpv + 1] &&
-          positionPawns[4 * cpv + 1] == positionPawns[4 * cpv + 2] &&
-          positionPawns[4 * cpv + 2] == positionPawns[4 * cpv + 3]) {
-        int r = Random().nextInt(4);
-        // print('|doBotTurn| [IF] r: $r');
-        try {
-          printForLogs('|doBotTurn|[$hash] IF movePawn(pawnNumber: $r)');
-          printForLogs(
-              '|doBotTurn|[$hash] cpv: $cpv (${colors[cpv]}), positionPawns: $positionPawns');
-          await movePawn(pawnNumber: r);
-        } catch (e) {
-          print('426: $e');
-          return await endTurn();
-        }
-      } else {
-        if (!bots[currentPlayer.value] && autoMoves[currentPlayer.value]) {
-          if ((possMoves[0] == positionPawns[4 * cpv + 0] ? 1 : 0) +
-                  (possMoves[1] == positionPawns[4 * cpv + 1] ? 1 : 0) +
-                  (possMoves[2] == positionPawns[4 * cpv + 2] ? 1 : 0) +
-                  (possMoves[3] == positionPawns[4 * cpv + 3] ? 1 : 0) ==
-              3) {
-            for (int i = 0; i < 4; i++) {
-              if (possMoves[i] != positionPawns[4 * cpv + i]) {
-                await movePawn(pawnNumber: i);
-                return;
-              }
-            }
-          } else {
-            int mv = -1;
-            int p = -1;
-            for (int i = 0; i < 4; i++) {
-              if (possMoves[i] != positionPawns[4 * cpv + i]) {
-                if (mv == -1 || mv == possMoves[i]) {
-                  mv = possMoves[i];
-                  p = i;
-                } else {
-                  autoMovesSwitch(cpv);
-                  return;
-                }
-              }
-            }
-            if (p != -1) {
-              await movePawn(pawnNumber: p);
-              return;
-            }
-          }
-          autoMovesSwitch(cpv, inputPlayer: inputPlayer);
-          return;
-        }
-
-        if (dice == 6) {
-          int r = Random().nextInt(4);
-          // print(
-          //     '|doBotTurn| ((${board[cpv]} + ${board[6 * cpv + 61]}) ~/ $pow) > $r | ((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r');
-          if (((board[cpv] + board[6 * cpv + 61]) ~/ pow) > r) {
-            List<int> valuesSix = [0, 1, 2, 3];
-            valuesSix.shuffle(Random());
-            for (int value in valuesSix) {
-              if (possMoves[value] == 13 * cpv + 4) {
-                await movePawn(pawnNumber: value);
-                break;
-              }
-            }
-          }
-        }
-
-        List<int> values = [];
-        for (int value = 0; value < 4; value++) {
-          if (possMoves[value] != positionPawns[4 * cpv + value]) {
-            values.add(value);
-          }
-        }
-        values.shuffle(Random());
-        // print(values);
-
-        /// BICIA
-        for (int value in values) {
-          // print(
-          //     '|BOT| BICIA - canCapture(possMoves[$value], $pow): ${canCapture(possMoves[value], pow)}');
-          if (canCapture(possMoves[value], pow)) {
-            await movePawn(pawnNumber: value);
-            return;
-          }
-        }
-
-        /// KOŃCOWE POLE
-        for (int value in values) {
-          // print(
-          //     '|BOT| KOŃCOWE - possMoves[$value] > 55 : ${possMoves[value] > 55}');
-          if (possMoves[value] > 55 && positionPawns[4 * cpv + value] < 56) {
-            try {
-              await movePawn(pawnNumber: value);
-              return;
-            } on ArgumentError catch (e) {
-              print('Przechwycono błąd: ${e.message}');
-            }
-          }
-        }
-
-        /// KOŃCOWE POLE
-        for (int value in values) {
-          List<int> endFields = [61, 67, 73, 79];
-          if (endFields.contains(possMoves[value])) {
-            try {
-              await movePawn(pawnNumber: value);
-              return;
-            } on ArgumentError catch (e) {
-              print('Przechwycono błąd: ${e.message}');
-            }
-          }
-        }
-
-        /// BEZPIECZNE POLE
-        List<int> safeFields = [4, 12, 17, 25, 30, 38, 43, 51];
-        for (int value in values) {
-          if (safeFields.contains(possMoves[value])) {
-            await movePawn(pawnNumber: value);
-            return;
-          }
-        }
-
-        /// Zostań na bezpiecznym polu
-        for (int value in values) {
-          if (!safeFields.contains(positionPawns[4 * cpv + value])) {
-            try {
-              await movePawn(pawnNumber: value);
-              return;
-            } on ArgumentError catch (e) {
-              print('Przechwycono błąd: ${e.message}');
-            }
-          }
-        }
-
-        /// TODO
-        for (int value in values) {
-          if (possMoves[value] != positionPawns[4 * cpv + value]) {
-            try {
-              await movePawn(pawnNumber: value);
-              return;
-            } on ArgumentError catch (e) {
-              print('Przechwycono błąd: ${e.message}');
-            }
-          }
-        }
-        await endTurn();
-      }
+    if (!waitForMove.value) {
+      return;
     }
+
+    List<int> possMoves = List.filled(4, -1);
+    for (int i = 0; i < 4; i++) {
+      possMoves[i] = whereToGo(positionPawns[4 * cpv + i], dice, cpv);
+    }
+
+    int? p = AutoMovesController.moveIfOnlyOnePossibility(this, cpv, dice);
+    if (p != null) {
+      await movePawn(pawnNumber: p);
+      return;
+    } else if (autoMoves[currentPlayer.value]) {
+      autoMovesSwitch(cpv, inputPlayer: currentPlayer.value);
+      return;
+    }
+
+    p = AutoMovesController.thinkAboutBestMove(this, cpv, dice);
+    if (p != null) {
+      await movePawn(pawnNumber: p);
+      return;
+    }
+
+    await endTurn();
   }
 
   Future<void> clearStorage() async {

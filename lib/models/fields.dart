@@ -81,4 +81,6 @@ enum Field {
   yellowFinish;
 
   static List<int> get baseIndexes => [blueBase.index, redBase.index, greenBase.index, yellowBase.index];
+  static List<int> get safeIndexes => [blueStart.index, blue8Safe.index, redStart.index, red8Safe.index, greenStart.index, green8Safe.index, yellowStart.index, yellow8Safe.index];
+  static List<int> get finishIndexes => [blueFinish.index, redFinish.index, greenFinish.index, yellowFinish.index];
 }
